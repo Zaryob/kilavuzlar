@@ -10,6 +10,7 @@ Docker konteyner'larının en büyük dezavantajı kendi libc kütüphanesini ve
 ## Bir Örnek
 
 Bir uygulama örneği oluşturalım. Mesela, bir merhaba dünya kodu oluşturalım ve bunu `hello.cc` dosyası içerisine yazdıralım.
+
 {% highlight c%}
 #include<iostream>
 
@@ -23,14 +24,13 @@ int main(){
 GCC kullanarak bu kodu derleyelim
 
 {% highlight bash%}
-$ g++ -o hello hello.cc
+g++ -o hello hello.cc
 {% endhighlight %}
 
 Bu şekilde derlemiş olduğumuz kodlar dinamik olarak linklenmiş olur. Ve bu uygulamanın bağımlılıklarını `ldd` ile listeleyelim.
 
 {% highlight bash%}
-
-$ ldd hello
+ldd hello
         linux-vdso.so.1 =>  (0x00007ffc0075c000)
         libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f88c92d0000)
         libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f88c8f06000)
@@ -44,7 +44,7 @@ Eğer ki bu kodu ikili dosyayı `scratch` docker imajı içerisinde çalıştır
  Ancak biz bu uygulamayı statik olarak linklersek bu hataya maruz kalmadan ve imajı şişirmeden ve bağımlılıklarla boğuşmadan ikili çalıştırılabilir dosyalar elde ederiz. Bunun için mevcut komut `-static` parametresi eklemek yeterlidir.
 
 {% highlight bash%}
-$ g++ -o hello -static hello.cc
+g++ -o hello -static hello.cc
 {% endhighlight %}
 
 Şimdi de bağımlılıkları kontrol edelim.
@@ -55,7 +55,7 @@ ldd hello
 
 Bu şekilde statik derlenmiş ikili dosyalar docker imajı içerisinde ek bir dosyaya veya bağımlılığa ihtiyaç duymadan çalışır. Şimdi de bir Dockerfile oluşturalım.
 {% highlight bash%}
-$ cat >> Dockerfile <<EOF
+cat > Dockerfile <<EOF
 FROM scratch
 ADD hello /
 CMD ["/hello"]
@@ -65,13 +65,13 @@ EOF
 Bu Dockerfile ile bir imaj inşaa edelim.
 
 {% highlight bash%}
-$ docker build --tag hello .
+docker build --tag hello .
 {% endhighlight %}
 
 Şimdi de docker imajını çalıştıralım.
 
 {% highlight bash%}
-$ docker run hello
+docker run hello
 Merhaba, dünya!
 {% endhighlight %}
 

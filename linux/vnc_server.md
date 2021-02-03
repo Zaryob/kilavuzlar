@@ -15,18 +15,18 @@ Debian tabanlı sistemler için kurulumu:
 
 Başta depolarımızı güncelleyelim:
 {% highlight bash %}
-$ sudo apt update
+sudo apt update
 {% endhighlight %}
 
 Tightvnc server paketini kuralım.
 {% highlight bash %}
-$ sudo apt install tightvncserver
+sudo apt install tightvncserver
 {% endhighlight %}
 
 Eğer bir masaüstü ortamına sahip değilseniz işleri kolaylaştırmak için xfce kurmanızı öneririm
 
 {% highlight bash %}
-$ sudo apt install xfce4 xfce4-goodies
+sudo apt install xfce4 xfce4-goodies
 {% endhighlight %}
 
 ## VNC Sunucusunu Yapılandırma
@@ -34,21 +34,21 @@ $ sudo apt install xfce4 xfce4-goodies
 VNC sunucusunun kurulumun ardından çalıştırılarak ilk ayarlamalarını yapıyoruz
 
 {% highlight bash %}
-$ vncserver
+vncserver
 {% endhighlight %}
 
 Bu aşamada sizden uzaktan sunucuya bağlanmak için şifre belirlemenizi isteyecek. Şifre girerken girdiğiniz karakterler gösterilmeyecek. O sebeple şifre yazın mesajının ardından neye tıklarsanız tıklayın hareketlenme olmayacaktır
 
-{% highlight bash %}
+```
 You will require a password to access your desktops.
 
 Password:
 Verify:
-{% endhighlight %}
+```
 
 Hemen aynı adım içerisinde sizden ikinci bir şifre isteyip istemediğinizi soran bir mesaj gelecek. Bu ise yönetim koruması şifresi. Zaruri değil hatta uzak sunucu için ise koymamanızı tavsiye ederim. O yüzden ben atlayacağım 
 
-{% highlight bash %}
+```
 auth:  file /home/zaryob/.Xauthority does not exist
 
 New 'X' desktop is your_hostname:1
@@ -56,8 +56,7 @@ New 'X' desktop is your_hostname:1
 Creating default startup script /home/zaryob/.vnc/xstartup
 Starting applications specified in /home/zaryob/.vnc/xstartup
 Log file is /home/zaryob/.vnc/your_hostname:1.log
-{% endhighlight %}
-
+```
 Böylece ilk yapılandırmayı yaptık ancak hala işimiz bitmedi. Farkettiğiniz gibi üstte .Xauthority dosyasının bulunmadığını yani XServer bağlantısı sağlanamadığını bize belirtiyor. Öncelikle vncserver'i kapatacağız ardından da bunun yapılandırmasını yapacağız.
 
 ## VNC Sunucusu için Masaüstü Ortamı yapılandırması
@@ -65,22 +64,23 @@ Böylece ilk yapılandırmayı yaptık ancak hala işimiz bitmedi. Farkettiğini
 Başlangıç olarak vncserveri sonlandıralım.
 
 {% highlight bash %}
-$ vncserver -kill :1
+vncserver -kill :1
 {% endhighlight %}
 
-{% highlight bash %}
+
+```
 Killing Xtightvnc process ID 17731
-{% endhighlight %}
+```
 
 Değişiklikler öncesi vnc-xauth dosyasını yedekleyelim
 {% highlight bash %}
-$ mv ~/.vnc/xstartup ~/.vnc/xstartup.bak
+mv ~/.vnc/xstartup ~/.vnc/xstartup.bak
 {% endhighlight %}
 
 Ardından da Xserver ayarlamasını yapalım.
 
 {% highlight bash %}
-$ cat >>~/.vnc/xstartup <<EOF
+cat > ~/.vnc/xstartup <<EOF
 #!/bin/bash
 xrdb $HOME/.Xresources
 startxfce4 &
@@ -92,23 +92,23 @@ Burada ben startxfce4 yazarak önceki adımda kurduğum masaüstünü tetikleyen
 Üstte yazdığımız betiği çalıştırılabilir hale getirelim 
 
 {% highlight bash %}
-$ sudo chmod +x ~/.vnc/xstartup
+sudo chmod +x ~/.vnc/xstartup
 {% endhighlight %}
 
 ve yeniden çalıştıralım
 
 {% highlight bash %}
-$ vncserver
+vncserver
 {% endhighlight %}
 
 yeniden çalıştırınca çıktımız da şu olacaktır.
 
-{% highlight bash %}
+```
 New 'X' desktop is your_hostname:1
 
 Starting applications specified in /home/zaryob/.vnc/xstartup
 Log file is /home/zaryob/.vnc/your_hostname:1.log
-{% endhighlight %}
+```
 
 
 ## VNC Sunucuna Bağlantı Sağlamak
