@@ -1,5 +1,8 @@
-Debian için depo oluşturma
-==========================
+---
+sort: 5
+---
+
+# Debian için depo oluşturma
 
 Bu dokümanda **debian** için depo oluşturma ve depoyu güncelleme konusu
 anlatılmıştır.

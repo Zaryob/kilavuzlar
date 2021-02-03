@@ -2,5 +2,9 @@
 sort: 1
 ---
 
-# jekyll-template
-My template page for jekyll
+# Kılavuz dosyaları
+
+Genel olarak kullandığım şeylerin kılavuzlandırmasıdır.
+
+{% include list.liquid all=true %}
+
