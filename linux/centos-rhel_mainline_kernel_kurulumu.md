@@ -20,7 +20,7 @@ rpm -Uvh https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
 
 Ve depo kataloglarını yenileyelim.
 ```
-yum refresh
+yum update
 ```
 
 ## Mainline Kerneli Kurmak
