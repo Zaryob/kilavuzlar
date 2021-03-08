@@ -1,5 +1,5 @@
 ---
-sort: 4
+sort: 5
 ---
 
 # CentOS ve RHEL'de Epel Kernel Kurulumu
