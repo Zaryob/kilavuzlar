@@ -23,19 +23,30 @@ sudo apt-get install build-essential cmake unzip pkg-config
 ## Görüntü kodekleri
 
 (Hepsini kurmanız önerilir)
-* Fotoğraf için (JPEG, PNG ve tiff formatı): ```sudo apt-get install libjpeg-dev libpng-dev libtiff-dev/```
+* Fotoğraf için (JPEG, PNG ve tiff formatı): ```sudo apt-get install libjpeg-dev libpng-dev libtiff-dev```
 * Video kayıt için: (Kamera kullanımında önerilir) ``` sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev```
 * Video dosyaları için: (Temel video formatları ve h264) ```sudo apt-get install libxvidcore-dev libx264-dev```
+* Ek kodekler için: ```sudo apt-get install libdc1394-22-dev libtheora-dev libvorbis-dev yasm libopencore-amrnb-dev libopencore-amrwb-dev libxine2-dev```
 
 ## GUI Araçları
 Gui araçlarını kullanacaksanız (Opencv ile pencere içerisinde çıktı almak gibi) GTK kurmanız önerilir
 ```
-sudo apt-get install libgtk-3-dev 
+sudo apt-get install libgtk-3-dev libgtkglext1-dev 
 ```
 
 GTK hatalarını yakalamak için 
 ```
 sudo apt-get install libcanberra-gtk*
+```
+
+QT için:
+```
+sudo apt-get install qt5-default
+```
+
+VT için:
+```
+sudo apt-get install libvtk6-dev
 ```
 
 ## Sayısal optimizasyon araçları
@@ -44,6 +55,12 @@ OpenCV'nin sayısal optimizayon araçları daha pürüzsüz sonuçlar almanızı
 Bunu eklemek için:
 ```
 sudo apt-get install libatlas-base-dev gfortran
+```
+
+## Optimizasyon ve Paralel İşlem
+
+```
+sudo apt-get install -y libtbb-dev libeigen3-dev
 ```
 
 ## Python bindingleri
@@ -56,6 +73,13 @@ sudo apt-get install python3-dev
 Python2 için
 ```
 sudo apt-get install python-dev
+```
+
+# Java Binding
+
+Java bindings:
+```
+sudo apt-get install -y ant default-jdk
 ```
 
 # OpenCV kaynak Kodunu indirme
@@ -160,10 +184,19 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
     -D ENABLE_NEON=ON \
     -D ENABLE_VFPV3=ON \
-    -D BUILD_TESTS=OFF \
+    -D WITH_OPENGL=ON \
+    -D WITH_QT=ON \
+    -D FORCE_VTK=ON \
+    -D WITH_LIBV4L=ON \
+    -D WITH_TBB=ON \
+    -D WITH_GDAL=ON \
+    -D WITH_FFMPEG=0 \
+    -D WITH_XINE=ON \
+    -D BUILD_TESTS=ON \
     -D OPENCV_ENABLE_NONFREE=ON \
-    -D INSTALL_PYTHON_EXAMPLES=OFF \
-    -D BUILD_EXAMPLES=OFF ..
+    -D ENABLE_PRECOMPILED_HEADERS=OFF \
+    -D INSTALL_PYTHON_EXAMPLES=ON \
+    -D BUILD_EXAMPLES=ON ..
 ```
 
 ### İnşaa

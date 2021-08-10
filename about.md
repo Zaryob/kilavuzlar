@@ -1,16 +1,26 @@
 ---
 layout: default
-title: About
+title: Hakkında 
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
 
-You can find the source code for Minima at GitHub:
+Bu dokümantasyon Jekyll kullanılarak oluşturulmuştur.
+
+Bu dokumantasyonda kullanılan, temel bir Jekyll temasıdır. Jekyll temanızı özelleştirme hakkında daha fazla bilgiyi ve temel Jekyll kullanım belgelerini [jekyllrb.com](https://jekyllrb.com/) adresinde bulabilirsiniz.
+
+İş bu tema, `rundocs/jekyll-rtd-theme` temasıdır. Tema, MIT Lisansı koşulları altında açık kaynak olarak mevcuttur. 
+
+  
+`rundocs/jekyll-rtd-theme` temasının kaynak kodunu GitHub'da bulabilirsiniz:
+[rundocs](https://github.com/rundocs/) /
+[jekyll-rtd-theme](https://github.com/rundocs/jekyll-rtd-theme)
+
+Minima temasının kaynak kodunu GitHub'da bulabilirsiniz:
 [jekyll][jekyll-organization] /
 [minima](https://github.com/jekyll/minima)
 
-You can find the source code for Jekyll at GitHub:
+Jekyll yazılımının kaynak kodunu GitHub'da bulabilirsiniz:
 [jekyll][jekyll-organization] /
 [jekyll](https://github.com/jekyll/jekyll)
 
