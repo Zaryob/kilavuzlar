@@ -12,9 +12,10 @@ Gerekli paketlerin kurulması
 
 Aşağıdaki komut ile index almamız için gereken paketi kurabilirsiniz:
 
-``` {.sourceCode .shell}
-$ apt-get instal apt-ftparchive
-```
+{% highlight bash %}
+apt-get instal apt-ftparchive
+{% endhighlight %}
+
 
 Depoyu ağda paylaşmak için web server gerekmektedir.
 
@@ -22,15 +23,16 @@ Depoyu ağda paylaşmak için web server gerekmektedir.
 
 Nginx kurmak için:
 
-``` {.sourceCode .shell}
-$ apt install nginx
-```
+{% highlight bash %}
+apt install nginx
+{% endhighlight %}
+
 
 Apache kurmak için:
 
-``` {.sourceCode .shell}
-$ apt install apache2
-```
+{% highlight bash %}
+apt install apache2
+{% endhighlight %}
 
 Depo ile ilgili temel kavramlar
 -------------------------------
@@ -41,7 +43,7 @@ Deponun bilgilerini **Release** dosyası içinde bulunur.
 
 Deponun temel dizin yapısı şu şekilde özetlenebilir:
 
-``` {.sourceCode .shell}
+{% highlight bash %}
 repository/
 |-- dists
 |   `-- stable
@@ -53,7 +55,8 @@ repository/
     |-- contrib
     |-- main
     `-- non-free
-```
+{% endhighlight %}
+
 
 Depoya **pool** ve **dists** dizinleri içinde olmamak şartı ile
 istediğiniz dosyaları yerleştirebilirsiniz. (örneğin: index.html)
@@ -69,7 +72,7 @@ bulunur.
 
 Örnek depo **dists** dizin yapısı (imzalanmamış depo):
 
-``` {.sourceCode .shell}
+{% highlight bash %}
 dists/
 `-- stable
     |-- Release
@@ -96,7 +99,8 @@ dists/
             `-- Packages.gz
 
 10 directories, 13 files
-```
+{% endhighlight %}
+
 
 ### Pool
 
@@ -132,7 +136,7 @@ Küçük depolar için tüm paketleri tek bir dizine yığabilirsiniz.
 
 Alfabetik kurala göre dizilmiş örnek **pool** dizini:
 
-``` {.sourceCode .shell}
+{% highlight bash %}
 pool/
 |-- contrib
 |-- main
@@ -142,7 +146,8 @@ pool/
 `-- non-free
 
 5 directories, 1 file
-```
+{% endhighlight %}
+
 
 Paketler **paket\_version\_mimari.deb** şeklinde isimlendirilmelidir.
 
@@ -155,7 +160,7 @@ amd64 mimaride ve 1.0 sürümünde olan test adındaki bir paket için
 bilgilerden sonra da dists içerisindeki indexlerin hash değerleri yer
 alır. Örneğin:
 
-``` {.sourceCode .shell}
+{% highlight bash %}
 Origin: Debian
 Label: Debian
 Suite: stable
@@ -211,7 +216,8 @@ SHA512:
   d54bcb50ab9409e3480dc002c520d240a02804ba648b9a581d524e1ae161f33a8d31e2bd4e0528db07c34ef2b0e4c53b7286ebc38fb319ff47be18be9db67db0  1156    main/binary-i386/Packages
   ff4ee4f90b1ecd861d1adedaa6f0d77684c188add447e81f5131ce8e77ede3f4c99762c6e22c7804f11694b57d160ab46f44075a3ff8305fe285bc43f68700d0  820 main/binary-i386/Packages.xz
   07524f649a0ffc66192af4925b750d22ce3fc446eb0d890b473713615fde4b2174214e94bdcdac97b5281e2386c5efaf7a8aa139a03f69c10b6d181e99d81c8a  747 main/binary-i386/Packages.gz
-```
+{% endhighlight %}
+
 
 İndex alınması
 --------------
@@ -224,11 +230,12 @@ içerisindeki isimler aynı olmalıdır.
 pool içerisindeki paket yerleştirme işlemi bittikten sonra şu komutu
 kullanarak index almalıyız:
 
-``` {.sourceCode .shell}
-$ apt-ftparchive -a amd64 packages pool/main > dists/stable/main/binary-amd64/Packages
-$ gzip -k dists/stable/main/binary-amd64/Packages
-$ xz -k dists/stable/main/binary-amd64/Packages
-```
+{% highlight bash %}
+apt-ftparchive -a amd64 packages pool/main > dists/stable/main/binary-amd64/Packages
+gzip -k dists/stable/main/binary-amd64/Packages
+xz -k dists/stable/main/binary-amd64/Packages
+{% endhighlight %}
+
 
 İlk komut ile pool/main içerisindeki paketlerin indexlerini dists
 içerisindeki main bölümüne yerleştiriyoruz. Bu işlem contrib ve non-free
@@ -249,52 +256,54 @@ ile de biçimlendirseniz güzel olur :D
 Başlık dosyamızdaki tarihi sonradan güncelleyebilmek için tarih yerine
 XdateX yazdık. Başlık dosyası içeriği şu şekilde olamalı:
 
-``` {.sourceCode .YAML}
-$ cat baslik
-Origin: Debian
-Label: Debian
-Suite: stable
-Version: 10.5
-Codename: stable
-Changelogs: https://sulincix.github.io
-Date: XdateX
-Acquire-By-Hash: yes
-Architectures: amd64 i386
-Components: main contrib non-free
-Description: Test repository
-```
+{% highlight bash %}
+cat baslik
+    Origin: Debian
+    Label: Debian
+    Suite: stable
+    Version: 10.5
+    Codename: stable
+    Changelogs: https://sulincix.github.io
+    Date: XdateX
+    Acquire-By-Hash: yes
+    Architectures: amd64 i386
+    Components: main contrib non-free
+    Description: Test repository
+{% endhighlight %}
+
 
 Release dosyamızı oluşturmadan önce yardımcı fonksionumuzu tanımlamamız
 gerekmektedir. Bashrc içerisine aşağıdaki fonksionu tanımlayalım. (veya
 betik yazıyorsanız betik içine) Bu fonksion Release dosyasındaki hash
 değerlerinin formatına uygun çıktı üzetebilmemizi sağlar.
 
-``` {.sourceCode .shell}
+{% highlight bash %}
 prepareLine(){
    while read line ; do
        fname=$(echo $line | sed "s/.* //g")
        fhash=$(echo $line | sed "s/ .*//g")
        echo -e "  $fhash\t$(du -bs $fname| sed 's|\./||g')"
    done
-```
+{% endhighlight %}
 
 > }
 
 Başlık ile md5sum birleştirmek için aşağıdakine benzer bir komut dizisi
 kullanabilirsiniz:
 
-``` {.sourceCode .shell}
-$ cat baslik | sed "s/XdateX/$(date -R)/g" > dists/stable/Release
-$ cd dists/stable/
-    $ echo "MD5Sum:" >>  Release
-$ find . -type f | xargs md5sum | prepareLine >> Release
-$ echo "SHA1:" >>  Release
-$ find . -type f | xargs sha1sum | prepareLine >> Release
-$ echo "SHA256:" >>  Release
-$ find . -type f | xargs sha256sum | prepareLine >> Release
-$ echo "SHA512:" >>  Release
-$ find . -type f | xargs sha512sum | prepareLine  >> Release
-```
+{% highlight bash %}
+cat baslik | sed "s/XdateX/$(date -R)/g" > dists/stable/Release
+cd dists/stable/
+echo "MD5Sum:" >>  Release
+find . -type f | xargs md5sum | prepareLine >> Release
+echo "SHA1:" >>  Release
+find . -type f | xargs sha1sum | prepareLine >> Release
+echo "SHA256:" >>  Release
+find . -type f | xargs sha256sum | prepareLine >> Release
+echo "SHA512:" >>  Release
+find . -type f | xargs sha512sum | prepareLine  >> Release
+{% endhighlight %}
+
 
 ### Deponun imzalanması
 
@@ -302,22 +311,24 @@ Depoyu eğer imzalamazsak depoyu güncellerken ve depodan paket kurarken
 uyarı verirler. Eğer gpg anahtarınız mevcutsa şu komutu
 kullanabilirsiniz:
 
-``` {.sourceCode .shell}
-$ gpg --clearsign -o InRelease Release
-$ gpg -abs -o Release.gpg Release
-```
+{% highlight bash %}
+gpg --clearsign -o InRelease Release
+gpg -abs -o Release.gpg Release
+{% endhighlight %}
+
 
 Eğer gpg anahtarınız yoksa oluşturmak için:
 
-``` {.sourceCode .shell}
-$ gpg --gen-key
-```
+{% highlight bash %}
+gpg --gen-key
+{% endhighlight %}
 
 Oluşturduğumuz gpg anahtarını listelemek için:
 
-``` {.sourceCode .shell}
-$ gpg --list-keys
-```
+{% highlight bash %}
+gpg --list-keys
+{% endhighlight %}
+
 
 Bu listede gpg anahtarını id değerleri bulunur. Bu değeri kullanarak gpg
 anahtarımızı dışarı aktarabiliriz. Aktarılan bu anahtar depoyu kullanmak
@@ -325,9 +336,9 @@ isteyen kullanıcılar tarafından anahtar deposuna eklenmelidir.
 
 Elimizdeki gpg anahtarını dışarı aktarmak için:
 
-``` {.sourceCode .shell}
-$ gpg --output Release.key --armor --export gpg_id_değeri
-```
+{% highlight bash %}
+gpg --output Release.key --armor --export gpg_id_değeri
+{% endhighlight %}
 
 Deponun ağda paylaşılması
 -------------------------
@@ -350,19 +361,19 @@ uygulamalılar.
 
 1.  Depoyu imzalayan gpg anahtarını içeri aktarmalılar.
 
-``` {.sourceCode .shell}
-$ wget -O - http://depo_sunucusu/depo_konumu/dists/stable/Release.key | apt-key add -
-```
+{% highlight bash %}
+wget -O - http://depo_sunucusu/depo_konumu/dists/stable/Release.key | apt-key add -
+{% endhighlight %}
 
 2.  /etc/sources.list.d/ dizinine dosya içerisine eklemeliler. (veya
     sources.list dosyasına)
 
-``` {.sourceCode .shell}
-$ echo "deb http://depo_sunucusu/depo_konumu stable main contrib non-free" > /etc/apt/sources.list.d/testrepo.list
-```
+{% highlight bash %}
+echo "deb http://depo_sunucusu/depo_konumu stable main contrib non-free" > /etc/apt/sources.list.d/testrepo.list
+{% endhighlight %}
 
 3.  Depoyu güncellemeliler.
 
-``` {.sourceCode .shell}
-$ apt-get update
-```
+{% highlight bash %}
+apt-get update
+{% endhighlight %}

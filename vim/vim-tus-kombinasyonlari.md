@@ -1,15 +1,15 @@
 ---
-sort: 2
+sort: 1
 ---
 
 # VIM Tuş Kombinasyonları
 
 ## Ekleme moduna geçiş
 
-* **i  (i=insert)**     bulunulan yerde yazma moduna geçer 
+* **i  (i=insert)**     bulunulan yerde yazma moduna geçer
 * **I  (I=insert)**     satır başına gidip yazma moduna geçer
 * **a  (a=append)**     bir sonraki yerden bir karakter sağa kayıp yazma moduna geçer
-* **A  (A=append)**     satır sonuna gidip yazma moduna geçer 
+* **A  (A=append)**     satır sonuna gidip yazma moduna geçer
 * **o**                 aşağıya yeni bir satır ekleyip yazma moduna geçer
 * **O**                 yukarıya bir satır ekleyip yazma moduna geçer
 * **\<ESC\>**             ekleme modundan çıkar
@@ -48,7 +48,7 @@ sort: 2
 * **:marks**          işaretli noktaların listesini gösterir
 
 
-## Silme, kopyalama ve yapıştırma 
+## Silme, kopyalama ve yapıştırma
 
 * **x \<DEL\>**         karakteri sil
 * **X**               önceki karakteri sil
@@ -111,7 +111,7 @@ sort: 2
 * **n**                     bir sonrakini bul
 * **N**                     bir öncekini bul
 * **:s/metin/yeni**         sablona uyan ilk metni, yenisi ile değiştir
-* **:s/metin/yeni/g**       satırda,şablona uyan tüm metinleri, yeni ile değiştir 
+* **:s/metin/yeni/g**       satırda,şablona uyan tüm metinleri, yeni ile değiştir
 * **\*:%s/metin/yeni/g\***  dosyada,şablona uyan tüm metinleri, yeni ile değiştir
 * **:%s/metin/yeni/gc**     dosyada,şablona uyan metinleri, yeni ile değiştir ama önce onay alır
 
@@ -179,7 +179,7 @@ sort: 2
 * **:setlist/nolist**           görünmeyen karakterleri göstermek veya göstermemek için…
 * **ga**                        imlecin altındaki karakterin, karakter kodunu gösterir
 * **:as**                       imlecin altındaki karakterin, karakter kodunu gösterir
-* *\<CTRL\>***n**                 yazma modundayken kelimeyi, var olan kelimelere bakarak tamamlar 
+* *\<CTRL\>***n**                 yazma modundayken kelimeyi, var olan kelimelere bakarak tamamlar
 * *\<CTRL\>***p**                 yazma modundayken kelimeyi, var olan kelimelere bakarak tamamlar
 * **\.**                       son yapılan işlemi tekrarlar
 * **q:**
@@ -201,7 +201,7 @@ sort: 2
 * **zk**                       önceki bloğa geçer
 * *\<CTRL\>***xo**               omnifunc tanımlanmış dosya biçimleri için kod tamamlar
 
-## Macrolar 
+## Macrolar
 
 * **q**                 ilk seferde makro bloğuna gider, bundan sonra girilen ilk harf makronun adı olur, bundan sonra yapılan bütün işlemler makro bloğuna kaydedilir, tekrar q’ye basıldığında makro kaydı sona erer.
 * **\@***\<harf\>*         makroyu çalıştırır
