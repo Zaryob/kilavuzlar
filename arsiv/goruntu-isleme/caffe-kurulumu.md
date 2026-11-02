@@ -1,12 +1,18 @@
 ---
-sort: 2
+title: "Caffe kurulumu"
+permalink: /arsiv/goruntu-isleme/caffe-kurulumu/
+status: arsiv
+reviewed: 2026-11-02
+scope: "BVLC Caffe, Python 2/3.7 ve OpenCV 4 yamaları."
+archive_reason: "Python ABI yolları ve mimariye bağlı kütüphane dizinleri sabit. Bağımlılıklar, yamalar ve test adımları sabitlenmiş bir ortamda doğrulanmalı."
+redirect_from:
+  - "/opencv/Caffe Kurulum Kılavuzu.html"
 ---
 
+# Caffe kurulumu
 
-# Caffe Kurulum Kılavuzu
 
-
-Bağımlılıkları kurun: 
+Bağımlılıkları kurun:
 ---------------------
 
 ```
@@ -22,7 +28,7 @@ sudo apt-get install -y python-dev libgflags-dev libgoogle-glog-dev liblmdb-dev 
 
 sudo pip3 install pyzmq jsonschema pillow numpy scipy ipython jupyter pyyaml
 ```
-# OpenCV'yi kurun:
+## OpenCV'yi kurun:
 
 Eğer depodaki sürümü kullanmak isterseniz
 ```
@@ -30,13 +36,13 @@ sudo apt install libopencv-dev
 ```
 komutu ile kurulum yapabilirsiniz. Elle derleme yapıp en son sürüme sahip olmak için diğer sayfalarda yer alan Opencv kurulum kılavuzuna bakınız.
 
-# Caffe'yi klonlayın:
+## Caffe'yi klonlayın:
 
 ```
 git clone https://github.com/BVLC/caffe
 ```
 
-# Caffeyi yapılandırın:
+## Caffeyi yapılandırın:
 
 Caffe dizinine girip temel configurasyon dosyasını kullanarak ön hazırlık yapın:
 ```
@@ -51,7 +57,7 @@ nano Makefile.config
 
 * (Raspberry pi için) `#CPU_ONLY := 1` yazan satırı `CPU_ONLY := 1` ile değiştirin.
 
-* (Python2 için) `/usr/lib/python2.7/dist-packages/numpy/core/include` yazan satırı eğer pip ile gelen bir sürümü kullanıyorsanız `/usr/local/lib/python2.7/dist-packages/numpy/core/include` ile değiştirin. 
+* (Python2 için) `/usr/lib/python2.7/dist-packages/numpy/core/include` yazan satırı eğer pip ile gelen bir sürümü kullanıyorsanız `/usr/local/lib/python2.7/dist-packages/numpy/core/include` ile değiştirin.
 
 * (Python2 harici bir sürüm kullanmak için) Eğer python2 kullanmayacaksanız:
 
@@ -65,39 +71,39 @@ nano Makefile.config
     #		/usr/lib/python2.7/dist-packages/numpy/core/include
     ```
     şeklinde satır başlarına `#` yazarak python2 desteğini kapatınız.
-    
+
     * Python3 için:
-    
+
     Aşağı satırlarda yer alan `Uncomment to use Python 3 (default is Python 2)` yazan satırın altındaki satırların başında yer alan `#` ibaresini kaldırın. Sonuç şöyle görünmelidir.
-    
+
     ```
     PYTHON_LIBRARIES := boost_python3 python3.7m
     PYTHON_INCLUDE := /usr/include/python3.7m \
                      /usr/lib/python3.7/dist-packages/numpy/core/include
     ```
-    
+
     * Anaconda için:
-    Aşağı satırlarda yer alan 
+    Aşağı satırlarda yer alan
     ```
     # Anaconda Python distribution is quite popular. Include path:
     # Verify anaconda location, sometimes it's in root.
     ```
-    
+
     yazan satırın altındaki satırların başında yer alan `#` ibaresini kaldırın. Sonuç şöyle görünmelidir.
-    
+
     ```
-    ANACONDA_HOME := $(HOME)/anaconda  
+    ANACONDA_HOME := $(HOME)/anaconda
     PYTHON_INCLUDE := $(ANACONDA_HOME)/include \
              $(ANACONDA_HOME)/include/python2.7 \
              $(ANACONDA_HOME)/lib/python2.7/site-packages/numpy/core/include
 
     ```
-    
+
     Not: `$(HOME)/anaconda` ibaresini sizin anaconda kurulumunuz ile değiştirmneyi unutmayınız.
-    
+
 * Include ve library değişkenlerini değiştiriniz:
 ```
-INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial 
+INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial
 LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/arm-linux-gnueabihf/hdf5/serial/
 ```
 
@@ -140,7 +146,7 @@ index c2c919e..b80df28 100644
 -    CV_LOAD_IMAGE_GRAYSCALE);
 +  int cv_read_flag = (is_color ? cv::IMREAD_COLOR :
 +    cv::IMREAD_GRAYSCALE);
- 
+
    cv::Mat cv_img_origin = cv::imread(filename, cv_read_flag);
    if (!cv_img_origin.data) {
 diff --git a//src/caffe/util/io.cpp b/caffe-1.0/src/caffe/util/io.cpp
@@ -188,14 +194,14 @@ olmalıdır [hata kaydı](https://github.com/BVLC/caffe/issues/6680)
 OpenCV 4.x'i elle derledi iseniz
 
 ```
-LIBRARIES += opencv_core opencv_highgui opencv_imgproc 
+LIBRARIES += opencv_core opencv_highgui opencv_imgproc
 ifeq ($(OPENCV_VERSION), 3)
         LIBRARIES += opencv_imgcodecs
 endif
 
 ```
 
-olan kısmı 
+olan kısmı
 
 
 ```
@@ -225,14 +231,13 @@ make pycaffe
 python3 scripts/download_model_binary.py models/bvlc_googlenet
 ```
 
-## Kurulum 
+## Kurulum
 
 
-Protobuf python bindingini kurmak için: 
+Protobuf python bindingini kurmak için:
 ```
 cd python
 
 sudo python3 setup.py install
 ```
 komutlarını işletin.
-

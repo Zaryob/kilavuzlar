@@ -1,11 +1,18 @@
 ---
-sort: 1
+title: "OpenCV kaynak kodundan kurulum"
+permalink: /arsiv/goruntu-isleme/opencv-kurulumu/
+status: arsiv
+reviewed: 2026-11-02
+scope: "OpenCV 4.0.0, Python 2 ve eski APT paket adları."
+archive_reason: "İndirme sürümleri tutarsız; x86 ve ARM derleme seçenekleri karışmış. Sistem pip kurulumu ve sanal ortam bağlantısı yeniden yazılmalı."
+redirect_from:
+  - "/opencv/OpenCV kurulum kılavuzu.html"
 ---
 
-# OpenCV Kurulum Kılavuzu
+# OpenCV kaynak kodundan kurulum
 
 
-İnşaa bağımlılıklarını kurmak 
+İnşaa bağımlılıklarını kurmak
 -----------------------------
 
 
@@ -31,10 +38,10 @@ sudo apt-get install build-essential cmake unzip pkg-config
 ## GUI Araçları
 Gui araçlarını kullanacaksanız (Opencv ile pencere içerisinde çıktı almak gibi) GTK kurmanız önerilir
 ```
-sudo apt-get install libgtk-3-dev libgtkglext1-dev 
+sudo apt-get install libgtk-3-dev libgtkglext1-dev
 ```
 
-GTK hatalarını yakalamak için 
+GTK hatalarını yakalamak için
 ```
 sudo apt-get install libcanberra-gtk*
 ```
@@ -51,7 +58,7 @@ sudo apt-get install libvtk6-dev
 
 ## Sayısal optimizasyon araçları
 
-OpenCV'nin sayısal optimizayon araçları daha pürüzsüz sonuçlar almanızı sağlar ancak totalde hız düşmesine sebep olur. 
+OpenCV'nin sayısal optimizayon araçları daha pürüzsüz sonuçlar almanızı sağlar ancak totalde hız düşmesine sebep olur.
 Bunu eklemek için:
 ```
 sudo apt-get install libatlas-base-dev gfortran
@@ -75,14 +82,14 @@ Python2 için
 sudo apt-get install python-dev
 ```
 
-# Java Binding
+## Java Binding
 
 Java bindings:
 ```
 sudo apt-get install -y ant default-jdk
 ```
 
-# OpenCV kaynak Kodunu indirme
+## OpenCV kaynak Kodunu indirme
 
 En yeni OpenCV sürümünü [Github Sayfası](https://github.com/opencv/opencv/releases) üzerinden belirleyin
 
@@ -102,7 +109,7 @@ mv opencv-4.0.0 opencv
 mv opencv_contrib-4.0.0 opencv_contrib
 ```
 
-# İnşaa
+## İnşaa
 
 ## Ana sisteme inşaa etmek
 Eğer ki virtualenv ile uğraşmak istemiyorsanız benim yönetemimi deneyin.
@@ -112,14 +119,14 @@ Kök sisteme kurmak için
 ```
 sudo pip3 install numpy
 ```
-kullanıcı için kurmak siterseniz de 
+kullanıcı için kurmak siterseniz de
 ```
 pip3 install numpy --user
 ```
 
 ## Virtualenv üzerine inşaa etmek
 
-Virtualenv sayesinde ana sisteminize zarar vermeden python3 tımbırtılarını işletebilirsiniz. 
+Virtualenv sayesinde ana sisteminize zarar vermeden python3 tımbırtılarını işletebilirsiniz.
 
 ### Virtualenv'yi kurun
 

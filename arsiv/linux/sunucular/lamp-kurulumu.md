@@ -1,8 +1,15 @@
 ---
-sort: 2
+title: "LAMP kurulumu"
+permalink: /arsiv/linux/sunucular/lamp-kurulumu/
+status: arsiv
+reviewed: 2026-11-02
+scope: "APT, Apache, MySQL ve PHP; dağıtım sürümü belirtilmemiş."
+archive_reason: "Örnek parola ve root kimlik doğrulama değişikliği gözden geçirilmeli; kurulum sonrası HTTP/PHP/veritabanı doğrulaması eksik."
+redirect_from:
+  - "/linux/lamp_server.html"
 ---
 
-# LAMP sunucusu Kurulumu
+# LAMP kurulumu
 
 "LAMP" dörtlüsü, bir sunucunun dinamik web sitelerini ve web uygulamalarını barındırmasını sağlamak için tipik olarak birlikte kurulan bir grup açık kaynaklı yazılımdır. Bu terim aslında Linux'u,  üzerine kurulan Apache web sunucusuyla site üretmeye hazır hale getirmeyi sağlar. Site verileri bir MySQL veritabanında saklanır ve dinamik içerik PHP tarafından işlenir.
 
@@ -27,7 +34,7 @@ sudo ufw allow in "Apache Full"
 
 ### MySQL Server Kurulumu
 
-Artık web sunucunuz hazır ve çalışır durumda olduğuna göre, MySQL'i kurmanın zamanı geldi. MySQL, bir veritabanı yönetim sistemidir. Temel olarak, sitenizin bilgileri depolayabileceği veritabanlarını düzenleyecek ve bunlara erişim sağlayacaktır. 
+Artık web sunucunuz hazır ve çalışır durumda olduğuna göre, MySQL'i kurmanın zamanı geldi. MySQL, bir veritabanı yönetim sistemidir. Temel olarak, sitenizin bilgileri depolayabileceği veritabanlarını düzenleyecek ve bunlara erişim sağlayacaktır.
 
 ```bash
 sudo apt install mysql-server
@@ -57,7 +64,7 @@ LOW    Length >= 8
 MEDIUM Length >= 8, numeric, mixed case, and special characters
 STRONG Length >= 8, numeric, mixed case, special characters and dictionary file
 
-Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG: 
+Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG:
 ```
 
 Bu aşamada orta uzunlukta bir şifre oluşturalım, bu yüzden 1'e tıklayalım
@@ -66,9 +73,9 @@ Bu aşamada orta uzunlukta bir şifre oluşturalım, bu yüzden 1'e tıklayalım
 Using existing password for root.
 
 Estimated strength of the password: 100
-Change the password for root ? ((Press y|Y for Yes, any other key for No) : 
+Change the password for root ? ((Press y|Y for Yes, any other key for No) :
 ```
-buna da `n` diyelim. Böylece kurulum tamamlanmış oldu. 
+buna da `n` diyelim. Böylece kurulum tamamlanmış oldu.
 
 Şimdi MySQL kullanıcılarını listeleyelim
 

@@ -1,8 +1,15 @@
 ---
-sort: 4
+title: "CentOS/RHEL: eski çekirdekleri kaldırma"
+permalink: /arsiv/linux/cekirdek/eski-cekirdekleri-kaldirma/
+status: arsiv
+reviewed: 2026-11-02
+scope: "Fedora 27/28 ve RHEL/CentOS 6–8 örnekleri."
+archive_reason: "Çalışan çekirdeğin korunması, geri dönüş çekirdeği ve dağıtıma uygun paket kaldırma davranışı doğrulanmalı."
+redirect_from:
+  - "/linux/centos-rhel_eski_kernel.html"
 ---
 
-# CentOS ve RHEL'de Eski Kernel'leri Kaldırma
+# CentOS/RHEL: eski çekirdekleri kaldırma
 
 Bu,  eski çekirdeklerin nasıl silineceği/kaldırılacağı/temizleneceği anlatan hızlı bir kılavuzdur. Burada örnek olarak iki çekirdek kullanıyorum, diğerini daha fazla veya daha az tutmak istiyorsanız, kurulu çekirdek miktarını istediğiniz gibi ayarlayın. Normalde çekirdekleri kaldırmak istemenizin nedeni sınırlı disk alanıdır, örneğin VPS sunucularında ve dizüstü bilgisayarda. Bu çok kolay işlemdir.
 

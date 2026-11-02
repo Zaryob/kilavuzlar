@@ -1,268 +1,162 @@
 ---
-sort: 1
+title: Vim tuş kombinasyonları
+permalink: /vim/vim-tus-kombinasyonlari/
+status: duzenlendi
+reviewed: 2026-11-02
+scope: Eklentisiz Vim; varsayılan tuş eşlemeleri.
+redirect_from:
+  - /vim/vim-tus-kombinasyonlari.html
 ---
 
-# VIM Tuş Kombinasyonları
+# Vim tuş kombinasyonları
 
-## Ekleme moduna geçiş
+Aksi belirtilmedikçe komutlar normal modda kullanılır. `Esc` normal moda döner.
+`Ctrl+w h`, Ctrl ile w'ye birlikte, ardından h'ye basmak anlamına gelir.
+`{n}` sayı, `{harf}` ise sizin seçeceğiniz harf için yer tutucudur.
 
-* **i  (i=insert)**     bulunulan yerde yazma moduna geçer
-* **I  (I=insert)**     satır başına gidip yazma moduna geçer
-* **a  (a=append)**     bir sonraki yerden bir karakter sağa kayıp yazma moduna geçer
-* **A  (A=append)**     satır sonuna gidip yazma moduna geçer
-* **o**                 aşağıya yeni bir satır ekleyip yazma moduna geçer
-* **O**                 yukarıya bir satır ekleyip yazma moduna geçer
-* **\<ESC\>**             ekleme modundan çıkar
+## Yazma ve seçim
 
+- `i` / `a`: imleçten önce / sonra ekleme moduna geçer.
+- `I` / `A`: ilk boşluk olmayan karakterde / satır sonunda ekleme moduna geçer.
+- `o` / `O`: alta / üste yeni satır açar ve ekleme moduna geçer.
+- `v` / `V` / `Ctrl+v`: karakter / satır / blok seçer.
+- `Esc`: ekleme veya seçim modundan çıkar.
 
-## Dosya içinde hareket
+## Hareket
 
-* **h**               sola bir karakter ilerle
-* **l**               sağa bir karakter ilerle
-* **j**               aşağı satıra ilerle
-* **k**               yukarı satıra ilerle
-* *x***h**            x satır yukarı ilerle
-* *x***j**            x satır aşağı ilerle
-* **H**               imleç sayfa başına git
-* *x***H**            imleç sayfa başından x satır aşağıya git
-* **L**               imleç sayfa sonuna git
-* *x***L**            imleç sayfa sonundan x satır yukarıya git
-* **M**               imleç sayfa ortasına git
-* **gg**              dosya başına git
-* **GG**              dosya sonuna git
-* *x***G**            x.satıra git
-* **:***x*            x.satıra git
-* *\<CTRL\>***e**       dosyayı yukarı doğru kaydır(imlecin yeri değişmez)
-* *\<CTRL\>***y**       dosyayı aşağıya doğru kaydır(imlecin yeri değişmez)
-* **zt**              bulunulan satırı sayfanın başında gösterir (imlecin yeri değişmez)
-* **zb**              bulunulan satırı sayfanın sonuna gösterir(imlecin yeri değişmez)
-* **zz**              bulunulan satırı sayfanın ortasına gösterir(imlecin yeri değişmez)
-* **%**               parantezin eşini bulur ve imleci oraya götürür
-* **“**               imlecin bir önceki konumuna geri döner
-* **.**               en son değişikliğin yapıldığı satıra geri döner
-* **f***\<harf\>*       satırda,sağa doğru ilk harfin bulunduğu konuma gider
-* **F***\<harf\>*       satırda,sola doğru ilk harfin bulunduğu konuma gider
-* **ma**              imlecin bulunduğu yeri a noktası olarak işaretle(a..z,A..Z,0..9)(m=mark)
-* **a**               a noktasının bulunduğu satıra git
-* **‘a**              a noktasına git
-* **:marks**          işaretli noktaların listesini gösterir
+- `h`, `j`, `k`, `l`: sola, aşağı, yukarı, sağa gider.
+- `{n}j` / `{n}k`: n satır aşağı / yukarı gider.
+- `w` / `b` / `e`: sonraki kelimenin başına / önceki kelimenin başına / kelime sonuna gider.
+- `0` / `^` / `$`: satır başına / ilk boşluk olmayan karaktere / satır sonuna gider.
+- `gg` / `G`: dosya başına / sonuna gider.
+- `{n}G` veya `:{n}`: n numaralı satıra gider.
+- `H` / `M` / `L`: ekranın üst / orta / alt satırına gider.
+- `{n}H` / `{n}L`: ekranın üstünden / altından n'inci satıra gider.
+- `f{harf}` / `F{harf}`: satırda sağdaki / soldaki eşleşmeye gider.
+- `%`: eşleşen paranteze gider.
+- `Ctrl+e` / `Ctrl+y`: görünümü aşağı / yukarı kaydırır.
+- `zt` / `zz` / `zb`: imlecin satırını ekranın üstüne / ortasına / altına alır.
 
+## İşaretler ve geri dönüş
 
-## Silme, kopyalama ve yapıştırma
+- `ma`: bulunduğunuz konumu `a` işareti olarak kaydeder.
+- `'a`: işaretin satırındaki ilk boşluk olmayan karaktere gider.
+- `` `a ``: işaretin tam konumuna gider.
+- `''`: önceki atlama konumunun satırına döner.
+- `` `. ``: son değişikliğin konumuna gider.
+- `:marks`: işaretleri listeler.
 
-* **x \<DEL\>**         karakteri sil
-* **X**               önceki karakteri sil
-* **dw**              bir sonraki kelimeye kadar sil(w=word)
-* **de**              kelimenin sonuna kadar sil
-* **db**              kelimenin başına kadar sil
-* **dd**              satırı sil
-* **d’a**             a noktasının bulunduğu satırakadar sil
-* **‘a**              a noktasına kadar sil
-* **d^**              bulunulan yerden,satır başına kadar sil
-* **d$**              bulunulan yerden,satır sonuna kadar sil
-* **D**               bulunulan yerden,satır sonuna kadar sil
-* *x***dd**           x satır sil
-* **yl**              harfi kopyala
-* **yw**              bir sonraki kelimeye kadar kopyala
-* **ye**              kelimenin sonuna kadar kopyala
-* **yb**              kelimenin başına kadar kopyala
-* **yy**              satırı kopyala
-* **y’a**             a noktasına kadar kopyala
-* **y^**              bulunulan yerden,satır başına kadar kopyala
-* **y$**              bulunulan yerden,satır sonuna kadar kopyala
-* **p**               bir sonraki pozisyona yapıştır
-* **P**               bir önceki pozisyona yapıştır
-* *x***p**            x kere yapıştır
+## Silme, kopyalama ve değiştirme
 
+- `x` / `X`: imlecin altındaki / önceki karakteri siler.
+- `dw` / `de` / `db`: sonraki kelime başına / kelime sonuna / önceki kelime başına kadar siler.
+- `dd` / `{n}dd`: bir / n satır siler.
+- `d^` / `d$` veya `D`: ilk boşluk olmayan karaktere / satır sonuna kadar siler.
+- `d'a`: işaretin satırına kadar, sınır satırları dahil siler.
+- `yy` / `yw` / `ye` / `yb`: satırı / kelime başına / sonuna / önceki başına kadar kopyalar.
+- `yl` / `y^` / `y$`: karakteri / satırın ilk boşluk olmayan karakterine / sonuna kadar kopyalar.
+- `y'a`: işaretin satırına kadar, sınır satırları dahil kopyalar.
+- `p` / `P`: kopyalanan veya silinen metni sonra / önce yapıştırır.
+- `{n}p`: n kez yapıştırır.
+- `r{harf}`: tek karakteri değiştirir.
+- `R`: üzerine yazma moduna geçer.
+- `cw` / `ce` / `cb`: kelime hareketiyle belirlenen kısmı değiştirir.
+- `cc` / `C`: satırı / satır sonuna kadar olan kısmı değiştirir.
+- Seçim modunda `d` / `c` / `y`: seçimi siler / değiştirir / kopyalar.
 
-## Dosya veya kabuktan veri alma
+## Geri alma ve tekrar
 
-* **:r dosya**     dosyanın içeriğini imleçten sonraki satıra yazar
-* **:r !komut**    komutun çıktısını imleçten sonraki satıra yazar
+- `u`: son değişikliği geri alır.
+- `Ctrl+r`: geri alınan değişikliği yeniden uygular.
+- `.`: son değişikliği tekrarlar.
+- `Ctrl+a` / `Ctrl+x`: imleçteki veya sonrasındaki sayıyı artırır / azaltır.
 
-## Depo kullanarak kopyalama ve yapıştırma
+## Yazmaçlar ve makrolar
 
-* **“add**              silinen satırı ‘a’ kodlu depoya koy
-* **“ayy**              kopyalanan satırı ‘a’ kodlu depoya koy
-* **“ap**               ‘a’ kodlu depodaki veriyi yapıştır
-* **:reg a**            ‘a’ kodlu depoda ne olduğunu gösterir (reg=register)
-* **:reg abcd**         a, b c, d depolarında ne olduğunu gösterir
-* **:reg**              bütün depoları gösterir
-* **a..z, A..Z, 0..9**  depo kodu olarak regex'e uygun olan bütün kopyalama ve yapıştırma komutlarını gösterir
+- `"ayy` / `"add`: satırı `a` yazmacına kopyalar / siler.
+- `"ap`: `a` yazmacını yapıştırır.
+- `:registers` veya `:reg a`: yazmaçları veya `a` yazmacını gösterir.
+- `qa`: `a` yazmacına makro kaydını başlatır; normal modda `q` kaydı bitirir.
+- `@a` / `{n}@a`: makroyu bir / n kez çalıştırır.
+- `@@`: son çalıştırılan makroyu tekrarlar.
 
+## Arama ve değiştirme
 
-## Görsel modda kopyalama ve yapıştırma
+- `/metin` / `?metin`: ileri / geri arar; Enter ile aramayı başlatır.
+- `n` / `N`: arama yönünde / ters yönde sonraki eşleşmeye gider.
+- `*` / `#`: imleçteki kelimeyi ileri / geri arar.
+- `:s/eski/yeni/`: satırdaki ilk eşleşmeyi değiştirir.
+- `:s/eski/yeni/g`: satırdaki bütün eşleşmeleri değiştirir.
+- `:%s/eski/yeni/gc`: dosyadaki eşleşmeleri tek tek onay alarak değiştirir.
+- `q/` / `q?` / `q:`: ileri arama / geri arama / komut geçmişini açar; `:q` kapatır.
+- `:set incsearch`: yazarken eşleşmeyi gösterir.
+- `:set hlsearch` / `:nohlsearch`: eşleşmeleri vurgular / mevcut vurguyu temizler.
+- `:set ignorecase`: büyük-küçük harf farkını yok sayar.
 
-* **v**                 görsel moda geç, karakter seçme
-* **V**                 görsel moda geç, satır satır seç
-* *\<CTRL\>***v**         görsel moda geç, blok seç
-* **d**                 seçimi sil
-* **c**                 seçimi sil ve yazma moduna geç
-* **y**                 seçimi kopyala
-* **p**                 seçimi yapıştır
+Varsayılan arama deseninde `^` satır başını, `$` sonunu, `.` bir karakteri,
+`[abc]` kümedeki bir karakteri, `[^abc]` küme dışındaki bir karakteri belirtir.
+`*` önceki öğeyi sıfır veya daha çok kez tekrarlar; herhangi bir dizi için `.*`
+kullanılır. Desen davranışı `:set magic?` seçeneğine bağlıdır.
 
+## Girinti, görünüm ve tamamlama
 
-## Arama ve otomatik değiştirme
+- `>>` / `<<`: satırı sağa / sola kaydırır.
+- `{n}>>`: n satırı sağa kaydırır.
+- `:set shiftwidth=4` / `:set tabstop=8`: girinti genişliğini / sekme duraklarını ayarlar.
+- `:set number` / `:set nonumber`: satır numaralarını açar / kapatır.
+- `:set list` / `:set nolist`: görünmeyen karakterleri gösterir / gizler.
+- `~`: karakterin büyük-küçük harfini değiştirir.
+- `ga` veya `:ascii`: karakter kodunu gösterir.
+- `Ctrl+l`: ekranı yeniden çizer.
+- Ekleme modunda `Ctrl+n` / `Ctrl+p`: sonraki / önceki kelime tamamlama adayını seçer.
+- Ekleme modunda `Ctrl+x Ctrl+o`: tanımlı `omnifunc` ile tamamlar.
+- `:TOhtml`: ilgili çalışma zamanı eklentisi varsa renklendirilmiş HTML üretir.
 
-* **\***                    imlecin üzerinde bulunduğu kelimenin tekrarını sonra doğru arar
-* **\#**                    imlecin üzerinde bulunduğu kelimenin tekrarını başa doğru arar
-* **/metin**                metini sona doğru ara
-* **?metin**                metin başa doğru ara
-* **n**                     bir sonrakini bul
-* **N**                     bir öncekini bul
-* **:s/metin/yeni**         sablona uyan ilk metni, yenisi ile değiştir
-* **:s/metin/yeni/g**       satırda,şablona uyan tüm metinleri, yeni ile değiştir
-* **\*:%s/metin/yeni/g\***  dosyada,şablona uyan tüm metinleri, yeni ile değiştir
-* **:%s/metin/yeni/gc**     dosyada,şablona uyan metinleri, yeni ile değiştir ama önce onay alır
+## Katlama
 
-## Arama şablonunda kullanılan regex komutları
+- `:set foldmethod=indent`: girintiye göre katlar.
+- `zo` / `zc` / `za`: katı açar / kapatır / durumunu değiştirir.
+- `zO` / `zC`: imleçteki katı ve alt katlarını açar / kapatır.
+- `zR` / `zM`: bütün katları açar / kapatır.
+- `zj` / `zk`: sonraki / önceki kata gider.
 
-* **^**                        satır başı
-* **$**                        satır sonu
-* **\[abc\]**                    bu karakterlerden biri…
-* **\[^abc\]**                   bu karakterlerden hiçbiri…
-* **\.**                       herhangi bir karakter
-* **\***  	                   herhangi bir karakter dizisi
-* **q/** veya */\<CTRL\>***f**   ileriye doğru yapılmış aramaların listesini verir
-* **q?** veya *?\<CTRL\>***f**   geriye doğru yapılmış aramaların listesini verir
-* **:set is**                  şablon yazılırken aramaya başla
-* **:set hls**                 şablona uyanları belirginleştir
-* **:set nohls**               hls modunu kapat
-* **:set ic**                  büyük-küçük harf ayırt etmeden arar
+## Dosya ve kabuk işlemleri
 
-## Kesme ve değiştirme işlemleri
+- `:edit dosya`: dosyayı açar.
+- `:new dosya`: yeni pencerede dosya açar.
+- `:w` / `:w dosya`: kaydeder / belirtilen dosyaya yazar.
+- `:wq` / `:q` / `:q!`: kaydedip kapatır / kapatır / değişiklikleri bırakarak kapatır.
+- `:r dosya`: dosya içeriğini mevcut satırdan sonra ekler.
+- `:r !komut`: komut çıktısını mevcut satırdan sonra ekler.
+- `:!komut` / `:shell`: kabuk komutu / geçici kabuk çalıştırır.
+- `:terminal`: terminal desteği olan Vim'de terminal açar.
+- `:Explore`: netrw varsa dosya tarayıcısını açar.
+- `:Nread scp://kullanici@sunucu/yol/dosya`: netrw ve SSH ile uzak dosyayı okur.
+- `:Nwrite scp://kullanici@sunucu/yol/dosya`: netrw ve SSH ile uzak dosyaya yazar.
 
-* **r\<harf\>**       imlecin bulunduğu harfi sil ve yerine, \<harf\> yaz
-* **R**             yazma moduna geç ve eski metnin üstüne yaz
-* **cw**            bir sonraki kelimeye kadar olan kısmı sil ve yerine, yazılanları yaz
-* **ce**            kelimenin sonuna kadar olan kısmı sil ve yerine, yazılanları yaz
-* **cb**            kelimenin başına kadar olan kısmı sil ve yerine, yazılanları yaz
-* **c’a**           a noktasının bulunduğu satıra kadar sil ve yerine, yazılanları yaz
-* **c`a**           a noktasına kadar sil ve yerine, yazılanları yaz
-* **c^**            satırın başına kadar olan kısmı sil ve yerine, yazılanları yaz
-* **c$**            satırın sonuna kadar olan kısmı sil ve yerine, yazılanları yaz
-* **C**             satırın sonuna kadar olan kısmı sil ve yerine, yazılanları yaz
-* *x***cw**         x kelimeyi sil ve yerine, yazılanları yaz
+## Tamponlar, sekmeler ve pencereler
 
+Tampon dosyanın bellekteki içeriği, pencere bu içeriğin görünümü, sekme ise
+pencere düzenidir.
 
-## Geri Alma - İleri Alma
+- `:ls`: tamponları listeler.
+- `:bnext` / `:bprevious` / `:buffer {n}`: sonraki / önceki / numaralı tampona geçer.
+- `:bdelete` veya `:bdelete {n}`: tamponu listeden kaldırır; kaydedilmemiş değişiklikte uyarır.
+- `:set hidden`: değiştirilmiş tamponu kaydetmeden arka planda tutabilmeyi sağlar.
+- `:tabnew dosya`: yeni sekmede dosya açar.
+- `gt` / `gT` / `:tabclose`: sonraki sekmeye / önceki sekmeye gider / sekmeyi kapatır.
+- `:tabmove {n}`: sekmeyi n'inci sekmenin arkasına taşır; 0 başa taşır.
+- `:vsplit` / `:split`: dikey / yatay böler.
+- `Ctrl+w w` veya `Ctrl+w h/j/k/l`: diğer pencereye / belirtilen yöne geçer.
+- `Ctrl+w +` / `Ctrl+w -`: pencere yüksekliğini artırır / azaltır.
+- `Ctrl+w c`: pencereyi kapatır.
 
-* **u**             yapılan işlemi geri al
-* **U**             satırı, imlecin satıra geldiği andaki şekle geri döndür
-* *\<CTRL\>***r**     undo işlemini geri al
-* *x***u**          son x değişikliği geri al
+## Kaynaklar ve doğrulama
 
-## Biçimlendirme
-
-* **:set expandtab**
-  **:retab**                      tab karakterlerini tab karakterlerini boşluk karakterine çevirir
-* **:set noexpandtab**
-* **:retab**                      uygun sayıda boşluk karakterini tab karakterine çevirir
-* **>>**                          satırı, bir tab aralığı kadar sağa kaydırır
-* **<<**                          satırı, bir tab aralığı kadar sola kaydırır
-* **>***\<sağ ok tuşu\>*            bulunulan satırı kaydırır
-* **>***\<yukarı ok tuşu\>*         bulunulan satır ve bir üst satırı kaydırır
-* **>***\<aşağı ok tuşu\>*          bulunulan satır ve bir alt satırı kaydırır
-* *x***>>**                       x satırı bir tab aralığı kadar kaydırır
-* *x***>** *\<yukarı ok tuşu\>*     bulunulan satır dahil yukarı doğru x satırı sağa kaydırır
-* **:set sw=4**                   tab aralığının kaç karakter uzunluğunda olacağını belirtir (sw=shift width)
-* **:set tabstop=8**              tab ile kaç karakter gidileceğini belirler
-* **:set nu**                     satır numaralarını gösterir (nu=number)
-* **:set nonu**                   satır numaralarını gizler (nonu=no number)
-* **~**                           imlecin üstünde bulunduğu karakteri büyükse küçük, küçükse büyük yapar
-* **:TOhtml**                     metni üretecek HTML kodunu üretir, renklendirmeleri dikkate alır
-
-
-## Yazma/işlem kolaylaştırıcılar
-
-* *\<CTRL\>***l**                 refresh
-* **:setlist/nolist**           görünmeyen karakterleri göstermek veya göstermemek için…
-* **ga**                        imlecin altındaki karakterin, karakter kodunu gösterir
-* **:as**                       imlecin altındaki karakterin, karakter kodunu gösterir
-* *\<CTRL\>***n**                 yazma modundayken kelimeyi, var olan kelimelere bakarak tamamlar
-* *\<CTRL\>***p**                 yazma modundayken kelimeyi, var olan kelimelere bakarak tamamlar
-* **\.**                       son yapılan işlemi tekrarlar
-* **q:**
-* *\<CTRL\>***f**                kullanılmış komutların listesini verir
-* **q**
-* *\<CTRL\>***f**                ileriye doğru yapılmış aramaların listesini verir
-* **q?**
-* **?***\<CTRL\>***f**           geriye doğru yapılmış aramaların listesini verir
-* *\<CTRL\>***c***\<CTRL\>***c**   komut/arama listesinden çıkmak için
-* *\<CTRL\>***x**                imleçin üstünde bulunduğu sayıyı bir azaltır
-* *\<CTRL\>***a**                imleçin üstünde bulunduğu sayıyı bir çoğaltır
-* **:setfoldmethod=indent**    indent’lere göre blokları belirler (Python kodu için…)
-* **zo**                       bloğu açar
-* **zO**                       bütün blokları açar
-* **zc**                       bloğu kapatır
-* **zC**                       bütün blokları kapatır
-* **za**                       açıksa, kapalı; kapalıysa, açık hale getirir
-* **zj**                       sonraki bloğa geçer
-* **zk**                       önceki bloğa geçer
-* *\<CTRL\>***xo**               omnifunc tanımlanmış dosya biçimleri için kod tamamlar
-
-## Macrolar
-
-* **q**                 ilk seferde makro bloğuna gider, bundan sonra girilen ilk harf makronun adı olur, bundan sonra yapılan bütün işlemler makro bloğuna kaydedilir, tekrar q’ye basıldığında makro kaydı sona erer.
-* **\@***\<harf\>*         makroyu çalıştırır
-* **\“***\<harf\>***p**    makro içeriğini metin olarak sayfaya yazar
-* **~/.viminfo**        dosyasından da makro kayıtları görünebilir
-
-
-## Dosya işlemleri
-
-* **:new** *\<DOSYA\>*    yeni dosya oluştur
-* **:S**                dosya tarayıcısını aç. Seçimler için \<ENTER\> kullan
-* **:e** *\<DOSYA\>*      var olan bir dosyayı aç
-* **:w**                yapılan değişiklikleri kaydet
-* **:w** *\<DOSYA\>*      yapılan değişiklikleri ‘dosya’ adı ile kaydet
-* **:wq**               yapılan değişiklikleri kaydedip çık
-* **:q!**               yapılan değişiklikleri kaydetmeden çık
-
-## Uzak dosya sistemleri
-
-* **:Nread** *scp://kullanici@12.12.12.12/klasor/dosya*      dosyaya scp ile uzaktaki makineden açar.
-* **:Nwrite** *scp://kullanici@12.12.12.12/klasor/dosya*     dosyayı scp ile uzaktaki makineye kaydeder.
-
-
-## Birçok dosya ile aynı anda çalışma
-
-* **:bn**         bir sonraki tampon belleğe geç
-* **:bp**         bir önceki tampon belleğe geç
-* **:wn**         değişiklikleri kaydet ve bir sonraki tampon belleğe geç
-* **:wp**         değişiklikleri kaydet ve bir önceki tampon belleğe geç
-* **:bn!**        değişiklikleri kaydetmeden bir sonraki tampon belleğe geç
-* **:bx**         x numaralı tampon belleğe geç
-* **:bd**         tampon bellegi siler
-* **:bd***x*      x numaralı tampon belleği siler
-* **:set hidden** bir tampon bellekten diğerine, değişiklikleri kaydetmeden geçmeye izin verir
-
-
-## Tab’lar ile çalışma
-
-* **:tabedit**                yeni tab oluşturur
-* **:tabnew** *\<DOSYA\>*       yeni tab oluşturur ve dosyayı bu tab’da açar
-* **:tabc**                   tab’ı kapatır
-* **:tabmove**                tab’ı taşı
-* **gt**                      sonraki tab’a git
-* **gT**                      önceki tab’a git
-
-
-## Birçok pencere ile aynı anda çalışma
-
-* **:vsp**                    ekranı dikeyde iki pencereye böL
-* **:sp**                     ekranı yatayda iki pencereye böl
-* *\<CTRL\>***w***\<CTRL\>***w**  diğer pencereye geç
-* *\<CTRL\>***w***\<ok tuşu\>*    ok yönündeki pencereye geç
-* *\<CTRL\>***w***\<hjkl\>*       yön karakterine göre pencereye geç
-* *\<CTRL\>***w** **+**         pencereyi 1 satır uzat
-* *\<CTRL\>***w** **–**         pencereyi 1 satır kısalt
-* *\<CTRL\>***w** **c**         pencereyi kapat
-* **:q**                      pencereyi kapat
-
-
-## Komut satırı
-
-* **:!komut**    komutu çalıştır
-* **:sh**        shell’i çalıştır. Shell’den çıkmak için “exit” komutunu kullan
-* **:term**      öntanımlı kabuk ortamını pencere olarak açar.
+Belgedeki hatalı hareket, işaret, tekrar ve tampon komutları Vim'in kendi
+[hareket](https://vimhelp.org/motion.txt.html),
+[hızlı başvuru](https://vimhelp.org/quickref.txt.html),
+[tekrar](https://vimhelp.org/repeat.txt.html) ve
+[pencere](https://vimhelp.org/windows.txt.html) belgeleriyle karşılaştırılarak düzeltildi.
+Yerel tuş eşlemeleri ve derleme seçenekleri davranışı değiştirebilir; ayrıntılar
+Vim içinde `:help` ile görülebilir.

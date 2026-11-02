@@ -1,8 +1,15 @@
 ---
-sort: 7
+title: "YUM/DNF ile depo işlemleri"
+permalink: /arsiv/linux/paket-yonetimi/yum-dnf-depo-islemleri/
+status: arsiv
+reviewed: 2026-11-02
+scope: "YUM, yum-utils ve RHEL 8 depo örnekleri."
+archive_reason: "YUM ile DNF sürümleri ayrılmalı; topluca depo açma/kapatma örnekleri ve joker karakterlerin kabuk tarafından genişletilmesi gözden geçirilmeli."
+redirect_from:
+  - "/linux/yum-dnf-ile-depo-islemleri.html"
 ---
 
-# YUM/DNF ile Depo İşlemleri
+# YUM/DNF ile depo işlemleri
 
 ## Depoları Listelemek
 
@@ -120,4 +127,3 @@ RHEL spesifik depolar için
 ```shell
 # subscription-manager repos --disable=*
 ```
-

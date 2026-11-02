@@ -1,8 +1,15 @@
 ---
-sort: 8
+title: "CentOS/RHEL: VirtualBox 6.1 kurulumu"
+permalink: /arsiv/linux/sanallastirma/virtualbox-6-1-kurulumu/
+status: arsiv
+reviewed: 2026-11-02
+scope: "VirtualBox 6.1 ve EL tabanlı dağıtımlar."
+archive_reason: "Sabit 6.1 paketi, depo adresi, çekirdek modülleri ve Secure Boot adımları hedef sürümde doğrulanmalı."
+redirect_from:
+  - "/linux/centos-rhel_virtualbox.html"
 ---
 
-# CentOS ve RHEL'de VirtualBox 6.1 Kurulumu
+# CentOS/RHEL: VirtualBox 6.1 kurulumu
 
 
 Virtualbox, Oracle tarafından yayımlanan ve geliştirilen, açık kaynak kodlu bir sanallaştırma programıdır.

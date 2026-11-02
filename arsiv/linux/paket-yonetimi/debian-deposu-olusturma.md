@@ -1,8 +1,15 @@
 ---
-sort: 6
+title: "Debian deposu oluşturma"
+permalink: /arsiv/linux/paket-yonetimi/debian-deposu-olusturma/
+status: arsiv
+reviewed: 2026-11-02
+scope: "Debian 10.5 örneği; apt-ftparchive ve apt-key kullanımı."
+archive_reason: "Paket kurulum komutu, Release dosyasının kendi hash listesine katılması ve anahtar dağıtımı yeniden ele alınmalı. signed-by kullanan, tekrar çalıştırılabilir bir örnek hazırlanmalı."
+redirect_from:
+  - "/linux/debian-depo-olusturma.html"
 ---
 
-# Debian için depo oluşturma
+# Debian deposu oluşturma
 
 Bu dokümanda **debian** için depo oluşturma ve depoyu güncelleme konusu
 anlatılmıştır.
@@ -12,9 +19,9 @@ Gerekli paketlerin kurulması
 
 Aşağıdaki komut ile index almamız için gereken paketi kurabilirsiniz:
 
-{% highlight bash %}
+```bash
 apt-get instal apt-ftparchive
-{% endhighlight %}
+```
 
 
 Depoyu ağda paylaşmak için web server gerekmektedir.
@@ -23,16 +30,16 @@ Depoyu ağda paylaşmak için web server gerekmektedir.
 
 Nginx kurmak için:
 
-{% highlight bash %}
+```bash
 apt install nginx
-{% endhighlight %}
+```
 
 
 Apache kurmak için:
 
-{% highlight bash %}
+```bash
 apt install apache2
-{% endhighlight %}
+```
 
 Depo ile ilgili temel kavramlar
 -------------------------------
@@ -43,7 +50,7 @@ Deponun bilgilerini **Release** dosyası içinde bulunur.
 
 Deponun temel dizin yapısı şu şekilde özetlenebilir:
 
-{% highlight bash %}
+```bash
 repository/
 |-- dists
 |   `-- stable
@@ -55,7 +62,7 @@ repository/
     |-- contrib
     |-- main
     `-- non-free
-{% endhighlight %}
+```
 
 
 Depoya **pool** ve **dists** dizinleri içinde olmamak şartı ile
@@ -72,7 +79,7 @@ bulunur.
 
 Örnek depo **dists** dizin yapısı (imzalanmamış depo):
 
-{% highlight bash %}
+```bash
 dists/
 `-- stable
     |-- Release
@@ -99,7 +106,7 @@ dists/
             `-- Packages.gz
 
 10 directories, 13 files
-{% endhighlight %}
+```
 
 
 ### Pool
@@ -136,7 +143,7 @@ Küçük depolar için tüm paketleri tek bir dizine yığabilirsiniz.
 
 Alfabetik kurala göre dizilmiş örnek **pool** dizini:
 
-{% highlight bash %}
+```bash
 pool/
 |-- contrib
 |-- main
@@ -146,7 +153,7 @@ pool/
 `-- non-free
 
 5 directories, 1 file
-{% endhighlight %}
+```
 
 
 Paketler **paket\_version\_mimari.deb** şeklinde isimlendirilmelidir.
@@ -160,7 +167,7 @@ amd64 mimaride ve 1.0 sürümünde olan test adındaki bir paket için
 bilgilerden sonra da dists içerisindeki indexlerin hash değerleri yer
 alır. Örneğin:
 
-{% highlight bash %}
+```bash
 Origin: Debian
 Label: Debian
 Suite: stable
@@ -216,7 +223,7 @@ SHA512:
   d54bcb50ab9409e3480dc002c520d240a02804ba648b9a581d524e1ae161f33a8d31e2bd4e0528db07c34ef2b0e4c53b7286ebc38fb319ff47be18be9db67db0  1156    main/binary-i386/Packages
   ff4ee4f90b1ecd861d1adedaa6f0d77684c188add447e81f5131ce8e77ede3f4c99762c6e22c7804f11694b57d160ab46f44075a3ff8305fe285bc43f68700d0  820 main/binary-i386/Packages.xz
   07524f649a0ffc66192af4925b750d22ce3fc446eb0d890b473713615fde4b2174214e94bdcdac97b5281e2386c5efaf7a8aa139a03f69c10b6d181e99d81c8a  747 main/binary-i386/Packages.gz
-{% endhighlight %}
+```
 
 
 İndex alınması
@@ -230,11 +237,11 @@ içerisindeki isimler aynı olmalıdır.
 pool içerisindeki paket yerleştirme işlemi bittikten sonra şu komutu
 kullanarak index almalıyız:
 
-{% highlight bash %}
+```bash
 apt-ftparchive -a amd64 packages pool/main > dists/stable/main/binary-amd64/Packages
 gzip -k dists/stable/main/binary-amd64/Packages
 xz -k dists/stable/main/binary-amd64/Packages
-{% endhighlight %}
+```
 
 
 İlk komut ile pool/main içerisindeki paketlerin indexlerini dists
@@ -256,7 +263,7 @@ ile de biçimlendirseniz güzel olur :D
 Başlık dosyamızdaki tarihi sonradan güncelleyebilmek için tarih yerine
 XdateX yazdık. Başlık dosyası içeriği şu şekilde olamalı:
 
-{% highlight bash %}
+```bash
 cat baslik
     Origin: Debian
     Label: Debian
@@ -269,7 +276,7 @@ cat baslik
     Architectures: amd64 i386
     Components: main contrib non-free
     Description: Test repository
-{% endhighlight %}
+```
 
 
 Release dosyamızı oluşturmadan önce yardımcı fonksionumuzu tanımlamamız
@@ -277,21 +284,20 @@ gerekmektedir. Bashrc içerisine aşağıdaki fonksionu tanımlayalım. (veya
 betik yazıyorsanız betik içine) Bu fonksion Release dosyasındaki hash
 değerlerinin formatına uygun çıktı üzetebilmemizi sağlar.
 
-{% highlight bash %}
+```bash
 prepareLine(){
    while read line ; do
        fname=$(echo $line | sed "s/.* //g")
        fhash=$(echo $line | sed "s/ .*//g")
        echo -e "  $fhash\t$(du -bs $fname| sed 's|\./||g')"
    done
-{% endhighlight %}
-
-> }
+}
+```
 
 Başlık ile md5sum birleştirmek için aşağıdakine benzer bir komut dizisi
 kullanabilirsiniz:
 
-{% highlight bash %}
+```bash
 cat baslik | sed "s/XdateX/$(date -R)/g" > dists/stable/Release
 cd dists/stable/
 echo "MD5Sum:" >>  Release
@@ -302,7 +308,7 @@ echo "SHA256:" >>  Release
 find . -type f | xargs sha256sum | prepareLine >> Release
 echo "SHA512:" >>  Release
 find . -type f | xargs sha512sum | prepareLine  >> Release
-{% endhighlight %}
+```
 
 
 ### Deponun imzalanması
@@ -311,23 +317,23 @@ Depoyu eğer imzalamazsak depoyu güncellerken ve depodan paket kurarken
 uyarı verirler. Eğer gpg anahtarınız mevcutsa şu komutu
 kullanabilirsiniz:
 
-{% highlight bash %}
+```bash
 gpg --clearsign -o InRelease Release
 gpg -abs -o Release.gpg Release
-{% endhighlight %}
+```
 
 
 Eğer gpg anahtarınız yoksa oluşturmak için:
 
-{% highlight bash %}
+```bash
 gpg --gen-key
-{% endhighlight %}
+```
 
 Oluşturduğumuz gpg anahtarını listelemek için:
 
-{% highlight bash %}
+```bash
 gpg --list-keys
-{% endhighlight %}
+```
 
 
 Bu listede gpg anahtarını id değerleri bulunur. Bu değeri kullanarak gpg
@@ -336,9 +342,9 @@ isteyen kullanıcılar tarafından anahtar deposuna eklenmelidir.
 
 Elimizdeki gpg anahtarını dışarı aktarmak için:
 
-{% highlight bash %}
+```bash
 gpg --output Release.key --armor --export gpg_id_değeri
-{% endhighlight %}
+```
 
 Deponun ağda paylaşılması
 -------------------------
@@ -361,19 +367,19 @@ uygulamalılar.
 
 1.  Depoyu imzalayan gpg anahtarını içeri aktarmalılar.
 
-{% highlight bash %}
+```bash
 wget -O - http://depo_sunucusu/depo_konumu/dists/stable/Release.key | apt-key add -
-{% endhighlight %}
+```
 
 2.  /etc/sources.list.d/ dizinine dosya içerisine eklemeliler. (veya
     sources.list dosyasına)
 
-{% highlight bash %}
+```bash
 echo "deb http://depo_sunucusu/depo_konumu stable main contrib non-free" > /etc/apt/sources.list.d/testrepo.list
-{% endhighlight %}
+```
 
 3.  Depoyu güncellemeliler.
 
-{% highlight bash %}
+```bash
 apt-get update
-{% endhighlight %}
+```

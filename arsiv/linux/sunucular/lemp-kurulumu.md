@@ -1,10 +1,17 @@
 ---
-sort: 3
+title: "LEMP kurulumu"
+permalink: /arsiv/linux/sunucular/lemp-kurulumu/
+status: arsiv
+reviewed: 2026-11-02
+scope: "APT, Nginx, MySQL ve PHP-FPM; dağıtım sürümü belirtilmemiş."
+archive_reason: "Nginx ile PHP-FPM bağlantısı ve site yapılandırması eksik. Güvenlik duvarında port açmak tek başına TLS sağlamaz. MySQL bölümü LAMP belgesiyle tekrarlanıyor."
+redirect_from:
+  - "/linux/lemp_server.html"
 ---
 
-# LEMP sunucusu Kurulumu
+# LEMP kurulumu
 
-"LEMP" dörtlüsü, LAMP dörtlüsünden farklı olarak Apache yerine Nginx kullanarak oluşturulan bir sunucu dörtlüsüdür. Linux'ta site oluştururken sitenizi Apache üzerinden değil, kurulan Nginx (Engine-X) web sunucusuyla site üretmeye hazır hale getirmeyi sağlar. 
+"LEMP" dörtlüsü, LAMP dörtlüsünden farklı olarak Apache yerine Nginx kullanarak oluşturulan bir sunucu dörtlüsüdür. Linux'ta site oluştururken sitenizi Apache üzerinden değil, kurulan Nginx (Engine-X) web sunucusuyla site üretmeye hazır hale getirmeyi sağlar.
 
 ## Debian Sistemlerinde LEMP Kurulumu
 
@@ -41,7 +48,7 @@ sudo ufw allow in "Nginx Full"
 
 ### MySQL Server Kurulumu
 
-Artık web sunucunuz hazır ve çalışır durumda olduğuna göre, MySQL'i kurmanın zamanı geldi. MySQL, bir veritabanı yönetim sistemidir. Temel olarak, sitenizin bilgileri depolayabileceği veritabanlarını düzenleyecek ve bunlara erişim sağlayacaktır. 
+Artık web sunucunuz hazır ve çalışır durumda olduğuna göre, MySQL'i kurmanın zamanı geldi. MySQL, bir veritabanı yönetim sistemidir. Temel olarak, sitenizin bilgileri depolayabileceği veritabanlarını düzenleyecek ve bunlara erişim sağlayacaktır.
 
 ```bash
 sudo apt install mysql-server
@@ -71,7 +78,7 @@ LOW    Length >= 8
 MEDIUM Length >= 8, numeric, mixed case, and special characters
 STRONG Length >= 8, numeric, mixed case, special characters and dictionary file
 
-Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG: 
+Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG:
 ```
 
 Bu aşamada orta uzunlukta bir şifre oluşturalım, bu yüzden 1'e tıklayalım
@@ -80,9 +87,9 @@ Bu aşamada orta uzunlukta bir şifre oluşturalım, bu yüzden 1'e tıklayalım
 Using existing password for root.
 
 Estimated strength of the password: 100
-Change the password for root ? ((Press y|Y for Yes, any other key for No) : 
+Change the password for root ? ((Press y|Y for Yes, any other key for No) :
 ```
-buna da `n` diyelim. Böylece kurulum tamamlanmış oldu. 
+buna da `n` diyelim. Böylece kurulum tamamlanmış oldu.
 
 Şimdi MySQL kullanıcılarını listeleyelim
 

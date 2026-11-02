@@ -1,8 +1,15 @@
 ---
-sort: 3
+title: "Caffe ile model oluşturma"
+permalink: /arsiv/goruntu-isleme/caffe-model-olusturma/
+status: arsiv
+reviewed: 2026-11-02
+scope: "weiliu89/caffe SSD dalı, Pascal VOC ve LMDB."
+archive_reason: "Metnin işaret ettiği train/test/solver örnekleri depoda yok. Veri seti lisansı, eğitim/doğrulama ayrımı ve çıktı değerlendirmesi tamamlanmalı."
+redirect_from:
+  - "/opencv/Model_Olusturma.html"
 ---
 
-# Caffe ile Model Oluşturma
+# Caffe ile model oluşturma
 
 Bu belge caffemodel objelerinin nasıl oluşturulduğu konusunda detayli bilgiyi içermektedir.
 
@@ -12,7 +19,7 @@ Bu tip veri setlerinde en önemli olan şey elde ettiğimiz data setlerinin ne k
 
 Veri seti oluşturmak için aşağıdaki adımlar izlenir.
 
-1. Veri ağı oluşturma (training) araçlarını kurmak 
+1. Veri ağı oluşturma (training) araçlarını kurmak
 
 Weiliu89'un caffe deposunun ssd branch'ini [Github linkini](https://github.com/weiliu89/caffe/tree/ssd)  kullanarak çekiniz. nşaa adımları depoda yer almakta.
 
@@ -71,7 +78,9 @@ Burada her bir item yukarıdaki Pascal VOC içerisindeki object nesnesinin adlar
 
 
 Bütün fotoğraf dosyaları ile Pascal VOC annotasyonları şu şekilde sıralanmalıdır:
+```text
 images_val/0.jpg annotations_val/0.jpg.xml
+```
 
 c) LMDB oluşturmak için caffe/data/VOC0712 Caffe'nin kaynak kod dizininden create_data.sh aracını kullanmanız gerekir.
 Bu komut dosyası, create_annoset.py dosyasını içinde çağırır, bu nedenle komut dosyasının argümanları olarak iletmeniz gerekenleri kontrol edin
@@ -85,9 +94,11 @@ Ayrıca, LMDB veritabanlarınızın yollarını 2. adımda oluşturduğunuz ger�
 
 Şimdi her şey başlangıç eğitim süreci için yapıldı.
 Terminal'de şu adımları tahip edin:
+```bash
 mkdir -p snapshot
 mkdir -p log
-/path_for_caffe_build_dir/tools/caffe train -solver="solver.prototxt" -gpu 0  2>&1 | tee -a log/log.log
+/path_for_caffe_build_dir/tools/caffe train -solver="solver.prototxt" -gpu 0 2>&1 | tee -a log/log.log
+```
 
 
 Ve bekleyin. İşlemin tamamlanması yaklaşık olarak verilerin ne kadar büyüklükt olduğu ile alakalı olarak birkaç dakika ile birkaç saat hatta belki de birkaç gün sürecektir.

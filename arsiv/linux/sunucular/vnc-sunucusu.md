@@ -1,8 +1,15 @@
 ---
-sort: 1
+title: "VNC sunucusu"
+permalink: /arsiv/linux/sunucular/vnc-sunucusu/
+status: arsiv
+reviewed: 2026-11-02
+scope: "TightVNC ve Xfce; dağıtım sürümü belirtilmemiş."
+archive_reason: "VNC güvenliği ve SSH tünelinin kullanımı hakkındaki açıklamalar düzeltilmeli; sunucunun dinleme adresi ve kimlik doğrulama ayarları doğrulanmalı."
+redirect_from:
+  - "/linux/vnc_server.html"
 ---
 
-# VNC Server
+# VNC sunucusu
 
 
 ## VNC Nedir
@@ -11,31 +18,31 @@ VNC (virtual network computing), ağ üzerinden bilgisayarınızın ekranını y
 
 ## VNC Kurulumu
 
-Debian tabanlı sistemler için kurulumu: 
+Debian tabanlı sistemler için kurulumu:
 
 Başta depolarımızı güncelleyelim:
-{% highlight bash %}
+```bash
 sudo apt update
-{% endhighlight %}
+```
 
 Tightvnc server paketini kuralım.
-{% highlight bash %}
+```bash
 sudo apt install tightvncserver
-{% endhighlight %}
+```
 
 Eğer bir masaüstü ortamına sahip değilseniz işleri kolaylaştırmak için xfce kurmanızı öneririm
 
-{% highlight bash %}
+```bash
 sudo apt install xfce4 xfce4-goodies
-{% endhighlight %}
+```
 
 ## VNC Sunucusunu Yapılandırma
 
 VNC sunucusunun kurulumun ardından çalıştırılarak ilk ayarlamalarını yapıyoruz
 
-{% highlight bash %}
+```bash
 vncserver
-{% endhighlight %}
+```
 
 Bu aşamada sizden uzaktan sunucuya bağlanmak için şifre belirlemenizi isteyecek. Şifre girerken girdiğiniz karakterler gösterilmeyecek. O sebeple şifre yazın mesajının ardından neye tıklarsanız tıklayın hareketlenme olmayacaktır
 
@@ -46,7 +53,7 @@ Password:
 Verify:
 ```
 
-Hemen aynı adım içerisinde sizden ikinci bir şifre isteyip istemediğinizi soran bir mesaj gelecek. Bu ise yönetim koruması şifresi. Zaruri değil hatta uzak sunucu için ise koymamanızı tavsiye ederim. O yüzden ben atlayacağım 
+Hemen aynı adım içerisinde sizden ikinci bir şifre isteyip istemediğinizi soran bir mesaj gelecek. Bu ise yönetim koruması şifresi. Zaruri değil hatta uzak sunucu için ise koymamanızı tavsiye ederim. O yüzden ben atlayacağım
 
 ```
 auth:  file /home/zaryob/.Xauthority does not exist
@@ -63,9 +70,9 @@ Böylece ilk yapılandırmayı yaptık ancak hala işimiz bitmedi. Farkettiğini
 
 Başlangıç olarak vncserveri sonlandıralım.
 
-{% highlight bash %}
+```bash
 vncserver -kill :1
-{% endhighlight %}
+```
 
 
 ```
@@ -73,33 +80,33 @@ Killing Xtightvnc process ID 17731
 ```
 
 Değişiklikler öncesi vnc-xauth dosyasını yedekleyelim
-{% highlight bash %}
+```bash
 mv ~/.vnc/xstartup ~/.vnc/xstartup.bak
-{% endhighlight %}
+```
 
 Ardından da Xserver ayarlamasını yapalım.
 
-{% highlight bash %}
+```bash
 cat > ~/.vnc/xstartup <<EOF
 #!/bin/bash
 xrdb $HOME/.Xresources
 startxfce4 &
 EOF
-{% endhighlight %}
+```
 
 Burada ben startxfce4 yazarak önceki adımda kurduğum masaüstünü tetikleyen komuttur. Diğer masaüstü ortamları için ise araştırıp bulabilirsiniz.
 
-Üstte yazdığımız betiği çalıştırılabilir hale getirelim 
+Üstte yazdığımız betiği çalıştırılabilir hale getirelim
 
-{% highlight bash %}
+```bash
 sudo chmod +x ~/.vnc/xstartup
-{% endhighlight %}
+```
 
 ve yeniden çalıştıralım
 
-{% highlight bash %}
+```bash
 vncserver
-{% endhighlight %}
+```
 
 yeniden çalıştırınca çıktımız da şu olacaktır.
 
@@ -118,9 +125,9 @@ Log file is /home/zaryob/.vnc/your_hostname:1.log
 ### SSH Kullanmak
 GNU/Linux Dağıtımları için ssh komutu vnc sunucusuna bağlanmak için kullanılabilir.
 
-{% highlight bash %}
+```bash
 ssh -L 5901:127.0.0.1:5901 -C -N -l zaryob sunucu_ip_adresi
-{% endhighlight %}
+```
 
 `zaryob` buradaki benim kullanıcı adım siz de bunu kendi sunucunuzdaki kullanıcı adınız ile değiştirebilirsiniz. Bu ssh komutu bir pencere açarak sizi vnc sunucuna bağlayacaktır.
 Bu ssh komutu tünelleme yaparak vnc sunucusuna bağlanacaktır.

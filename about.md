@@ -1,28 +1,18 @@
 ---
-layout: default
-title: Hakkında 
+title: Hakkında
 permalink: /about/
+nav_order: 5
 ---
 
+# Hakkında
 
-Bu dokümantasyon Jekyll kullanılarak oluşturulmuştur.
+Bu depo, Süleyman Poyraz'ın yazılım geliştirme ve sistem yönetimi sırasında
+tuttuğu Türkçe çalışma notlarını içerir.
 
-Bu dokumantasyonda kullanılan, temel bir Jekyll temasıdır. Jekyll temanızı özelleştirme hakkında daha fazla bilgiyi ve temel Jekyll kullanım belgelerini [jekyllrb.com](https://jekyllrb.com/) adresinde bulabilirsiniz.
+Docker ve Vim belgeleri düzenlenmiş kılavuzlardır. Eski veya doğrulanmayı bekleyen
+Linux, OpenCV ve Caffe notları [arşivde](arsiv/README.md) saklanır. Her arşiv
+sayfasında kapsam ve eksikler belirtilir. Kaynak kontrolü ile uygulamalı test
+bilgisi ayrı değerlendirilir.
 
-İş bu tema, `rundocs/jekyll-rtd-theme` temasıdır. Tema, MIT Lisansı koşulları altında açık kaynak olarak mevcuttur. 
-
-  
-`rundocs/jekyll-rtd-theme` temasının kaynak kodunu GitHub'da bulabilirsiniz:
-[rundocs](https://github.com/rundocs/) /
-[jekyll-rtd-theme](https://github.com/rundocs/jekyll-rtd-theme)
-
-Minima temasının kaynak kodunu GitHub'da bulabilirsiniz:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
-
-Jekyll yazılımının kaynak kodunu GitHub'da bulabilirsiniz:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
-
-
-[jekyll-organization]: https://github.com/jekyll
+Site [Jekyll](https://jekyllrb.com/) ile üretilir. Sayfa şablonu ve stiller bu
+depoda tutulur. İçerik ve kaynak kod [MIT lisansı](LICENSE) altındadır.
