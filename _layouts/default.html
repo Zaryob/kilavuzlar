@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang | default: 'tr' }}">
+  <head>
+    {% include console-alternates.html %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{{ '/assets/console/i18n.js' | relative_url }}"></script>
+    <script src="{{ '/assets/console/theme.js' | relative_url }}"></script>
+    <title>{{ page.title | escape }} · {{ site.title | escape }}</title>
+    <meta name="description" content="{{ page.scope | default: site.description | escape }}">
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+    <link rel="stylesheet" href="{{ '/assets/console/theme.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+  </head>
+  <body class="console-site console-guides">
+    <a class="skip-link" href="#icerik"><span data-i18n="Skip to content">İçeriğe geç</span></a>
+    {% include console-header.html %}
+    <div class="guide-shell">
+      <aside class="guide-sidebar" aria-label="Kılavuz dizini" data-i18n-aria-label="Guide directory">
+        <details open class="guide-tree">
+          <summary><span data-i18n="guides/">kılavuzlar/</span></summary>
+          <nav aria-label="Konu ağacı" data-i18n-aria-label="Topic tree">
+            {% assign groups = 'docker,vim,arsiv' | split: ',' %}
+            {% for group in groups %}
+              {% assign prefix = '/' | append: group | append: '/' %}
+              <details class="tree-group"{% unless group == 'arsiv' %} open{% endunless %}{% if group == 'arsiv' and page.url contains '/arsiv/' %} open{% endif %}>
+                <summary><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder"></use></svg><a href="{{ prefix | relative_url }}"{% if page.url == prefix %} aria-current="page"{% endif %}>{{ group }}/</a></summary>
+                {% assign documents = site.pages | sort: 'url' %}
+                {% for item in documents %}
+                  {% if item.url contains prefix and item.url != prefix and item.title and item.layout == 'default' %}
+                    <a href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ item.lang | default: 'tr' }}">{{ item.title | escape }}</span></a>
+                  {% endif %}
+                {% endfor %}
+              </details>
+            {% endfor %}
+            <div class="tree-meta">
+              <a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}><span data-i18n="about">hakkında</span></a>
+              <a href="{{ '/katki/' | relative_url }}"><span data-i18n="contribution guide">katkı rehberi</span></a>
+            </div>
+          </nav>
+        </details>
+      </aside>
+      <main id="icerik" class="guide-content">
+        <p class="guide-breadcrumb"><a href="{{ '/' | relative_url }}">~/kılavuzlar</a>{{ page.url | escape }}</p>
+        <p class="guide-filename"><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg>{{ page.path | escape }}</p>
+        {% capture provenance %}
+        {% if page.status == 'arsiv' %}
+          <aside class="notice archive" aria-label="Arşiv notu" data-i18n-aria-label="Archive note">
+            <strong><span data-i18n="Archive · Revalidation required">Arşiv · Yeniden doğrulama gerekiyor</span></strong>
+            <p lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</p>
+            <p lang="{{ page.lang | default: 'tr' }}">{{ page.archive_reason | escape }}</p>
+            <p><span data-i18n="These commands have not been verified for current systems.">Bu komutlar güncel sistemler için doğrulanmadı.</span> <a href="{{ '/arsiv/' | relative_url }}"><span data-i18n="Archive directory">Arşiv dizini</span></a></p>
+          </aside>
+        {% elsif page.status == 'duzenlendi' %}
+          <p class="notice guide-scope"><span data-i18n="Edited · Scope:">Düzenlendi · Kapsam:</span> <span lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</span></p>
+        {% endif %}
+        {% endcapture %}
+        {% include console-content-language.html %}
+        <article lang="{{ page.lang | default: 'tr' }}">
+          {% if content contains '</h1>' %}
+            {% assign after_title = '</h1>' | append: provenance %}
+            {{ content | replace_first: '</h1>', after_title }}
+          {% else %}
+            {{ provenance }}{{ content }}
+          {% endif %}
+        </article>
+        {% if page.reviewed %}
+          <p class="reviewed"><span data-i18n="Last content review:">Son içerik incelemesi:</span> {{ page.reviewed | date: '%d.%m.%Y' }}.</p>
+        {% endif %}
+        <nav class="guide-related" aria-label="İlgili kaynaklar" data-i18n-aria-label="Related resources"><a href="{{ site.suite_url }}/syscall/"><span data-i18n="Linux system call reference">Linux sistem çağrıları referansı</span></a> · <a href="{{ site.suite_url }}/posts/"><span data-i18n="technical posts">teknik yazılar</span></a></nav>
+      </main>
+    </div>
+    <footer class="console-footer"><span>{{ site.author | escape }} · <a href="{{ '/about/' | relative_url }}"><span data-i18n="About the guides">Kılavuzlar hakkında</span></a></span><span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span></footer>
+    <script src="{{ '/assets/guides.js' | relative_url }}" defer></script>
+  </body>
+</html>

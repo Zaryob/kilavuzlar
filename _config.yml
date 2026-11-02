@@ -1,32 +1,38 @@
-title: Süleyman Poyraz
+title: Kılavuzlar
+author: Süleyman Poyraz
 email: zaryob.dev@gmail.com
-description: >- # this means to ignore newlines until "baseurl:"
- Kişisel olarak oluşturduğum kılavuz dosyalarını içeriyor
-baseurl: "/kilavuzlar" # the subpath of your site, e.g. /blog
-url: "zaryob.github.io" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: pyrz_suleyman
+description: Yazılım geliştirme ve sistem yönetimi üzerine kişisel kılavuzlar.
+lang: tr
+baseurl: "/kilavuzlar"
+url: "https://zaryob.github.io"
 github_username: Zaryob
+markdown: kramdown
+highlighter: rouge
 
-## local method ##
-# theme: jekyll-rtd-theme
-# debug:
-#   compress: false
-#   dist: true
-#   shortcodes: true
-
-## remote method ##
-remote_theme: rundocs/jekyll-rtd-theme
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
 
 readme_index:
   with_frontmatter: true
-
-exclude: [vendor]
-
-exclude:
-  - Gemfile
-  - Gemfile.lock
+relative_links:
+  enabled: true
+  collections: false
 
 plugins:
-  - jemoji
-  - jekyll-avatar
-  - jekyll-mentions
+  - jekyll-readme-index
+  - jekyll-relative-links
+  - jekyll-redirect-from
+
+exclude:
+  - design-qa.md
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+  - scripts
+
+# Common Zaryob navigation; override suite_url for a combined local preview.
+suite_url: "https://zaryob.github.io"
+suite_section: kilavuzlar
