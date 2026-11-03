@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="{{ '/assets/console/i18n.js' | relative_url }}"></script>
     <script src="{{ '/assets/console/theme.js' | relative_url }}"></script>
-    <title>{{ page.title | escape }} · {{ site.title | escape }}</title>
-    <meta name="description" content="{{ page.scope | default: site.description | escape }}">
+    <title>{{ page.title | escape }} · {% if page.lang == 'en' %}Guides{% else %}{{ site.title | escape }}{% endif %}</title>
+    <meta name="description" content="{% if page.lang == 'en' %}{{ page.scope | default: 'Software development and system administration guides by Süleyman Poyraz.' | escape }}{% else %}{{ page.scope | default: site.description | escape }}{% endif %}">
     <link rel="canonical" href="{{ page.url | absolute_url }}">
     <link rel="stylesheet" href="{{ '/assets/console/theme.css' | relative_url }}">
     <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
@@ -20,28 +20,31 @@
         <details open class="guide-tree">
           <summary><span data-i18n="guides/">kılavuzlar/</span></summary>
           <nav aria-label="Konu ağacı" data-i18n-aria-label="Topic tree">
-            {% assign groups = 'docker,vim,arsiv' | split: ',' %}
+            {% assign groups = 'docker,linux,cpp,emacs,sanallastirma,vim,arsiv' | split: ',' %}
+            {% assign directory_lang = page.lang | default: 'tr' %}
+            {% assign language_prefix = '' %}{% if directory_lang == 'en' %}{% assign language_prefix = '/en' %}{% endif %}
             {% for group in groups %}
-              {% assign prefix = '/' | append: group | append: '/' %}
+              {% assign prefix = language_prefix | append: '/' | append: group | append: '/' %}
               <details class="tree-group"{% unless group == 'arsiv' %} open{% endunless %}{% if group == 'arsiv' and page.url contains '/arsiv/' %} open{% endif %}>
                 <summary><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder"></use></svg><a href="{{ prefix | relative_url }}"{% if page.url == prefix %} aria-current="page"{% endif %}>{{ group }}/</a></summary>
                 {% assign documents = site.pages | sort: 'url' %}
                 {% for item in documents %}
-                  {% if item.url contains prefix and item.url != prefix and item.title and item.layout == 'default' %}
+                  {% assign item_lang = item.lang | default: 'tr' %}
+                  {% if item.url contains prefix and item.url != prefix and item.title and item.layout == 'default' and item_lang == directory_lang %}
                     <a href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ item.lang | default: 'tr' }}">{{ item.title | escape }}</span></a>
                   {% endif %}
                 {% endfor %}
               </details>
             {% endfor %}
             <div class="tree-meta">
-              <a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}><span data-i18n="about">hakkında</span></a>
-              <a href="{{ '/katki/' | relative_url }}"><span data-i18n="contribution guide">katkı rehberi</span></a>
+              <a href="{{ language_prefix | append: '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}><span data-i18n="about">hakkında</span></a>
+              <a href="{{ language_prefix | append: '/katki/' | relative_url }}"><span data-i18n="contribution guide">katkı rehberi</span></a>
             </div>
           </nav>
         </details>
       </aside>
       <main id="icerik" class="guide-content">
-        <p class="guide-breadcrumb"><a href="{{ '/' | relative_url }}">~/kılavuzlar</a>{{ page.url | escape }}</p>
+        <p class="guide-breadcrumb"><a href="{{ language_prefix | append: '/' | relative_url }}">~/{% if page.lang == 'en' %}guides{% else %}kılavuzlar{% endif %}</a>{{ page.url | escape }}</p>
         <p class="guide-filename"><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg>{{ page.path | escape }}</p>
         {% capture provenance %}
         {% if page.status == 'arsiv' %}
@@ -49,7 +52,7 @@
             <strong><span data-i18n="Archive · Revalidation required">Arşiv · Yeniden doğrulama gerekiyor</span></strong>
             <p lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</p>
             <p lang="{{ page.lang | default: 'tr' }}">{{ page.archive_reason | escape }}</p>
-            <p><span data-i18n="These commands have not been verified for current systems.">Bu komutlar güncel sistemler için doğrulanmadı.</span> <a href="{{ '/arsiv/' | relative_url }}"><span data-i18n="Archive directory">Arşiv dizini</span></a></p>
+            <p><span data-i18n="These commands have not been verified for current systems.">Bu komutlar güncel sistemler için doğrulanmadı.</span> <a href="{{ language_prefix | append: '/arsiv/' | relative_url }}"><span data-i18n="Archive directory">Arşiv dizini</span></a></p>
           </aside>
         {% elsif page.status == 'duzenlendi' %}
           <p class="notice guide-scope"><span data-i18n="Edited · Scope:">Düzenlendi · Kapsam:</span> <span lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</span></p>
@@ -70,7 +73,7 @@
         <nav class="guide-related" aria-label="İlgili kaynaklar" data-i18n-aria-label="Related resources"><a href="{{ site.suite_url }}/syscall/"><span data-i18n="Linux system call reference">Linux sistem çağrıları referansı</span></a> · <a href="{{ site.suite_url }}/posts/"><span data-i18n="technical posts">teknik yazılar</span></a></nav>
       </main>
     </div>
-    <footer class="console-footer"><span>{{ site.author | escape }} · <a href="{{ '/about/' | relative_url }}"><span data-i18n="About the guides">Kılavuzlar hakkında</span></a></span><span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span></footer>
+    <footer class="console-footer"><span>{{ site.author | escape }} · <a href="{{ language_prefix | append: '/about/' | relative_url }}"><span data-i18n="About the guides">Kılavuzlar hakkında</span></a></span><span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span></footer>
     <script src="{{ '/assets/guides.js' | relative_url }}" defer></script>
   </body>
 </html>
