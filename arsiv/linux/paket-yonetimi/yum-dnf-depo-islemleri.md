@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-paket-yonetimi-yum-dnf-depo-islemleri
+lang: tr
 title: "YUM/DNF ile depo işlemleri"
 permalink: /arsiv/linux/paket-yonetimi/yum-dnf-depo-islemleri/
 status: arsiv

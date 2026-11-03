@@ -1,4 +1,6 @@
 ---
+translation_key: guide-CONTRIBUTING
+lang: tr
 title: Katkı ve bakım kuralları
 permalink: /katki/
 ---
@@ -58,3 +60,13 @@ python3 scripts/check_site.py _site --baseurl /kilavuzlar
 Kontrol betiği yerel sayfa, görsel, stil, sayfa içi bağlantı ve yönlendirme
 hedeflerini denetler. Harici sitelerin güncelliği ve kılavuz komutlarının
 çalışması ayrıca kontrol edilmelidir.
+
+## Dil sürümleri
+
+Türkçe kaynak dosyayı konu klasöründe, İngilizce karşılığını aynı dosya yapısıyla
+`en/` altında tutun. İkisine aynı `translation_key`, kendi dilleri için `lang: tr`
+ve `lang: en` ekleyin. İngilizce kalıcı adresin başına `/en` gelir; özgün adres ve
+yönlendirmeler Türkçe dosyada kalır. Kod örneklerini iki sürümde de birebir koruyun.
+Çeviri tarihini `translated` ile belirtin; yalnızca çeviri yapıldığı için `reviewed`
+tarihini veya belgenin doğrulama iddiasını değiştirmeyin. Kapsam ve arşiv gerekçesi
+alanlarını da çevirin. Değişiklik yaparken iki dilin bağlantılarını birlikte denetleyin.

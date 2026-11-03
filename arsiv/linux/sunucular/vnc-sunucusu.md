@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-sunucular-vnc-sunucusu
+lang: tr
 title: "VNC sunucusu"
 permalink: /arsiv/linux/sunucular/vnc-sunucusu/
 status: arsiv

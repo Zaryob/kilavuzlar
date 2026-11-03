@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-sanallastirma-virtualbox-6-1-kurulumu
+lang: tr
 title: "CentOS/RHEL: VirtualBox 6.1 kurulumu"
 permalink: /arsiv/linux/sanallastirma/virtualbox-6-1-kurulumu/
 status: arsiv

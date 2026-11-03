@@ -1,4 +1,6 @@
 ---
+translation_key: guide-BAKIM
+lang: tr
 title: İçerik incelemesi ve bakım planı
 permalink: /bakim/
 ---

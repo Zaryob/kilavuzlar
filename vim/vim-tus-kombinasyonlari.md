@@ -1,4 +1,6 @@
 ---
+translation_key: guide-vim-vim-tus-kombinasyonlari
+lang: tr
 title: Vim tuş kombinasyonları
 permalink: /vim/vim-tus-kombinasyonlari/
 status: duzenlendi

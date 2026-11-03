@@ -1,4 +1,6 @@
 ---
+translation_key: guide-docker-coklu-mimari-imajlar
+lang: tr
 title: Çok mimarili Docker imajları
 permalink: /docker/coklu-mimari-imajlar/
 status: duzenlendi

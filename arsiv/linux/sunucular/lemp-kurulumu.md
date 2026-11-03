@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-sunucular-lemp-kurulumu
+lang: tr
 title: "LEMP kurulumu"
 permalink: /arsiv/linux/sunucular/lemp-kurulumu/
 status: arsiv

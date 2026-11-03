@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-paket-yonetimi-debian-deposu-olusturma
+lang: tr
 title: "Debian deposu oluşturma"
 permalink: /arsiv/linux/paket-yonetimi/debian-deposu-olusturma/
 status: arsiv

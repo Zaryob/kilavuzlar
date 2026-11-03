@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-goruntu-isleme-caffe-kurulumu
+lang: tr
 title: "Caffe kurulumu"
 permalink: /arsiv/goruntu-isleme/caffe-kurulumu/
 status: arsiv

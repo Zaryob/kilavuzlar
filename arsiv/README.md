@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-README
+lang: tr
 title: "Arşiv"
 permalink: /arsiv/
 nav_order: 4

@@ -1,9 +1,8 @@
 ---
+translation_key: guide-arsiv-linux-README
+lang: tr
 title: "Linux arşivi"
 permalink: /arsiv/linux/
-redirect_from:
-  - /linux/
-  - /linux/README.html
 ---
 
 # Linux arşivi

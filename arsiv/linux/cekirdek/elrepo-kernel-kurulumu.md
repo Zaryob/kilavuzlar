@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-cekirdek-elrepo-kernel-kurulumu
+lang: tr
 title: "CentOS/RHEL: ELRepo çekirdeği kurulumu"
 permalink: /arsiv/linux/cekirdek/elrepo-kernel-kurulumu/
 status: arsiv

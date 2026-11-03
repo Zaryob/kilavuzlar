@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-goruntu-isleme-opencv-kurulumu
+lang: tr
 title: "OpenCV kaynak kodundan kurulum"
 permalink: /arsiv/goruntu-isleme/opencv-kurulumu/
 status: arsiv

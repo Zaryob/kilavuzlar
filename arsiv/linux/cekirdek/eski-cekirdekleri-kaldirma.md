@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-cekirdek-eski-cekirdekleri-kaldirma
+lang: tr
 title: "CentOS/RHEL: eski çekirdekleri kaldırma"
 permalink: /arsiv/linux/cekirdek/eski-cekirdekleri-kaldirma/
 status: arsiv

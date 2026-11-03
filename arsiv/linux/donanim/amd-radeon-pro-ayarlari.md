@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-donanim-amd-radeon-pro-ayarlari
+lang: tr
 title: "AMD Radeon Pro ayarları"
 permalink: /arsiv/linux/donanim/amd-radeon-pro-ayarlari/
 status: arsiv

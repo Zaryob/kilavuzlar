@@ -1,4 +1,6 @@
 ---
+translation_key: guide-vim-README
+lang: tr
 title: "Vim"
 permalink: /vim/
 nav_order: 3

@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-linux-sunucular-lamp-kurulumu
+lang: tr
 title: "LAMP kurulumu"
 permalink: /arsiv/linux/sunucular/lamp-kurulumu/
 status: arsiv

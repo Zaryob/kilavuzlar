@@ -1,4 +1,6 @@
 ---
+translation_key: guide-docker-scratch-ile-statik-uygulama
+lang: tr
 title: scratch ile statik Docker uygulaması
 permalink: /docker/scratch-ile-statik-uygulama/
 status: duzenlendi

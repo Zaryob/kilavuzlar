@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-goruntu-isleme-README
+lang: tr
 title: "Görüntü işleme arşivi"
 permalink: /arsiv/goruntu-isleme/
 redirect_from:

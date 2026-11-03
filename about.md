@@ -1,4 +1,6 @@
 ---
+translation_key: guide-about
+lang: tr
 title: Hakkında
 permalink: /about/
 nav_order: 5

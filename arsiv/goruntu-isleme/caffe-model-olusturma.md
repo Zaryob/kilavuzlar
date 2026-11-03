@@ -1,4 +1,6 @@
 ---
+translation_key: guide-arsiv-goruntu-isleme-caffe-model-olusturma
+lang: tr
 title: "Caffe ile model oluşturma"
 permalink: /arsiv/goruntu-isleme/caffe-model-olusturma/
 status: arsiv
