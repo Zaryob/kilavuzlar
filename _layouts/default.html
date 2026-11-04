@@ -28,7 +28,9 @@
             {% assign language_prefix = '' %}{% if directory_lang == 'en' %}{% assign language_prefix = '/en' %}{% endif %}
             {% for group in groups %}
               {% assign prefix = language_prefix | append: '/' | append: group | append: '/' %}
-              <details class="tree-group"{% unless group == 'arsiv' %} open{% endunless %}{% if group == 'arsiv' and page.url contains '/arsiv/' %} open{% endif %}>
+              {% assign prefix_size = prefix | size %}
+              {% assign current_prefix = page.url | slice: 0, prefix_size %}
+              <details class="tree-group"{% if current_prefix == prefix %} open{% endif %}>
                 <summary><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder"></use></svg><a href="{{ prefix | relative_url }}"{% if page.url == prefix %} aria-current="page"{% endif %}>{{ group }}/</a></summary>
                 {% assign documents = site.pages | sort: 'url' %}
                 {% for item in documents %}
