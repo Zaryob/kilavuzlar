@@ -39,15 +39,17 @@
   nav.append(details);
 
   const wide = matchMedia('(min-width: 1280px)');
+  const medium = matchMedia('(min-width: 760px)');
   const title = article.querySelector('h1');
   const placeToc = () => {
-    details.open = wide.matches;
+    details.open = medium.matches;
     if (wide.matches) article.after(nav);
     else if (title) title.after(nav);
     else article.prepend(nav);
   };
   placeToc();
   wide.addEventListener('change', placeToc);
+  medium.addEventListener('change', placeToc);
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
