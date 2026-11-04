@@ -31,7 +31,8 @@
               {% assign prefix_size = prefix | size %}
               {% assign current_prefix = page.url | slice: 0, prefix_size %}
               <details class="tree-group"{% if current_prefix == prefix %} open{% endif %}>
-                <summary><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder"></use></svg><a href="{{ prefix | relative_url }}"{% if page.url == prefix %} aria-current="page"{% endif %}>{{ group }}/</a></summary>
+                <summary><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder"></use></svg><span>{{ group }}/</span></summary>
+                <a href="{{ prefix | relative_url }}" class="tree-index"{% if page.url == prefix %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ directory_lang }}">README.md</span></a>
                 {% assign documents = site.pages | sort: 'url' %}
                 {% for item in documents %}
                   {% assign item_lang = item.lang | default: 'tr' %}
