@@ -64,14 +64,16 @@
         {% endif %}
         {% endcapture %}
         {% include console-content-language.html %}
-        <article lang="{{ page.lang | default: 'tr' }}"{% if page.title and page.path != '404.html' %} data-pagefind-body{% endif %}>
-          {% if content contains '</h1>' %}
-            {% assign after_title = '</h1>' | append: provenance %}
-            {{ content | replace_first: '</h1>', after_title }}
-          {% else %}
-            {{ provenance }}{{ content }}
-          {% endif %}
-        </article>
+        <div class="guide-article-layout">
+          <article lang="{{ page.lang | default: 'tr' }}"{% if page.title and page.path != '404.html' %} data-pagefind-body{% endif %}>
+            {% if content contains '</h1>' %}
+              {% assign after_title = '</h1>' | append: provenance %}
+              {{ content | replace_first: '</h1>', after_title }}
+            {% else %}
+              {{ provenance }}{{ content }}
+            {% endif %}
+          </article>
+        </div>
         {% if page.reviewed %}
           <p class="reviewed"><span data-i18n="Last content review:">Son içerik incelemesi:</span> {{ page.reviewed | date: '%d.%m.%Y' }}.</p>
         {% endif %}

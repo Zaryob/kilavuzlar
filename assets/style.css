@@ -38,6 +38,15 @@ summary .tree-icon { margin-right: 10px; }
 .guide-content .reviewed { padding-top: 16px; margin-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 .guide-related { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; font-size: 12px; }
 .guide-content .console-code pre { max-width: 100%; }
+.guide-article-layout > article { min-width: 0; }
+.guide-toc { margin-block: 0 20px; padding: 10px 14px; border: 1px solid var(--line); font-size: 13px; }
+.guide-toc summary { color: var(--accent); cursor: pointer; font-weight: 500; }
+.guide-toc ul { margin: 8px 0 0; padding-inline-start: 18px; }
+.guide-toc a { overflow-wrap: anywhere; }
+@media (min-width: 1280px) {
+  .guide-article-layout:has(> .guide-toc) { display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: 24px; }
+  .guide-toc { position: sticky; top: 98px; align-self: start; width: 220px; max-height: calc(100vh - 120px); overflow-y: auto; }
+}
 @media (max-width: 1080px) {
   .guide-shell { grid-template-columns: 250px minmax(0,1fr); }
   .guide-content { padding-inline: 28px; }
