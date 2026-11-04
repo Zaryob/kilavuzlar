@@ -27,7 +27,6 @@ plugins:
   - jekyll-redirect-from
 
 exclude:
-  - design-qa.md
   - vendor
   - Gemfile
   - Gemfile.lock

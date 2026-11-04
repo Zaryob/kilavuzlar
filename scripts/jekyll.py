@@ -29,7 +29,7 @@ def main():
         else:
             command = [bundle, 'exec', 'jekyll', *sys.argv[1:]]
         os.execvpe(command[0], command, env)
-    print('Ruby 3.3+ and Bundler are required. Install them and add their bin directory to PATH; see README.md.', file=sys.stderr)
+    print('Ruby 3.3+ and Bundler are required. Install them and add their bin directory to PATH; see CONTRIBUTING.md.', file=sys.stderr)
     return 1
 
 

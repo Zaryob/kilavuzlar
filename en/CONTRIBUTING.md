@@ -15,6 +15,7 @@ translated: '2026-11-03'
 - Use lowercase ASCII letters and hyphens in filenames. Preserve Turkish characters in Turkish titles and prose.
 - Use one main heading (`#`) per document, with `##` and `###` sections.
 - Put commands in fenced blocks with a language identifier. Do not prefix copyable commands with `$` or `#`; show output separately in a `text` block.
+- If a block shows an example file, add a filename directly below the closing fence, like `{: data-filename="Dockerfile"}`.
 - State the purpose, operating-system/version scope, prerequisites, steps, expected results and sources.
 - Distinguish source review from an environment in which the commands were actually run. Do not label untested instructions as current or working.
 
@@ -38,11 +39,11 @@ Place notes with unclear currency or environment under the appropriate `arsiv/` 
 
 ## Local preview and checks
 
-In an environment with Ruby and Bundler, using Ruby 3.3 in the recorded review:
+You need Python 3, Ruby 3.3 or later, and Bundler. Run these commands from the repository root:
 
 ```bash
-bundle install
-bundle exec jekyll serve
+python3 scripts/jekyll.py install
+python3 scripts/jekyll.py serve
 ```
 
 Preview: [localhost:4000/kilavuzlar/](http://localhost:4000/kilavuzlar/).
@@ -50,14 +51,14 @@ Preview: [localhost:4000/kilavuzlar/](http://localhost:4000/kilavuzlar/).
 Before publishing:
 
 ```bash
-bundle exec jekyll build --strict_front_matter
+python3 scripts/jekyll.py build --strict_front_matter
 python3 scripts/check_site.py _site --baseurl /kilavuzlar
 npx --yes pagefind@1.6.0 --site _site
 ```
 
 The checker verifies local pages, images, styles, anchors and redirect targets. External-site currency and the actual operation of guide commands must be checked separately.
 
-Specify the language in code blocks. If the snippet represents an example file, add a filename directly below the closing fence, like `{: data-filename="Dockerfile"}`.
+GitHub Actions builds the site, generates the search index and publishes `main` builds to GitHub Pages. To preview the blog and guide search indexes together locally, use `scripts/preview_suite.py` in the main site repository.
 
 ## Language editions
 

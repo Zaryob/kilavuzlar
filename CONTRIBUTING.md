@@ -13,6 +13,7 @@ permalink: /katki/
 - Dosya adında küçük ASCII harfleri ve kısa çizgi kullanın. Başlık ve metinde Türkçe karakterleri koruyun.
 - Bir belgede tek ana başlık (`#`) kullanın. Bölümleri `##` ve `###` ile ayırın.
 - Komutları dil belirtilmiş üç ters tırnaklı bloklara yazın. Kopyalanacak komutların başına `$` veya `#` istemi eklemeyin; çıktıyı ayrı `text` bloğunda gösterin.
+- Blok bir örnek dosyanın içeriğini gösteriyorsa kapanış çitinin hemen altına `{: data-filename="Dockerfile"}` gibi bir dosya adı ekleyin.
 - Amaç, işletim sistemi ve sürüm, ön koşullar, uygulama adımları, beklenen sonuç ve kaynakları belirtin.
 - Kaynak kontrolü ile komutların gerçekten çalıştırıldığı test ortamını ayrı yazın. Test edilmemiş bir belgeyi güncel veya çalışır diye etiketlemeyin.
 
@@ -41,11 +42,11 @@ yerine arşivleyin; aynı konunun yeni anlatımında eski notla ilişki kurun.
 
 ## Yerel önizleme ve kontrol
 
-Ruby ve Bundler bulunan bir ortamda (bu incelemede Ruby 3.3 kullanıldı):
+Python 3, Ruby 3.3 veya üstü ve Bundler gerekir. Deponun kök dizininden çalıştırın:
 
 ```bash
-bundle install
-bundle exec jekyll serve
+python3 scripts/jekyll.py install
+python3 scripts/jekyll.py serve
 ```
 
 Önizleme: [localhost:4000/kilavuzlar/](http://localhost:4000/kilavuzlar/).
@@ -53,7 +54,7 @@ bundle exec jekyll serve
 Yayımlamadan önce:
 
 ```bash
-bundle exec jekyll build --strict_front_matter
+python3 scripts/jekyll.py build --strict_front_matter
 python3 scripts/check_site.py _site --baseurl /kilavuzlar
 npx --yes pagefind@1.6.0 --site _site
 ```
@@ -62,12 +63,9 @@ Kontrol betiği yerel sayfa, görsel, stil, sayfa içi bağlantı ve yönlendirm
 hedeflerini denetler. Harici sitelerin güncelliği ve kılavuz komutlarının
 çalışması ayrıca kontrol edilmelidir.
 
-GitHub Actions aynı derleme ve indeks üretimini çalıştırır ve `main` derlemelerini
+GitHub Actions siteyi derler, arama indeksini üretir ve `main` derlemelerini
 GitHub Pages'e yayımlar. Yerelde blog ve kılavuz indekslerini birlikte denemek
 için ana sitenin `scripts/preview_suite.py` betiğini kullanın.
-
-Kod bloğunda dili belirtin. Örnek bir dosyanın içeriğini gösteriyorsa, kapanış
-çitinin hemen altına `{: data-filename="Dockerfile"}` gibi bir dosya adı ekleyin.
 
 ## Dil sürümleri
 
