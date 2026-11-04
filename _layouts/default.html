@@ -9,6 +9,8 @@
     <script src="{{ '/assets/console/theme.js' | relative_url }}"></script>
     <title>{{ page.title | escape }} · {% if page.lang == 'en' %}Guides{% else %}{{ site.title | escape }}{% endif %}</title>
     <meta name="description" content="{% if page.lang == 'en' %}{{ page.scope | default: 'Software development and system administration guides by Süleyman Poyraz.' | escape }}{% else %}{{ page.scope | default: site.description | escape }}{% endif %}">
+    <meta data-pagefind-meta="title[content]" content="{{ page.title | escape }}">
+    <meta data-pagefind-meta="type[content]" content="{% if page.status == 'arsiv' %}kılavuzlar/arşiv/{% else %}kılavuzlar/{% endif %}">
     <link rel="canonical" href="{{ page.url | absolute_url }}">
     <link rel="stylesheet" href="{{ '/assets/console/theme.css' | relative_url }}">
     <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
@@ -60,7 +62,7 @@
         {% endif %}
         {% endcapture %}
         {% include console-content-language.html %}
-        <article lang="{{ page.lang | default: 'tr' }}">
+        <article lang="{{ page.lang | default: 'tr' }}"{% if page.title and page.path != '404.html' %} data-pagefind-body{% endif %}>
           {% if content contains '</h1>' %}
             {% assign after_title = '</h1>' | append: provenance %}
             {{ content | replace_first: '</h1>', after_title }}

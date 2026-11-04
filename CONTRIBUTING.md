@@ -55,11 +55,16 @@ Yayımlamadan önce:
 ```bash
 bundle exec jekyll build --strict_front_matter
 python3 scripts/check_site.py _site --baseurl /kilavuzlar
+npx --yes pagefind@1.6.0 --site _site
 ```
 
 Kontrol betiği yerel sayfa, görsel, stil, sayfa içi bağlantı ve yönlendirme
 hedeflerini denetler. Harici sitelerin güncelliği ve kılavuz komutlarının
 çalışması ayrıca kontrol edilmelidir.
+
+GitHub Actions aynı derleme ve indeks üretimini çalıştırır ve `main` derlemelerini
+GitHub Pages'e yayımlar. Yerelde blog ve kılavuz indekslerini birlikte denemek
+için ana sitenin `scripts/preview_suite.py` betiğini kullanın.
 
 ## Dil sürümleri
 
