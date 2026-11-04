@@ -52,9 +52,12 @@ Before publishing:
 ```bash
 bundle exec jekyll build --strict_front_matter
 python3 scripts/check_site.py _site --baseurl /kilavuzlar
+npx --yes pagefind@1.6.0 --site _site
 ```
 
 The checker verifies local pages, images, styles, anchors and redirect targets. External-site currency and the actual operation of guide commands must be checked separately.
+
+Specify the language in code blocks. If the snippet represents an example file, add a filename directly below the closing fence, like `{: data-filename="Dockerfile"}`.
 
 ## Language editions
 
