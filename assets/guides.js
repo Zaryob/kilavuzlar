@@ -50,6 +50,32 @@
   placeToc();
   wide.addEventListener('change', placeToc);
   medium.addEventListener('change', placeToc);
+
+  if ('IntersectionObserver' in window) {
+    const links = new Map();
+    list.querySelectorAll('a').forEach(a => {
+      const id = decodeURIComponent(a.getAttribute('href').slice(1));
+      links.set(id, a);
+    });
+
+    let currentActive = null;
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const a = links.get(entry.target.id);
+          if (a && a !== currentActive) {
+            currentActive?.removeAttribute('aria-current');
+            currentActive?.classList.remove('is-active');
+            a.setAttribute('aria-current', 'location');
+            a.classList.add('is-active');
+            currentActive = a;
+          }
+        }
+      }
+    }, { rootMargin: '0px 0px -65% 0px', threshold: 0 });
+
+    headings.forEach(h => observer.observe(h));
+  }
 })();
 
 document.addEventListener('DOMContentLoaded', () => {

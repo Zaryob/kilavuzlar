@@ -54,7 +54,15 @@ summary .tree-icon { margin-right: 10px; }
 .guide-toc { margin-block: 0 20px; padding: 10px 14px; border: 1px solid var(--line); font-size: 13px; }
 .guide-toc summary { color: var(--accent); cursor: pointer; font-weight: 500; }
 .guide-toc ul { margin: 8px 0 0; padding-inline-start: 18px; }
-.guide-toc a { overflow-wrap: anywhere; }
+.guide-toc a { overflow-wrap: anywhere; text-decoration: none; color: var(--muted); }
+.guide-toc a:hover { color: var(--accent); }
+.guide-toc a.is-active,
+.guide-toc a[aria-current] {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 @media (min-width: 1280px) {
   .guide-article-layout:has(> .guide-toc) { display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: 24px; }
   .guide-toc { position: sticky; top: 98px; align-self: start; width: 220px; max-height: calc(100vh - 120px); overflow-y: auto; }
