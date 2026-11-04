@@ -114,8 +114,9 @@
       wrapper.append(button);
     });
 
-    const openSearch = document.querySelector('[data-console-search]');
-    if (!openSearch) return;
+    const searchTriggers = document.querySelectorAll('[data-console-search], [data-console-search-compact]');
+    if (!searchTriggers.length) return;
+    const openSearch = searchTriggers[0];
     const suite = new URL(openSearch.dataset.suiteRoot || '/', location.href);
     const dialog = document.createElement('dialog');
     dialog.className = 'console-search';
@@ -140,7 +141,7 @@
       if (language) link.lang = language;
       const label = document.createElement('small');
       label.textContent = t(({ 'yazılar/': 'posts/', 'sayfalar/': 'pages/', 'kılavuzlar/': 'guides/', 'kılavuzlar/arşiv/': 'guides/archive/' })[type] || type);
-      link.append(label, document.createTextNode(title));
+      link.append(label, document.createTextNode(' ' + title));
       if (excerpt) {
         const snippet = document.createElement('small');
         snippet.textContent = excerpt;
@@ -161,7 +162,6 @@
         const guides = new URL('kilavuzlar/', suite);
         indexes.set(language, index.mergeIndex(new URL('pagefind/', guides).href, {
           baseUrl: guides.href,
-          language,
         }).then(() => index).catch(error => {
           index.destroy();
           throw error;
@@ -220,7 +220,7 @@
       input.focus();
       render();
     };
-    openSearch.addEventListener('click', showSearch);
+    searchTriggers.forEach(btn => btn.addEventListener('click', showSearch));
     dialog.querySelector('[data-search-close]').addEventListener('click', () => dialog.close());
     dialog.addEventListener('close', () => {
       clearTimeout(debounce);
