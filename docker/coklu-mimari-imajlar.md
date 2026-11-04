@@ -47,6 +47,7 @@ Boş bir çalışma dizininde `Dockerfile` oluşturun:
 FROM alpine:3.22
 CMD ["uname", "-m"]
 ```
+{: data-filename="Dockerfile"}
 
 Taban imajın hedef mimarileri desteklemesi gerekir.
 

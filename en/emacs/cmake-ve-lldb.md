@@ -114,6 +114,7 @@ Add this configuration to `~/.emacs.d/init.el` or `~/.config/emacs/init.el`:
    ("C-x C-a r" . dape-repl)
    ("C-x C-a i" . dape-info)))
 ```
+{: data-filename="init.el"}
 
 ## 3. Project-level CMake and Clangd configuration
 
@@ -125,12 +126,14 @@ Add `.dir-locals.el` to the project root so the Clangd language server and Emacs
  (c++-mode . ((eglot-workspace-configuration
                . (:clangd (:compilationDatabasePath "build"))))))
 ```
+{: data-filename=".dir-locals.el"}
 
 Enable generation of the compilation database (`compile_commands.json`) in CMake:
 
 ```cmake
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ```
+{: data-filename="CMakeLists.txt"}
 
 ## 4. Debugging workflow
 

@@ -49,3 +49,28 @@
   placeToc();
   wide.addEventListener('change', placeToc);
 })();
+
+document.addEventListener('DOMContentLoaded', () => {
+  for (const block of document.querySelectorAll('.guide-content article .console-code')) {
+    const code = block.querySelector('pre > code');
+    const copy = block.querySelector('.console-copy');
+    const language = [...(code.closest('.highlighter-rouge') || code).classList]
+      .find(name => name.startsWith('language-'))?.slice('language-'.length);
+    const filename = code.closest('[data-filename]')?.dataset.filename;
+
+    const bar = document.createElement('div');
+    bar.className = 'guide-code-bar';
+    const badge = document.createElement('span');
+    badge.className = 'guide-code-language';
+    badge.textContent = language && language !== 'plaintext' ? language : 'text';
+    bar.append(badge);
+    if (filename) {
+      const name = document.createElement('span');
+      name.className = 'guide-code-filename';
+      name.textContent = filename;
+      bar.append(name);
+    }
+    if (copy) bar.append(copy);
+    block.prepend(bar);
+  }
+});

@@ -45,6 +45,7 @@ Create `vcpkg.json` in the project root:
   ]
 }
 ```
+{: data-filename="vcpkg.json"}
 
 ### Meaning of the fields
 
@@ -65,6 +66,7 @@ Add an `overrides` block to require a specific version outside the baseline:
   ]
 }
 ```
+{: data-filename="vcpkg.json"}
 
 ## 3. CMake integration
 
@@ -91,6 +93,7 @@ target_link_libraries(uygulama PRIVATE
     nlohmann_json::nlohmann_json
 )
 ```
+{: data-filename="CMakeLists.txt"}
 
 ### Connecting the vcpkg toolchain through `CMakePresets.json`
 
@@ -127,6 +130,7 @@ Add the toolchain to `CMakePresets.json` so developers do not have to repeat `-D
   ]
 }
 ```
+{: data-filename="CMakePresets.json"}
 
 > [!NOTE]
 > Make sure `VCPKG_ROOT` is defined in the environment, for example `export VCPKG_ROOT=/opt/vcpkg` or a path such as `$HOME/vcpkg` in your shell profile.
@@ -151,6 +155,7 @@ To use packages from private Git repositories alongside open source libraries, a
   ]
 }
 ```
+{: data-filename="vcpkg-configuration.json"}
 
 In this example, `sirket-guvenlik` comes from the private registry, while `fmt` and `nlohmann-json` come from the official registry.
 
@@ -188,6 +193,7 @@ int main() {
     return 0;
 }
 ```
+{: data-filename="src/main.cpp"}
 
 ### Build process
 

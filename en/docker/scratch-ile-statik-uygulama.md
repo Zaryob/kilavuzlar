@@ -26,6 +26,7 @@ int main() {
     return 0;
 }
 ```
+{: data-filename="hello.cc"}
 
 ## Dockerfile
 
@@ -42,6 +43,7 @@ COPY --from=build /src/hello /hello
 USER 65532:65532
 ENTRYPOINT ["/hello"]
 ```
+{: data-filename="Dockerfile"}
 
 ## Build and run
 

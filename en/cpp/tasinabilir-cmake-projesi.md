@@ -80,6 +80,7 @@ else()
     target_compile_options(uygulama PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 ```
+{: data-filename="CMakeLists.txt"}
 
 With `target_compile_features(hesaplayici PUBLIC cxx_std_20)`, the `uygulama` target automatically acquires the C++20 requirement when it links to `hesaplayici`. There is no need to add `-std=c++20` manually: CMake translates the requirement into the correct GCC, Clang or MSVC option.
 
@@ -136,6 +137,7 @@ Create `CMakePresets.json` in the project root:
   ]
 }
 ```
+{: data-filename="CMakePresets.json"}
 
 > [!TIP]
 > Developers can put machine-specific configuration in `CMakeUserPresets.json`. Add this file to `.gitignore` rather than committing it.
@@ -157,6 +159,7 @@ if(LLD_EXECUTABLE)
     set(CMAKE_SHARED_LINKER_FLAGS_INIT "-fuse-ld=lld")
 endif()
 ```
+{: data-filename="cmake/toolchains/clang.cmake"}
 
 To connect the toolchain to a preset, add `"toolchainFile": "${sourceDir}/cmake/toolchains/clang.cmake"` under `configurePresets`.
 
@@ -202,6 +205,7 @@ namespace hesaplayici {
     [[nodiscard]] int topla(int a, int b) noexcept;
 }
 ```
+{: data-filename="include/hesaplayici/topla.hpp"}
 
 Implementation file, `src/topla.cpp`:
 
@@ -214,6 +218,7 @@ namespace hesaplayici {
     }
 }
 ```
+{: data-filename="src/topla.cpp"}
 
 Main program, `src/main.cpp`:
 
@@ -226,6 +231,7 @@ int main() {
     return 0;
 }
 ```
+{: data-filename="src/main.cpp"}
 
 ### Configure and build the project
 

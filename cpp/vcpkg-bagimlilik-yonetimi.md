@@ -48,6 +48,7 @@ Proje kök dizininde `vcpkg.json` dosyası oluşturun:
   ]
 }
 ```
+{: data-filename="vcpkg.json"}
 
 ### Alanların anlamı:
 
@@ -68,6 +69,7 @@ Baseline dışındaki özel bir sürümü zorlamak istediğinizde `overrides` bl
   ]
 }
 ```
+{: data-filename="vcpkg.json"}
 
 ## 3. CMake entegrasyonu
 
@@ -95,6 +97,7 @@ target_link_libraries(uygulama PRIVATE
     nlohmann_json::nlohmann_json
 )
 ```
+{: data-filename="CMakeLists.txt"}
 
 ### `CMakePresets.json` ile vcpkg araç zincirini bağlama
 
@@ -132,6 +135,7 @@ araç zinciri `CMakePresets.json` dosyasına eklenir:
   ]
 }
 ```
+{: data-filename="CMakePresets.json"}
 
 > [!NOTE]
 > Ortamınızda `VCPKG_ROOT` değişkeninin tanımlı olduğundan emin olun (örneğin kabuk
@@ -158,6 +162,7 @@ proje köküne `vcpkg-configuration.json` dosyası eklenir:
   ]
 }
 ```
+{: data-filename="vcpkg-configuration.json"}
 
 Bu sayede `sirket-guvenlik` paketi özel depodan, `fmt` ve `nlohmann-json` ise resmi depodan çekilir.
 
@@ -198,6 +203,7 @@ int main() {
     return 0;
 }
 ```
+{: data-filename="src/main.cpp"}
 
 ### Derleme süreci
 

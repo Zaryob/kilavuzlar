@@ -144,6 +144,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 CMD ["glxgears"]
 ```
+{: data-filename="Dockerfile"}
 
 İmajı derleyin:
 

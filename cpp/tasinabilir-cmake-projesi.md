@@ -84,6 +84,7 @@ else()
     target_compile_options(uygulama PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 ```
+{: data-filename="CMakeLists.txt"}
 
 Bu modelde `target_compile_features(hesaplayici PUBLIC cxx_std_20)` yazıldığında, `uygulama`
 hedefi `hesaplayici`ya bağlandığı anda C++20 standardını otomatik olarak kazanır.
@@ -144,6 +145,7 @@ Proje kökünde `CMakePresets.json`:
   ]
 }
 ```
+{: data-filename="CMakePresets.json"}
 
 > [!TIP]
 > Geliştiricilerin yerel makineye özel yapılandırmaları için `CMakeUserPresets.json` dosyası
@@ -168,6 +170,7 @@ if(LLD_EXECUTABLE)
     set(CMAKE_SHARED_LINKER_FLAGS_INIT "-fuse-ld=lld")
 endif()
 ```
+{: data-filename="cmake/toolchains/clang.cmake"}
 
 Presets içine toolchain bağlamak için `configurePresets` alanına `"toolchainFile": "${sourceDir}/cmake/toolchains/clang.cmake"` eklemek yeterlidir.
 
@@ -214,6 +217,7 @@ namespace hesaplayici {
     [[nodiscard]] int topla(int a, int b) noexcept;
 }
 ```
+{: data-filename="include/hesaplayici/topla.hpp"}
 
 Örnek gövde dosyası `src/topla.cpp`:
 
@@ -226,6 +230,7 @@ namespace hesaplayici {
     }
 }
 ```
+{: data-filename="src/topla.cpp"}
 
 Ana program `src/main.cpp`:
 
@@ -238,6 +243,7 @@ int main() {
     return 0;
 }
 ```
+{: data-filename="src/main.cpp"}
 
 ### Projeyi yapılandırma ve derleme
 

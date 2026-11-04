@@ -66,6 +66,9 @@ GitHub Actions aynı derleme ve indeks üretimini çalıştırır ve `main` derl
 GitHub Pages'e yayımlar. Yerelde blog ve kılavuz indekslerini birlikte denemek
 için ana sitenin `scripts/preview_suite.py` betiğini kullanın.
 
+Kod bloğunda dili belirtin. Örnek bir dosyanın içeriğini gösteriyorsa, kapanış
+çitinin hemen altına `{: data-filename="Dockerfile"}` gibi bir dosya adı ekleyin.
+
 ## Dil sürümleri
 
 Türkçe kaynak dosyayı konu klasöründe, İngilizce karşılığını aynı dosya yapısıyla

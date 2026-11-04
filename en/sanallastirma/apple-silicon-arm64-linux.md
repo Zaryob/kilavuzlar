@@ -134,6 +134,7 @@ exec qemu-system-aarch64 \
     -device virtio-net-pci,netdev=net0 \
     -nographic
 ```
+{: data-filename="baslat.sh"}
 
 ### Options explained
 

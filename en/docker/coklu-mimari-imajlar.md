@@ -42,6 +42,7 @@ Create a `Dockerfile` in an empty working directory:
 FROM alpine:3.22
 CMD ["uname", "-m"]
 ```
+{: data-filename="Dockerfile"}
 
 The base image must support the target architectures.
 

@@ -117,6 +117,7 @@ Aşağıdaki yapılandırmayı `~/.emacs.d/init.el` veya `~/.config/emacs/init.e
    ("C-x C-a r" . dape-repl)
    ("C-x C-a i" . dape-info)))
 ```
+{: data-filename="init.el"}
 
 ## 3. Proje düzeyinde CMake ve Clangd ayarları
 
@@ -129,12 +130,14 @@ Clangd dil sunucusunun ve Emacs derleme komutunun projeyi tanıması için proje
  (c++-mode . ((eglot-workspace-configuration
                . (:clangd (:compilationDatabasePath "build"))))))
 ```
+{: data-filename=".dir-locals.el"}
 
 CMake yapılandırmanızda derleme veritabanını (`compile_commands.json`) üretmeyi unutmayın:
 
 ```cmake
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ```
+{: data-filename="CMakeLists.txt"}
 
 ## 4. Hata ayıklama iş akışı
 

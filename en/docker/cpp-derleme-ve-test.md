@@ -126,6 +126,7 @@ COPY --from=derleyici /proje/build/bin/uygulama /app/uygulama
 USER nonroot:nonroot
 ENTRYPOINT ["/app/uygulama"]
 ```
+{: data-filename="Dockerfile"}
 
 ## 3. Example CMakeLists.txt and test definition
 
@@ -157,6 +158,7 @@ if(BUILD_TESTING)
     add_test(NAME TemelTest COMMAND birim_test)
 endif()
 ```
+{: data-filename="CMakeLists.txt"}
 
 Example test file, `tests/test_main.cpp`:
 
@@ -172,6 +174,7 @@ int main() {
     return 0;
 }
 ```
+{: data-filename="tests/test_main.cpp"}
 
 ## 4. Building, testing and selecting a target
 
