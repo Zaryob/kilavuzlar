@@ -5,6 +5,13 @@ permalink: /search.json
 {% assign searchable = site.pages | where_exp: 'item', 'item.title' | where_exp: 'item', 'item.layout == "default"' %}
 [
 {% for item in searchable %}
-  {"lang": {{ item.lang | default: 'tr' | jsonify }}, "title": {{ item.title | jsonify }}, "url": {{ item.url | relative_url | jsonify }}, "type": {% if item.status == 'arsiv' %}"kılavuzlar/arşiv/"{% else %}"kılavuzlar/"{% endif %}, "description": {{ item.scope | default: item.title | jsonify }}}{% unless forloop.last %},{% endunless %}
+  {% assign desc = item.scope | default: '' %}
+  {% if desc == '' %}
+    {% assign desc = item.content | strip_html | normalize_whitespace | truncate: 350 %}
+  {% else %}
+    {% assign body_snippet = item.content | strip_html | normalize_whitespace | truncate: 250 %}
+    {% assign desc = desc | append: ' · ' | append: body_snippet %}
+  {% endif %}
+  {"lang": {{ item.lang | default: 'tr' | jsonify }}, "title": {{ item.title | jsonify }}, "url": {{ item.url | relative_url | jsonify }}, "type": {% if item.status == 'arsiv' %}"kılavuzlar/arşiv/"{% else %}"kılavuzlar/"{% endif %}, "description": {{ desc | jsonify }}}{% unless forloop.last %},{% endunless %}
 {% endfor %}
 ]

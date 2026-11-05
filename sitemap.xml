@@ -1,0 +1,42 @@
+---
+layout: null
+permalink: /sitemap.xml
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>{{ '/' | absolute_url }}</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="{{ '/' | absolute_url }}" />
+    <xhtml:link rel="alternate" hreflang="en" href="{{ '/en/' | absolute_url }}" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>{{ '/en/' | absolute_url }}</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="{{ '/en/' | absolute_url }}" />
+    <xhtml:link rel="alternate" hreflang="tr" href="{{ '/' | absolute_url }}" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+{% assign skip_urls = '/, /en/, /404.html, /search.json, /sitemap.xml' | split: ', ' %}
+{% for page in site.pages %}
+{% if page.url and page.title and page.title != 'empty' %}
+{% unless skip_urls contains page.url %}
+  <url>
+    <loc>{{ page.url | absolute_url }}</loc>
+    <changefreq>{% if page.status == 'arsiv' %}yearly{% else %}monthly{% endif %}</changefreq>
+    <priority>{% if page.status == 'arsiv' %}0.5{% else %}0.8{% endif %}</priority>
+{% if page.translation_key %}
+{% assign page_alternates = site.pages | where: "translation_key", page.translation_key %}
+{% for alt in page_alternates %}
+{% if alt.url and alt.title %}
+    <xhtml:link rel="alternate" hreflang="{{ alt.lang | default: 'tr' }}" href="{{ alt.url | absolute_url }}" />
+{% endif %}
+{% endfor %}
+{% endif %}
+  </url>
+{% endunless %}
+{% endif %}
+{% endfor %}
+</urlset>
