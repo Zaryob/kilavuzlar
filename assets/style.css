@@ -1,21 +1,17 @@
 /* Guide layout; shared fonts, colors and controls are in console/theme.css. */
-@font-face { font-family: "IBM Plex Sans"; src: url("console/fonts/IBMPlexSans-Regular.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
-@font-face { font-family: "IBM Plex Sans"; src: url("console/fonts/IBMPlexSans-Italic.woff2") format("woff2"); font-style: italic; font-weight: 400; font-display: swap; }
-@font-face { font-family: "IBM Plex Sans"; src: url("console/fonts/IBMPlexSans-SemiBold.woff2") format("woff2"); font-style: normal; font-weight: 600; font-display: swap; }
-@font-face { font-family: "IBM Plex Sans"; src: url("console/fonts/IBMPlexSans-SemiBoldItalic.woff2") format("woff2"); font-style: italic; font-weight: 600; font-display: swap; }
 .guide-shell { display: grid; grid-template-columns: 340px minmax(0,1fr); max-width: var(--shell-width); min-height: calc(100vh - 155px); margin: auto; }
 .guide-sidebar { border-right: 1px solid var(--line); padding: 24px 20px 40px 24px; }
 .guide-tree { position: sticky; top: 98px; max-height: calc(100vh - 120px); overflow-y: auto; }
-.guide-tree > summary { color: var(--accent); font-size: 18px; font-weight: 500; margin-bottom: 16px; }
+.guide-tree > summary { color: var(--accent); font-size: var(--text-h3); font-weight: 500; margin-bottom: 16px; }
 .guide-sidebar summary { cursor: pointer; padding: 6px 0; }
 .guide-sidebar nav { margin: 0; }
-.guide-sidebar a { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-left: 2px solid transparent; color: var(--muted); font-size: 14px; line-height: 1.65; text-decoration: none; overflow-wrap: anywhere; }
+.guide-sidebar a { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-left: 2px solid transparent; color: var(--muted); font-size: var(--text-sm); line-height: 1.65; text-decoration: none; overflow-wrap: anywhere; }
 .guide-sidebar a:hover { color: var(--ink); background: var(--surface); }
 .guide-sidebar a[aria-current] { color: var(--accent); border-left-color: var(--accent); background: var(--surface); }
-.guide-sidebar a.tree-index { font-size: 12px; }
+.guide-sidebar a.tree-index { font-size: var(--text-sm); }
 .tree-group { margin-top: 16px; }
-.tree-group > summary { color: var(--ink); font-size: 14px; }
-.guide-sidebar summary a { display: inline; padding: 0; border: 0; font-size: 16px; color: var(--ink); }
+.tree-group > summary { color: var(--ink); font-size: var(--text-sm); }
+.guide-sidebar summary a { display: inline; padding: 0; border: 0; font-size: var(--text-base); color: var(--ink); }
 .guide-sidebar summary a:hover { color: var(--accent); background: transparent; }
 .guide-sidebar summary a[aria-current] { background: transparent; }
 .tree-group > a { margin-left: 12px; }
@@ -24,34 +20,34 @@
 summary .tree-icon { margin-right: 10px; }
 .tree-meta { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
 .guide-content { min-width: 0; padding: 24px 40px 48px; }
-.guide-breadcrumb { margin: 0 0 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.guide-breadcrumb { margin: 0 0 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: var(--text-xs); overflow-wrap: anywhere; }
 .guide-breadcrumb a { color: var(--muted); text-decoration: none; }
-.guide-filename { display: flex; gap: 12px; align-items: center; color: var(--muted); font-size: 12px; margin: 0 0 24px; overflow-wrap: anywhere; }
+.guide-filename { display: flex; gap: 12px; align-items: center; color: var(--muted); font-size: var(--text-xs); margin: 0 0 24px; overflow-wrap: anywhere; }
 .guide-content h1 { margin: 0 0 20px; }
-.guide-content h2 { margin: 32px 0 16px; font-size: 22px; }
+.guide-content h2 { margin: 32px 0 16px; font-size: var(--text-h2); }
 .guide-content h3 { margin: 28px 0 12px; }
-.guide-content article { font-family: "IBM Plex Sans", system-ui, sans-serif; }
+.guide-content article { font-family: var(--font-prose); font-size: var(--text-prose); line-height: var(--line-prose); }
 .guide-content article :is(strong,b) { font-weight: 600; }
 .guide-content article :is(.notice,.guide-toc,.guide-code-bar,figcaption) { font-family: var(--font-mono); }
-.guide-content article :is(p,ul,ol,dl) { max-width: 72ch; }
+.guide-content article :is(p,ul,ol,dl) { max-width: 70ch; overflow-wrap: anywhere; }
 .guide-content p { margin: 0 0 20px; }
 .guide-content li { margin-block: 6px; }
-.guide-content article > table { display: block; width: max-content; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 13px; margin-block: 24px; }
+.guide-content article > table { display: block; width: max-content; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: var(--text-sm); margin-block: 24px; }
 .guide-content :is(th,td) { border: 1px solid var(--line); padding: 8px 12px; }
 .guide-content th { background: var(--surface); text-align: left; font-weight: 500; }
-.guide-content .notice { padding: 12px 16px; border-left: 2px solid var(--accent); background: var(--surface); font-size: 12px; margin: 20px 0; }
+.guide-content .notice { padding: 12px 16px; border-left: 2px solid var(--accent); background: var(--surface); font-size: var(--text-sm); margin: 20px 0; }
 .guide-content .notice p { margin: 8px 0 0; }
 .guide-content .archive { border-color: var(--warning); }
-.guide-content .reviewed { padding-top: 16px; margin-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-.guide-related { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; font-size: 12px; }
+.guide-content .reviewed { padding-top: 16px; margin-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: var(--text-xs); }
+.guide-related { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; font-size: var(--text-xs); }
 .guide-content .console-code pre { max-width: 100%; }
-.guide-code-bar { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 2px 2px 0 0; background: var(--paper); font-size: 12px; }
+.guide-code-bar { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 2px 2px 0 0; background: var(--paper); font-size: var(--text-xs); }
 .guide-code-language { padding-inline: 6px; color: var(--accent); background: var(--surface); }
 .guide-code-filename { min-width: 0; overflow-wrap: anywhere; }
 .guide-code-bar .console-copy { position: static; margin-inline-start: auto; flex-shrink: 0; }
 .guide-content .guide-code-bar + pre { padding-top: 16px; border-top: 0; border-radius: 0 0 2px 2px; }
 .guide-article-layout > article { min-width: 0; }
-.guide-toc { margin-block: 0 20px; padding: 10px 14px; border: 1px solid var(--line); font-size: 13px; }
+.guide-toc { margin-block: 0 20px; padding: 10px 14px; border: 1px solid var(--line); font-size: var(--text-sm); }
 .guide-toc summary { color: var(--accent); cursor: pointer; font-weight: 500; }
 .guide-toc ul { margin: 8px 0 0; padding-inline-start: 18px; }
 .guide-toc a { overflow-wrap: anywhere; text-decoration: none; color: var(--muted); }
@@ -76,9 +72,8 @@ summary .tree-icon { margin-right: 10px; }
   .guide-shell { display: block; }
   .guide-sidebar { border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 20px; }
   .guide-tree { position: static; max-height: none; }
-  .guide-tree > summary { font-size: 14px; margin-bottom: 0; }
+  .guide-tree > summary { font-size: var(--text-base); margin-bottom: 0; }
   .guide-tree > nav { max-height: 45vh; overflow-y: auto; padding-bottom: 12px; }
   .guide-content { padding: 20px; }
-  .guide-content h2 { font-size: 18px; }
 }
 @media (max-width: 560px) { .guide-content, .guide-sidebar { padding-inline: 16px; } }
