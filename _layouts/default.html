@@ -23,34 +23,52 @@
     {% include console-header.html %}
     <div class="guide-shell">
       <aside class="guide-sidebar" aria-label="Kılavuz dizini" data-i18n-aria-label="Guide directory">
-        <details open class="guide-tree">
-          <summary><span data-i18n="guides/">kılavuzlar/</span></summary>
-          <nav aria-label="Konu ağacı" data-i18n-aria-label="Topic tree">
-            {% assign groups = 'docker,linux,cpp,emacs,sanallastirma,vim,arsiv' | split: ',' %}
-            {% assign directory_lang = page.lang | default: 'tr' %}
-            {% assign language_prefix = '' %}{% if directory_lang == 'en' %}{% assign language_prefix = '/en' %}{% endif %}
-            {% for group in groups %}
-              {% assign prefix = language_prefix | append: '/' | append: group | append: '/' %}
-              {% assign prefix_size = prefix | size %}
-              {% assign current_prefix = page.url | slice: 0, prefix_size %}
-              <details class="tree-group"{% if current_prefix == prefix %} open{% endif %}>
-                <summary><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder"></use></svg><span>{{ group }}/</span></summary>
-                <a href="{{ prefix | relative_url }}" class="tree-index"{% if page.url == prefix %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ directory_lang }}">README.md</span></a>
-                {% assign documents = site.pages | sort: 'url' %}
-                {% for item in documents %}
-                  {% assign item_lang = item.lang | default: 'tr' %}
-                  {% if item.url contains prefix and item.url != prefix and item.title and item.layout == 'default' and item_lang == directory_lang %}
-                    <a href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ item.lang | default: 'tr' }}">{{ item.title | escape }}</span></a>
-                  {% endif %}
+        {% assign directory_lang = page.lang | default: 'tr' %}
+        {% assign language_prefix = '' %}{% if directory_lang == 'en' %}{% assign language_prefix = '/en' %}{% endif %}
+        <div class="guide-directory">
+          {% assign tree_sections = 'guides,archive' | split: ',' %}
+          {% for tree_section in tree_sections %}
+            {% if tree_section == 'guides' %}
+              {% assign groups = 'docker,linux,cpp,emacs,sanallastirma,vim' | split: ',' %}
+            {% else %}
+              {% assign groups = 'arsiv/linux,arsiv/goruntu-isleme' | split: ',' %}
+            {% endif %}
+            <details open class="guide-tree">
+              <summary><svg class="tree-icon tree-root-icon" aria-hidden="true"><use href="{{ '/assets/console/site.svg' | relative_url }}#{% if tree_section == 'guides' %}guides{% else %}archive{% endif %}"></use></svg>{% if tree_section == 'guides' %}<span data-i18n="Guides">Kılavuzlar</span>{% else %}<span lang="{{ directory_lang }}">{% if directory_lang == 'en' %}Archive{% else %}Arşiv{% endif %}</span>{% endif %}<svg class="tree-chevron" aria-hidden="true"><use href="{{ '/assets/console/site.svg' | relative_url }}#chevron-down"></use></svg></summary>
+              <nav aria-label="{% if tree_section == 'guides' %}Konu ağacı{% else %}Arşiv dizini{% endif %}" data-i18n-aria-label="{% if tree_section == 'guides' %}Topic tree{% else %}Archive directory{% endif %}">
+                {% if tree_section == 'archive' %}
+                  {% assign archive_url = language_prefix | append: '/arsiv/' %}
+                  <a href="{{ archive_url | relative_url }}" class="tree-index"{% if page.url == archive_url %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ directory_lang }}">README.md</span></a>
+                {% endif %}
+                {% for group in groups %}
+                  {% assign prefix = language_prefix | append: '/' | append: group | append: '/' %}
+                  {% assign prefix_size = prefix | size %}
+                  {% assign current_prefix = page.url | slice: 0, prefix_size %}
+                  <details class="tree-group{% if current_prefix == prefix %} is-current{% endif %}"{% if current_prefix == prefix %} open{% endif %}>
+                    <summary><svg class="tree-icon tree-folder-closed" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder"></use></svg><svg class="tree-icon tree-folder-open" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder-open"></use></svg><span class="tree-group-name">{{ group | split: "/" | last }}/</span><svg class="tree-chevron" aria-hidden="true"><use href="{{ '/assets/console/site.svg' | relative_url }}#chevron-down"></use></svg></summary>
+                    <div class="tree-children">
+                    <a href="{{ prefix | relative_url }}" class="tree-index"{% if page.url == prefix %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ directory_lang }}">README.md</span></a>
+                    {% assign documents = site.pages | sort: 'url' %}
+                    {% for item in documents %}
+                      {% assign item_lang = item.lang | default: 'tr' %}
+                      {% assign item_prefix = item.url | slice: 0, prefix_size %}
+                      {% if item_prefix == prefix and item.url != prefix and item.title and item.layout == 'default' and item_lang == directory_lang %}
+                        <a href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ item.lang | default: 'tr' }}">{{ item.title | escape }}</span></a>
+                      {% endif %}
+                    {% endfor %}
+                    </div>
+                  </details>
                 {% endfor %}
-              </details>
-            {% endfor %}
-            <div class="tree-meta">
-              <a href="{{ language_prefix | append: '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}><span data-i18n="about">hakkında</span></a>
-              <a href="{{ language_prefix | append: '/katki/' | relative_url }}"><span data-i18n="contribution guide">katkı rehberi</span></a>
-            </div>
-          </nav>
-        </details>
+              </nav>
+            </details>
+          {% endfor %}
+          <div class="tree-meta">
+            {% assign about_url = language_prefix | append: '/about/' %}
+            {% assign contribution_url = language_prefix | append: '/katki/' %}
+            <a href="{{ about_url | relative_url }}"{% if page.url == about_url %} aria-current="page"{% endif %}><span data-i18n="about">hakkında</span></a>
+            <a href="{{ contribution_url | relative_url }}"{% if page.url == contribution_url %} aria-current="page"{% endif %}><span data-i18n="contribution guide">katkı rehberi</span></a>
+          </div>
+        </div>
       </aside>
       <main id="icerik" class="guide-content">
         <p class="guide-breadcrumb"><a href="{{ language_prefix | append: '/' | relative_url }}">~/{% if page.lang == 'en' %}guides{% else %}kılavuzlar{% endif %}</a>{{ page.url | escape }}</p>
@@ -85,6 +103,6 @@
       </main>
     </div>
     <footer class="console-footer"><span>{{ site.author | escape }} · <a href="{{ language_prefix | append: '/about/' | relative_url }}"><span data-i18n="About the guides">Kılavuzlar hakkında</span></a></span><span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span></footer>
-    <script src="{{ '/assets/guides.js' | relative_url }}" defer></script>
+    <script src="{{ '/assets/guides.js' | relative_url }}?v=sections" defer></script>
   </body>
 </html>

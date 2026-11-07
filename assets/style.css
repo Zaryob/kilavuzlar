@@ -1,24 +1,36 @@
 /* Guide layout; shared fonts, colors and controls are in console/theme.css. */
 .guide-shell { display: grid; grid-template-columns: 340px minmax(0,1fr); max-width: var(--shell-width); min-height: calc(100vh - 155px); margin: auto; }
 .guide-sidebar { border-right: 1px solid var(--line); padding: 24px 20px 40px 24px; }
-.guide-tree { position: sticky; top: 98px; max-height: calc(100vh - 120px); overflow-y: auto; }
-.guide-tree > summary { color: var(--accent); font-size: var(--text-h3); font-weight: 500; margin-bottom: 16px; }
-.guide-sidebar summary { cursor: pointer; padding: 6px 0; }
+.guide-directory { position: sticky; top: 98px; max-height: calc(100dvh - 120px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line) transparent; padding: 4px; margin: -4px; }
+.guide-tree > summary { color: var(--accent); font-size: var(--text-base); font-weight: 500; margin-bottom: 16px; padding: 8px 10px 16px 0; border-bottom: 1px solid var(--line); }
+.guide-tree[open] > summary { border-bottom-color: var(--accent); }
+.guide-sidebar summary { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; list-style: none; }
+.guide-sidebar summary::-webkit-details-marker { display: none; }
 .guide-sidebar nav { margin: 0; }
-.guide-sidebar a { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-left: 2px solid transparent; color: var(--muted); font-size: var(--text-sm); line-height: 1.65; text-decoration: none; overflow-wrap: anywhere; }
+.guide-sidebar a { display: flex; align-items: flex-start; gap: 10px; min-height: 40px; padding: 9px 12px; border-left: 2px solid transparent; color: var(--muted); font-size: var(--text-sm); line-height: 1.65; text-decoration: none; overflow-wrap: anywhere; }
 .guide-sidebar a:hover { color: var(--ink); background: var(--surface); }
 .guide-sidebar a[aria-current] { color: var(--accent); border-left-color: var(--accent); background: var(--surface); }
 .guide-sidebar a.tree-index { font-size: var(--text-sm); }
-.tree-group { margin-top: 16px; }
-.tree-group > summary { color: var(--ink); font-size: var(--text-sm); }
-.guide-sidebar summary a { display: inline; padding: 0; border: 0; font-size: var(--text-base); color: var(--ink); }
-.guide-sidebar summary a:hover { color: var(--accent); background: transparent; }
-.guide-sidebar summary a[aria-current] { background: transparent; }
-.tree-group > a { margin-left: 12px; }
-.tree-group:last-of-type { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 24px; }
+.tree-group { margin-top: 4px; }
+.tree-group > summary { padding: 8px 10px; color: var(--muted); font-size: var(--text-sm); }
+.tree-group > summary:hover { color: var(--ink); background: var(--surface); }
+.tree-group[open] > summary { color: var(--ink); }
+.tree-group.is-current > summary { color: var(--accent); }
+.tree-group-name { min-width: 0; overflow-wrap: anywhere; }
+.tree-chevron { width: 12px; height: 12px; flex: 0 0 12px; margin-left: auto; fill: currentColor; transform: rotate(-90deg); }
+details[open] > summary > .tree-chevron { transform: rotate(0); }
+.tree-children { margin: 2px 0 12px 22px; border-left: 1px solid var(--line); padding-left: 12px; }
+.tree-children > a + a { margin-top: 2px; }
+.tree-children .tree-icon { height: 16px; margin-top: 3px; opacity: .65; }
+.tree-children a[aria-current] .tree-icon { opacity: 1; }
+.guide-tree + .guide-tree { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px; }
 .tree-icon { display: inline-block; width: 16px; height: 18px; fill: currentColor; flex: 0 0 16px; vertical-align: -.2em; }
-summary .tree-icon { margin-right: 10px; }
-.tree-meta { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+.tree-group > summary > .tree-folder-open { display: none; }
+.tree-group[open] > summary > .tree-folder-open { display: inline-block; }
+.tree-group[open] > summary > .tree-folder-closed { display: none; }
+.tree-meta { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+.guide-tree:not([open]) + :is(.guide-tree, .tree-meta) { border-top: 0; padding-top: 0; }
+.tree-meta a { font-size: var(--text-xs); }
 .guide-content { min-width: 0; padding: 24px 40px 48px; }
 .guide-breadcrumb { margin: 0 0 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: var(--text-xs); overflow-wrap: anywhere; }
 .guide-breadcrumb a { color: var(--muted); text-decoration: none; }
@@ -64,15 +76,17 @@ summary .tree-icon { margin-right: 10px; }
   .guide-toc { position: sticky; top: 98px; align-self: start; width: 220px; max-height: calc(100vh - 120px); overflow-y: auto; }
 }
 @media (max-width: 1080px) {
-  .guide-shell { grid-template-columns: 250px minmax(0,1fr); }
+  .guide-shell { grid-template-columns: 280px minmax(0,1fr); }
+  .tree-children { margin-left: 18px; padding-left: 8px; }
   .guide-content { padding-inline: 28px; }
-  .guide-tree { top: 140px; max-height: calc(100vh - 165px); }
+  .guide-directory { top: 88px; max-height: calc(100dvh - 108px); }
 }
 @media (max-width: 760px) {
   .guide-shell { display: block; }
   .guide-sidebar { border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 20px; }
-  .guide-tree { position: static; max-height: none; }
-  .guide-tree > summary { font-size: var(--text-base); margin-bottom: 0; }
+  .guide-directory { position: static; max-height: none; }
+  .guide-tree > summary { font-size: var(--text-base); margin-bottom: 0; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .guide-tree[open] > summary { margin-bottom: 8px; border-bottom: 1px solid var(--accent); }
   .guide-tree > nav { max-height: 45vh; overflow-y: auto; padding-bottom: 12px; }
   .guide-content { padding: 20px; }
 }
