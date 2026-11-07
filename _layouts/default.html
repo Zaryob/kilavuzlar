@@ -8,7 +8,9 @@
     <script src="{{ '/assets/console/language.js' | relative_url }}"></script>
     <script src="{{ '/assets/console/i18n.js' | relative_url }}"></script>
     <script src="{{ '/assets/console/theme.js' | relative_url }}"></script>
-    <title>{{ page.title | escape }} · {% if page.lang == 'en' %}Guides{% else %}{{ site.title | escape }}{% endif %}</title>
+    {% assign guides_title = site.title %}{% if page.lang == 'en' %}{% assign guides_title = 'Guides' %}{% endif %}
+    <title>{{ page.title | escape }}{% unless page.title == guides_title %} · {{ guides_title | escape }}{% endunless %}</title>
+    <link rel="icon" href="{{ site.suite_url | default: 'https://zaryob.github.io' }}/favicon.ico">
     <meta name="description" content="{% if page.lang == 'en' %}{{ page.scope | default: 'Software development and system administration guides by Süleyman Poyraz.' | escape }}{% else %}{{ page.scope | default: site.description | escape }}{% endif %}">
     <meta data-pagefind-meta="title[content]" content="{{ page.title | escape }}">
     <meta data-pagefind-meta="type[content]" content="{% if page.status == 'arsiv' %}kılavuzlar/arşiv/{% else %}kılavuzlar/{% endif %}">
