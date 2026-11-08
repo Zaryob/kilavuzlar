@@ -4,7 +4,7 @@ lang: tr
 title: "Docker'da C++ uygulaması derleyip test etmek"
 permalink: /docker/cpp-derleme-ve-test/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-09
 scope: Multi-stage Dockerfile, BuildKit cache mounts, CMake/Ninja, CTest ve Distroless çalışma zamanı.
 ---
 
@@ -18,7 +18,7 @@ Bu sorunların modern çözümü; **Çok Aşamalı Derleme (Multi-Stage Build)**
 
 ## 1. Çok aşamalı mimarinin yapısı
 
-Boru hattı mantıksal olarak 4 aşamadan oluşur:
+Boru hattı mantıksal olarak 5 aşamadan oluşur:
 
 ```text
 [ 1. Derleme Ortamı ]   ──► Derleyici araçlar (GCC/Clang, CMake, Ninja, Ccache)
@@ -29,7 +29,7 @@ Boru hattı mantıksal olarak 4 aşamadan oluşur:
           │
 [ 4. Test Koşucusu ]    ──► CTest ile birim testler (Başarısız olursa imaj üretimi durur)
           │
-[ 5. Minimal Çalışma ]  ──► Yalnızca ikili dosya (Distroless / Scratch - ~25 MB)
+[ 5. Minimal Çalışma ]  ──► Yalnızca ikili dosya (Distroless; boyut ölçülmelidir)
 ```
 
 ## 2. Üretime hazır çok aşamalı Dockerfile
@@ -48,7 +48,11 @@ ENV DEBIAN_FRONTEND=noninteractive \
     VCPKG_ROOT=/opt/vcpkg \
     VCPKG_FORCE_SYSTEM_BINARIES=1
 
-# APT paketlerini BuildKit önbelleği ile kur (tekrar indirilmez)
+# APT arşivlerinin docker-clean tarafından silinmesini engelle
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
+# APT paketlerini BuildKit önbelleği ile kur
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
@@ -65,7 +69,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         ccache
 
 # vcpkg aracını kur
-RUN git clone --depth 1 https://github.com/microsoft/vcpkg.git /opt/vcpkg && \
+RUN git clone --branch 2024.09.30 https://github.com/microsoft/vcpkg.git /opt/vcpkg && \
     /opt/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 
 # ==============================================================================
@@ -78,8 +82,10 @@ WORKDIR /proje
 COPY vcpkg.json ./
 
 # vcpkg ikili önbelleği ile bağımlılıkları derle
+ARG TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/vcpkg \
-    ${VCPKG_ROOT}/vcpkg install --triplet x64-linux
+    case "$TARGETARCH" in amd64) triplet=x64-linux ;; arm64) triplet=arm64-linux ;; *) exit 1 ;; esac && \
+    ${VCPKG_ROOT}/vcpkg install --triplet "$triplet"
 
 # ==============================================================================
 # AŞAMA 3: Projeyi Derleme
@@ -88,7 +94,7 @@ FROM bagimlilik-derleyici AS derleyici
 WORKDIR /proje
 
 # Kaynak kodları kopyala
-COPY CMakeLists.txt CMakePresets.json ./
+COPY CMakeLists.txt ./
 COPY src/ ./src/
 COPY tests/ ./tests/
 
@@ -98,6 +104,8 @@ RUN --mount=type=cache,target=/root/.cache/vcpkg \
     --mount=type=cache,target=/root/.cache/ccache \
     cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+        -DVCPKG_INSTALLED_DIR=/proje/vcpkg_installed \
         -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
         -DBUILD_TESTING=ON && \
     cmake --build build -j
@@ -118,12 +126,33 @@ RUN ctest --test-dir build --output-on-failure
 FROM gcr.io/distroless/cc-debian12:nonroot AS calisma-zamani
 
 WORKDIR /app
-COPY --from=derleyici /proje/build/bin/uygulama /app/uygulama
+COPY --from=test-kosucu /proje/build/bin/uygulama /app/uygulama
 
 USER nonroot:nonroot
 ENTRYPOINT ["/app/uygulama"]
 ```
 {: data-filename="Dockerfile"}
+
+Tam build bağlamı `Dockerfile`, `vcpkg.json`, `CMakeLists.txt`, `src/main.cpp` ve `tests/test_main.cpp` dosyalarından oluşur. Preset dosyası gerekmez. Son COPY `test-kosucu` aşamasına bağlıdır; böylece BuildKit çalışma zamanı hedefinde de CTest’i yürütmek zorundadır.
+
+```json
+{
+  "name": "docker-cpp-ornek",
+  "version": "1.0.0",
+  "builtin-baseline": "c82f74667287d3dc386bce81e44964370c91a289",
+  "dependencies": ["fmt"]
+}
+```
+{: data-filename="vcpkg.json"}
+
+```cpp
+#include <fmt/core.h>
+
+int main() {
+    fmt::print("Uygulama calisti!\n");
+}
+```
+{: data-filename="src/main.cpp"}
 
 ## 3. Örnek CMakeLists.txt ve test tanımı
 
@@ -161,12 +190,15 @@ endif()
 
 ```cpp
 #include <iostream>
-#include <cassert>
 
 int topla(int a, int b) { return a + b; }
 
 int main() {
-    assert(topla(2, 3) == 5);
+    const int beklenen = 5;
+    if (topla(2, 3) != beklenen) {
+        std::cerr << "topla(2, 3): beklenen " << beklenen << ", alinan " << topla(2, 3) << "\n";
+        return 1;
+    }
     std::cout << "Tüm testler başarıyla geçti.\n";
     return 0;
 }
@@ -196,23 +228,27 @@ Bütün adımları tek seferde çalıştırmak yerine CI adımlarını aşamalar
    docker build --target calisma-zamani -t cpp-uygulama:prod .
    ```
 
-## 5. İmaj boyutlarının karşılaştırılması
+### Başarısızlık kapısını kanıtlama
 
-Geleneksel tek katmanlı imaj ile multi-stage Distroless imaj arasındaki fark:
+Projenin geçici kopyasında `const int beklenen = 5;` satırını `const int beklenen = 6;` yapın. Son çalışma zamanı hedefi dahil aşağıdaki iki derleme sıfırdan farklı çıkmalıdır. Sonra beklentiyi geri alın. Bu açık kontrol `-DNDEBUG` ile de aktiftir.
 
-```text
-Geleneksel GCC + CMake İmajı:       ~1.85 GB
-Multi-Stage Distroless İmajı:        ~28.4 MB
+```bash
+docker build --target test-kosucu -t cpp-test-negatif .
+docker build --target calisma-zamani -t cpp-runtime-negatif .
 ```
 
-Son imajda gereksiz derleyiciler, başlık dosyaları (`.h`/`.hpp`), paket yöneticisi ve
-kabuk bulunmadığı için konteyner saniyeler içinde ayağa kalkar ve saldırı yüzeyi minimuma iner.
+## 5. İmaj boyutlarının karşılaştırılması
+
+Boyutu seçilen platform ve etiket için ölçün; sabit boyut veya başlangıç süresi garantisi verilmez:
+
+```bash
+docker image inspect cpp-uygulama:latest --format '{% raw %}{{.Size}}{% endraw %}'
+```
 
 ## Kaynaklar ve doğrulama ortamı
 
 - [Docker Multi-Stage Builds Resmi Kılavuzu](https://docs.docker.com/build/building/multi-stage/)
 - [Google Container Tools - Distroless İmajları](https://github.com/GoogleContainerTools/distroless)
-- [BuildKit Cache Mounts Belgesi](https://docs.docker.com/build/cache/backends/)
+- [BuildKit Cache Mounts Belgesi](https://docs.docker.com/build/cache/optimize/#use-cache-mounts)
 
-Bu kılavuzdaki adımlar, Docker Engine 26.1, BuildKit ve Debian 12 tabanında GCC 12,
-CMake 3.25 ve Ninja ile test edilerek doğrulanmıştır.
+8–9 Kasım 2026: Docker 29.6.2/BuildKit, Debian 12 ARM64, GCC 12.2.0 ve CMake 3.25.1 ile son imaj derlendi ve çalıştırıldı. Derleme komutunda `ccache` ve `-DNDEBUG` görüldü. Kasıtlı yanlış beklenti hem `test-kosucu` hem `calisma-zamani` hedefini exit 1 ile durdurdu. Başarılı derleme performans veya sabit imaj boyutu iddiası oluşturmaz.

@@ -4,7 +4,7 @@ lang: tr
 title: "vcpkg ile C++ bağımlılıklarını yönetmek"
 permalink: /cpp/vcpkg-bagimlilik-yonetimi/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-09
 scope: vcpkg Manifest modu (vcpkg.json), CMakePresets entegrasyonu ve ikili önbellekleme (binary caching).
 ---
 
@@ -24,7 +24,7 @@ dosyasında bildirilir ve CMake yapılandırması başladığında otomatik olar
 | Özellik | Klasik Mod (`vcpkg install`) | Manifest Modu (`vcpkg.json`) |
 | :--- | :--- | :--- |
 | **Bağımlılık Tanımı** | Kullanıcının terminalde çalıştırdığı komutlar | Proje kökünde sürüm kontrolüne giren JSON dosyası |
-| **Sürüm Kitleme (Pinning)** | Zordur; vcpkg deposunun güncel commit'ine bağlıdır | `builtin-baseline` ve `overrides` ile tam kesinlik |
+| **Sürüm Kitleme (Pinning)** | Zordur; vcpkg deposunun güncel commit'ine bağlıdır | `builtin-baseline` ile taban sürümler; `overrides` ile seçili sürümler |
 | **Kurulum Konumu** | Merkezi vcpkg dizini altında global | Projenin kendi `build/vcpkg_installed` dizininde |
 | **Ekip Uyumluluğu** | Her geliştirici paketleri elle kurmak zorundadır | Depoyu klonlayan herkes `cmake` çalıştırdığında aynı ortam kurulur |
 
@@ -37,7 +37,7 @@ Proje kök dizininde `vcpkg.json` dosyası oluşturun:
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "ornek-vcpkg-uygulamasi",
   "version": "1.0.0",
-  "builtin-baseline": "5040e32d43717de55ff672a11540d99042b5c54d",
+  "builtin-baseline": "c82f74667287d3dc386bce81e44964370c91a289",
   "dependencies": [
     "fmt",
     "nlohmann-json",
@@ -50,14 +50,25 @@ Proje kök dizininde `vcpkg.json` dosyası oluşturun:
 ```
 {: data-filename="vcpkg.json"}
 
+Devam etmeden önce aracı aynı upstream etikette kurun (Git, C++ derleyicisi, CMake ve Ninja gerekir):
+
+```bash
+git clone --branch 2024.09.30 https://github.com/microsoft/vcpkg.git "$HOME/vcpkg-kilavuz"
+export VCPKG_ROOT="$HOME/vcpkg-kilavuz"
+"$VCPKG_ROOT/bootstrap-vcpkg.sh" -disableMetrics
+# HEAD: c82f74667287d3dc386bce81e44964370c91a289
+```
+
+`--depth 1` kullanmayın: sürüm kısıtları ve override’lar sığ checkout’ta bulunmayan geçmiş port ağaçlarını gerektirebilir.
+
 ### Alanların anlamı:
 
-- `builtin-baseline`: Paketlerin hangi vcpkg git commit'inden çözümleneceğini belirten hash'tir. Bu alan sayesinde 2 yıl sonra bile aynı sürümler derlenir. Güncel baseline hash'i `git rev-parse HEAD` komutuyla vcpkg deposundan alınabilir.
+- `builtin-baseline`: Paketlerin asgari sürümlerinin alındığı kayıt deposu snapshot’ıdır. Örnekte araç checkout’u ve kayıt deposu upstream `2024.09.30` etiketine sabitlenmiştir. Aynı ikilileri üretmek için derleyici, SDK, triplet, özellikler ve kaynak erişimi de sabitlenmelidir; bu alan tek başına yıllar sonra aynı derlemeyi garanti etmez.
 - `dependencies`: Projenin ihtiyaç duyduğu kütüphanelerdir. İstenirse opsiyonel özellikler (`features`) veya platform kısıtları (`"platform": "!windows"`) eklenebilir.
 
 ### Sürümleri sabitleme (`overrides`)
 
-Baseline dışındaki özel bir sürümü zorlamak istediğinizde `overrides` bloğu eklenir:
+Baseline dışındaki özel bir sürümü zorlamak istediğinizde ana manifest’e `overrides` bloğu eklenir. Aşağıdaki isteğe bağlı parça çalıştırılan örnekte kullanılmaz; sonraki sürüm çıktıları override olmadan alınmıştır:
 
 ```json
 {
@@ -88,6 +99,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Bağımlılıkları ara (vcpkg otomatik olarak CONFIG modunda sağlar)
 find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(cxxopts CONFIG REQUIRED)
 
 add_executable(uygulama src/main.cpp)
 
@@ -95,6 +107,7 @@ add_executable(uygulama src/main.cpp)
 target_link_libraries(uygulama PRIVATE
     fmt::fmt
     nlohmann_json::nlohmann_json
+    cxxopts::cxxopts
 )
 ```
 {: data-filename="CMakeLists.txt"}
@@ -143,20 +156,19 @@ araç zinciri `CMakePresets.json` dosyasına eklenir:
 
 ## 4. Özel depolar ve şirket içi paketler (Registries)
 
-Açık kaynak kütüphanelerin yanı sıra kendi özel git depolarınızdaki paketleri kullanmak için
-proje köküne `vcpkg-configuration.json` dosyası eklenir:
+Aşağıdaki bir **şablondur**, çalıştırılabilir örneğe dahil değildir. Gerçek özel kayıt deposu URL’si, 40 karakterli commit’i ve paketleri yoksa bu dosyayı kaydetmeyin. Önce bütün yer tutucuları değiştirin:
 
 ```json
 {
   "default-registry": {
     "kind": "builtin",
-    "baseline": "5040e32d43717de55ff672a11540d99042b5c54d"
+    "baseline": "c82f74667287d3dc386bce81e44964370c91a289"
   },
   "registries": [
     {
       "kind": "git",
-      "repository": "https://github.com/sirketim/vcpkg-ozel-depo",
-      "baseline": "a1b2c3d4e5f6...",
+      "repository": "<PRIVATE_REGISTRY_URL>",
+      "baseline": "<40_HEX_COMMIT>",
       "packages": ["sirket-guvenlik", "sirket-protokol"]
     }
   ]
@@ -173,12 +185,27 @@ veya temiz derlemelerde paketlerin tekrar tekrar saatlerce derlenmesini önlemek
 `VCPKG_BINARY_SOURCES` ortam değişkeni ayarlanabilir:
 
 ```bash
-# Yerel dosya sistemi önbelleği:
-export VCPKG_BINARY_SOURCES="clear;files,/opt/vcpkg-cache,readwrite"
-
-# GitHub Actions ortamında:
-export VCPKG_BINARY_SOURCES="clear;gha,readwrite"
+mkdir -p "$HOME/.cache/vcpkg-kilavuz"
+export VCPKG_BINARY_SOURCES="clear;files,$HOME/.cache/vcpkg-kilavuz,readwrite"
 ```
+
+GitHub Actions’ta aynı `files` sağlayıcısını `actions/cache` ile saklayın; kaldırılmış `x-gha` sağlayıcısını kullanmayın. Checkout ve araç kurulumu sonrasında, araç zinciri sabit Linux runner için örnek adımlar:
+
+{% raw %}
+```yaml
+- uses: actions/cache@v4
+  with:
+    path: ~/.cache/vcpkg-kilavuz
+    key: vcpkg-${{ runner.os }}-${{ runner.arch }}-gcc12-c82f746-${{ hashFiles('vcpkg.json') }}-${{ github.sha }}
+    restore-keys: |
+      vcpkg-${{ runner.os }}-${{ runner.arch }}-gcc12-c82f746-${{ hashFiles('vcpkg.json') }}-
+- name: Configure and build
+  run: |
+    export VCPKG_BINARY_SOURCES="clear;files,$HOME/.cache/vcpkg-kilavuz,readwrite"
+    cmake --preset dev-debug
+    cmake --build build/dev-debug
+```
+{% endraw %}
 
 Aynı paketi ve derleyici kombinasyonunu kullanan derlemelerde vcpkg önceden üretilmiş ikiliyi
 saniyeler içinde önbellekten çeker.
@@ -188,11 +215,12 @@ saniyeler içinde önbellekten çeker.
 `src/main.cpp`:
 
 ```cpp
-#include <iostream>
+#include <cxxopts.hpp>
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
 
 int main() {
+    cxxopts::Options options("uygulama", "vcpkg manifest example");
     nlohmann::json veri = {
         {"proje", "kilavuzlar"},
         {"mod", "manifest"},
@@ -213,20 +241,12 @@ Projeyi yapılandırın:
 cmake --preset dev-debug
 ```
 
-Beklenen çıktı:
+Temiz `arm64-osx` çalıştırmasından paket sürümleri özeti (yardımcı portlar ve süreler çıkarıldı):
 
 ```text
--- Running vcpkg install
-Detecting compiler hash for triplet x64-linux...
-The following packages will be built and installed:
-    fmt:x64-linux -> 10.2.1
-    nlohmann-json:x64-linux -> 3.11.3
-Restored 2 package(s) from /home/kullanici/.cache/vcpkg/archives in 12 ms.
--- Running vcpkg install - done
--- Found fmt: .../build/dev-debug/vcpkg_installed/x64-linux/share/fmt/fmt-config.cmake
--- Found nlohmann_json: .../build/dev-debug/vcpkg_installed/x64-linux/share/nlohmann_json/nlohmann_jsonConfig.cmake
--- Configuring done
--- Generating done
+    cxxopts:arm64-osx@3.2.1
+    fmt:arm64-osx@11.0.2#1
+    nlohmann-json:arm64-osx@3.11.3#1
 ```
 
 Derleyin ve çalıştırın:
@@ -256,8 +276,7 @@ JSON Çıktısı: {
 ## Kaynaklar ve doğrulama ortamı
 
 - [Microsoft vcpkg Resmi Belgesi - Manifest Mode](https://learn.microsoft.com/en-us/vcpkg/consume/manifest-mode)
-- [vcpkg İkili Önbellekleme Kılavuzu](https://learn.microsoft.com/en-us/vcpkg/users/binarycaching)
+- [vcpkg İkili Önbellekleme Kılavuzu](https://learn.microsoft.com/en-us/vcpkg/reference/binarycaching)
 - [vcpkg Git Registries](https://learn.microsoft.com/en-us/vcpkg/users/registries)
 
-Bu kılavuz, Ubuntu 24.04 (Linux x86_64) ve macOS Sonoma (ARM64) üzerinde vcpkg 2024-09,
-CMake 3.28 ve Ninja 1.11 ile test edilmiştir.
+8–9 Kasım 2026: sabit manifest macOS 27.2 ARM64 ve Debian 12 ARM64 üzerinde ikili önbellek kapalıyken kaynaklardan kuruldu; CMake Debug uygulaması derlenip çalıştırıldı. `files` sağlayıcısı ikinci temiz Linux kurulumunda 5/5 paketi önbellekten geri yükledi. Özel kayıt deposu ve Actions hizmeti çalıştırılmadı.

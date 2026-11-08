@@ -4,253 +4,170 @@ lang: tr
 title: "macOS'ta Linux USB/IP altyapısını test etmek"
 permalink: /sanallastirma/macos-linux-usbip/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-09
 scope: macOS üzerinde vhci_hcd kısıtları, QEMU USB passthrough (-device usb-host) ve Linux VM'leri arasında USB/IP testi.
 ---
 
-# macOS'ta Linux USB/IP altyapısını test etmek
+# macOS’ta Linux USB/IP altyapısını test etmek
 
-USB/IP protokolü, bir bilgisayara bağlı fiziksel USB aygıtlarını (kamera, seri dönüştürücü,
-güvenlik dongle'ı) TCP/IP ağı üzerinden başka bir makineye yerel bir donanım gibi bağlamayı sağlar.
+Linux USB/IP, TCP 3240 üzerinden sunucuda `usbip-host`, istemcide `vhci-hcd` modüllerini kullanır. Bu Linux çekirdek modülleri Darwin’de çalışmaz. Kılavuz iki Linux VM kullanır; bütün üçüncü taraf macOS USB/IP uygulamaları veya DriverKit yetenekleri hakkında mutlak bir iddia kurmaz.
 
-Gömülü sistemler ve bulut testleri için kritik olan bu altyapıyı macOS üzerinde yerel
-olarak test etmeye çalışan mühendisler, macOS çekirdeğinin mimari engellerine çarpar.
-Bu kılavuzda macOS'taki **`vhci_hcd` kısıtlamalarını** ve **QEMU sanallaştırması ile
-eksiksiz bir USB/IP test laboratuvarının** nasıl kurulacağını ele alacağız.
+## 1. Önyüklenebilir iki VM hazırlama
 
-## 1. Neden USB/IP macOS üzerinde yerel (Native) çalışamaz?
-
-Linux ortamında USB/IP iki çekirdek modülü üzerinden yürütülür:
-
-1. **`usbip-host.ko` (Sunucu / Stub Sürücüsü):** Fiziksel aygıtı Linux `usbcore` alt sisteminden ayırır (unbind) ve URB (**USB Request Block**) paketlerini TCP (port 3240) üzerinden ağa aktarır.
-2. **`vhci-hcd.ko` (İstemci / Sanal Ana Bilgisayar Denetleyicisi):** İstemci tarafında sanal bir USB Host Controller (HCI) emüle eder. Ağdan gelen paketleri yerel çekirdeğe sanki anakarta bir USB aygıtı takılmış gibi sunar.
-
-### macOS Çekirdek Engelleri:
-
-- **Mimari Uyuşmazlığı:** macOS (Darwin/XNU), Linux'un `usbcore` veya `struct urb` yapılarını kullanmaz; Apple'ın I/O Kit ve DriverKit mimarisini kullanır. macOS'ta `vhci-hcd` veya `usbip-host` eşdeğeri bir çekirdek sürücüsü yoktur.
-- **KEXT Deprecation ve Sistem Güvenliği:** Modern macOS sürümlerinde (Sonoma, Sequoia) üçüncü taraf çekirdek uzantıları (KEXT) kullanımdan kaldırılmıştır. Apple Silicon üzerinde KEXT yüklemek için makinenin "Reduced Security" moduna alınması gerekir.
-- **DriverKit Sınırları:** Apple'ın sunduğu modern `USBDriverKit` API'si yalnızca spesifik kullanıcı seviyesi aygıt sürücülerine (örneğin özel bir USB kulaklık) izin verir; sanal bir USB Host Controller (HCI) oluşturmaya veya veri yolu paketlerini TCP'ye tünellemeye izin vermez.
-
-Bu nedenlerle **macOS ne yerel bir USB/IP sunucusu ne de USB/IP istemcisi olabilir**.
-
-## 2. Çözüm: QEMU ile macOS üzerinde USB/IP test mimarisi
-
-macOS'un doğrudan USB/IP çalıştıramaması, Mac üzerinde bu altyapıyı geliştiremeyeceğimiz
-anlamına gelmez. Standart çözüm, macOS üzerinde **QEMU ve sanal Linux makineleri** kullanmaktır:
-
-```text
-┌─────────────────────────────────────────────────────────────────────────┐
-│                               macOS Host                                │
-│                                                                         │
-│  ┌───────────────────────────┐           ┌───────────────────────────┐  │
-│  │    QEMU VM 1 (Sunucu)     │           │    QEMU VM 2 (İstemci)    │  │
-│  │   (IP: 192.168.64.10)     │           │    (IP: 192.168.64.11)    │  │
-│  │                           │           │                           │  │
-│  │  ┌─────────────────────┐  │  TCP 3240 │  ┌─────────────────────┐  │  │
-│  │  │ usbip-host.ko       │  │◄──────────┼──│ vhci-hcd.ko         │  │  │
-│  │  │ usbipd servisi      │  │ (USB/IP)  │  │ usbip attach        │  │  │
-│  │  └─────────────────────┘  │           │  └─────────────────────┘  │  │
-│  │             ▲             │           │             │             │  │
-│  │             │             │           │             ▼             │  │
-│  │  [QEMU USB Passthrough]   │           │    [Sanal Kök Hub]        │  │
-│  │  [-device usb-host]       │           │    [Görünen lsusb aygıtı] │  │
-│  └─────────────┬─────────────┘           └───────────────────────────┘  │
-└────────────────┼────────────────────────────────────────────────────────┘
-                 ▼
-     [Mac'e Takılı Fiziksel USB]
-```
-
-### QEMU USB Passthrough Mekanizması:
-
-QEMU, macOS'in kullanıcı seviyesi `libusb` / IOKit arayüzünü kullanarak Mac'e takılı
-gerçek bir USB aygıtını doğrudan sanal makinenin sanal USB veriyoluna (`-device usb-host`)
-devredebilir. Böylece fiziksel aygıt Mac tarafından serbest bırakılır ve VM 1'in Linux çekirdeğine bağlanır.
-
-## 3. Ön koşullar ve kurulum
-
-Mac terminalinde QEMU ve libusb kütüphanelerini kurun:
+Apple Silicon Mac üzerinde QEMU/HVF ve Ubuntu 24.04 ARM64 bulut imajı gerekir. Aşağıdaki komutlar macOS’ta yeni bir laboratuvar dizininde çalışır. İmaj URL’si değişkendir; çalıştırma tarihinizi ve hash’ini kaydedin.
 
 ```bash
 brew install qemu libusb
+mkdir usbip-lab
+cd usbip-lab
+curl -fLO https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-arm64.img
+shasum -a 256 noble-server-cloudimg-arm64.img
 ```
 
-Mac'inize takılı USB aygıtının Satıcı (Vendor) ve Ürün (Product) kimliklerini tespit edin:
+Kurulum ayrı disk katmanları, cloud-init seed’leri ve yazılabilir UEFI değişken depoları üretir. İki VM aynı yazılabilir vars dosyasını paylaşmamalıdır. Özel SSH anahtarını yerelde tutun. `bash prepare.sh` komutunu bir kez çalıştırın:
 
 ```bash
-system_profiler SPUSBDataType
+set -eu
+QEMU_SHARE="$(brew --prefix qemu)/share/qemu"
+test -f "$QEMU_SHARE/edk2-aarch64-code.fd"
+test -f "$QEMU_SHARE/edk2-arm-vars.fd"
+# Run once in a new lab directory; keep each VM's state on subsequent boots.
+ssh-keygen -t ed25519 -N "" -f lab_ed25519
+for vm in server client; do
+    qemu-img create -f qcow2 -F qcow2 \
+        -b "$PWD/noble-server-cloudimg-arm64.img" "$vm.qcow2" 12G
+    cp "$QEMU_SHARE/edk2-arm-vars.fd" "$vm-vars.fd"
+    mkdir "seed-$vm"
+    cat > "seed-$vm/meta-data" <<EOF
+instance-id: kilavuzlar-$vm
+local-hostname: $vm
+EOF
+    cat > "seed-$vm/user-data" <<EOF
+#cloud-config
+users:
+  - default
+ssh_authorized_keys:
+  - $(cat lab_ed25519.pub)
+ssh_pwauth: false
+EOF
+    hdiutil makehybrid -o "seed-$vm.iso" -iso -joliet \
+        -default-volume-name cidata "seed-$vm"
+done
 ```
+{: data-filename="prepare.sh"}
 
-Örnek çıktı:
+## 2. İki VM’yi başlatıp boot kaydı alma
 
-```text
-FT232R USB UART:
-  Product ID: 0x6001
-  Vendor ID: 0x0403  (Future Technology Devices International Limited)
-```
-
-## 4. QEMU Sanal Makinelerini Başlatma
-
-### Sunucu Sanal Makinesi (VM 1):
-
-Sunucu makinesine Mac'teki gerçek USB aygıtını passthrough ile bağlayın ve USB/IP portunu
-(`3240`) dışarıya açın:
+VM’ler ayrı user-mode ağlarda, normalde aynı `10.0.2.15` konuk adresini alır; ortak LAN üzerinde değildir. İstemcide `10.0.2.2:33240`, ana makinenin loopback yönlendirmesi üzerinden sunucuya ulaşır. Konuk sunucu 3240’ı dinler; host portu 33240 yerel çakışmayı azaltmak için seçilmiştir. SSH yönlendirmeleri de yalnız host loopback adresine bağlıdır.
 
 ```bash
+set -eu
+QEMU_SHARE="$(brew --prefix qemu)/share/qemu"
 qemu-system-aarch64 \
     -M virt,highmem=on -accel hvf -cpu host -m 2G -smp 2 \
-    -drive file=server.qcow2,if=virtio \
-    -netdev user,id=net0,hostfwd=tcp::3240-:3240,hostfwd=tcp::2222-:22 \
+    -drive if=pflash,format=raw,readonly=on,file="$QEMU_SHARE/edk2-aarch64-code.fd" \
+    -drive if=pflash,format=raw,file=server-vars.fd \
+    -drive file=server.qcow2,if=virtio,format=qcow2 \
+    -drive file=seed-server.iso,if=virtio,format=raw,readonly=on \
+    -netdev user,id=net0,hostfwd=tcp:127.0.0.1:33240-:3240,hostfwd=tcp:127.0.0.1:2222-:22 \
     -device virtio-net-pci,netdev=net0 \
     -device qemu-xhci,id=xhci \
-    -device usb-host,vendorid=0x0403,productid=0x6001 \
     -nographic
 ```
+{: data-filename="start-server.sh"}
 
-*(Not: Eğer elinizde fiziksel USB donanımı yoksa, `-device usb-host` yerine QEMU'nun sanal USB diskini bağlayarak protokolü test edebilirsiniz: `-drive file=test_disk.raw,if=none,id=u1 -device usb-storage,drive=u1`)*
-
-### İstemci Sanal Makinesi (VM 2):
-
-İkinci terminalde istemci sanal makinesini başlatın:
 
 ```bash
+set -eu
+QEMU_SHARE="$(brew --prefix qemu)/share/qemu"
 qemu-system-aarch64 \
     -M virt,highmem=on -accel hvf -cpu host -m 2G -smp 2 \
-    -drive file=client.qcow2,if=virtio \
-    -netdev user,id=net0,hostfwd=tcp::2223-:22 \
+    -drive if=pflash,format=raw,readonly=on,file="$QEMU_SHARE/edk2-aarch64-code.fd" \
+    -drive if=pflash,format=raw,file=client-vars.fd \
+    -drive file=client.qcow2,if=virtio,format=qcow2 \
+    -drive file=seed-client.iso,if=virtio,format=raw,readonly=on \
+    -netdev user,id=net0,hostfwd=tcp:127.0.0.1:2223-:22 \
     -device virtio-net-pci,netdev=net0 \
     -nographic
 ```
+{: data-filename="start-client.sh"}
 
-## 5. Sunucuda USB/IP yapılandırması (VM 1)
 
-Sunucu Linux terminaline SSH ile bağlanın (`ssh -p 2222 ubuntu@localhost`):
+```bash
+bash start-server.sh > server-boot.log 2>&1 &
+bash start-client.sh > client-boot.log 2>&1 &
+# Wait for cloud-init/SSH to become ready on each VM.
+ssh -i ./lab_ed25519 -p 2222 ubuntu@127.0.0.1 'cloud-init status --wait; uname -a; ip -4 addr'
+ssh -i ./lab_ed25519 -p 2223 ubuntu@127.0.0.1 'cloud-init status --wait; uname -a; ip -4 addr'
+```
 
-### 1. Araçları kurun ve çekirdek modüllerini yükleyin:
+QEMU sürecinin başlaması Ubuntu’nun boot ettiğini kanıtlamaz; `server-boot.log` ve `client-boot.log` dosyalarını saklayın. Yalnız yazılımsal USB testi için `qemu-img create -f raw test_disk.raw 64M` ile boş disk oluşturup sunucu komutuna boot öncesi `-drive file=test_disk.raw,if=none,id=u1,format=raw -device usb-storage,drive=u1` ekleyebilirsiniz. Bu, fiziksel passthrough doğrulaması değildir.
+
+## 3. Fiziksel USB passthrough (donanım gerekir)
+
+Gerçek üretici/ürün kimliklerini `system_profiler SPUSBDataType` ile bulun. Sunucu kapalıyken QEMU komutuna aşağıdaki seçeneği ekleyin (kimlikler yalnız FTDI örneğidir):
+
+```text
+-device usb-host,vendorid=0x0403,productid=0x6001
+```
+
+Aygıt macOS sürücüsü tarafından tutuluyor olabilir; libusb erişimi, sürücünün bırakması ve izinler gerçek aygıtla sınanmalıdır. QEMU’nun seçeneği kabul etmesi USB aktarım başarısı değildir.
+
+## 4. Sunucuda paylaşma (VM 1)
+
+Sunucu VM içinde çalıştırın. Çalışan çekirdekle eşleşen araçlar gerekir; bazı imajlarda ayrıca `linux-modules-extra-$(uname -r)` gerekir. Eşleşen paket bulunmazsa desteklenen generic çekirdeği kurup önce yeniden başlatın.
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y linux-tools-generic linux-tools-$(uname -r) hwdata usbutils
-sudo modprobe usbip-core
+sudo apt-get install -y linux-tools-generic "linux-tools-$(uname -r)" "linux-modules-extra-$(uname -r)" usbutils
 sudo modprobe usbip-host
-```
-
-### 2. USB/IP arka plan servisini (daemon) başlatın:
-
-```bash
 sudo usbipd -D
-```
-
-### 3. Yerel aygıtları listeleyin:
-
-```bash
 usbip list -l
-```
-
-Beklenen çıktı:
-
-```text
- - busid 1-1 (0403:6001)
-   Future Technology Devices International, Ltd : FT232 Serial (UART) IC (0403:6001)
-```
-
-### 4. Aygıtı USB/IP stub sürücüsüne bağlayın (bind):
-
-```bash
+# Replace 1-1 with the actual busid listed above.
 sudo usbip bind -b 1-1
 ```
 
-Aygıt artık yerel işletim sisteminden ayrılmış ve ağ üzerinden paylaşıma açılmıştır.
+## 5. İstemcide bağlama (VM 2)
 
-## 6. İstemcide USB/IP yapılandırması (VM 2)
-
-İstemci Linux terminaline bağlanın (`ssh -p 2223 ubuntu@localhost`):
-
-### 1. Araçları kurun ve `vhci-hcd` sanal denetleyicisini yükleyin:
+İstemci VM içinde çalıştırın. Paylaşılan gerçek busid’yi kullanın; bu kalıcı aygıt kimliği değildir:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y linux-tools-generic linux-tools-$(uname -r) usbutils
+sudo apt-get install -y linux-tools-generic "linux-tools-$(uname -r)" "linux-modules-extra-$(uname -r)" usbutils
 sudo modprobe vhci-hcd
-```
-
-### 2. Sunucuda paylaşılan aygıtları sorgulayın:
-
-```bash
-usbip list -r 10.0.2.2
-```
-
-*(QEMU kullanıcı ağı varsayılanında ana makine ağ geçidi `10.0.2.2` adresindedir).*
-
-Beklenen çıktı:
-
-```text
-Exportable USB devices
-======================
- - 10.0.2.2
-      1-1: Future Technology Devices International, Ltd : FT232 Serial (0403:6001)
-         : /sys/devices/platform/xhci-hcd.0/usb1/1-1
-         : (Defined at Interface level) (00/00/00)
-```
-
-### 3. Uzaktaki aygıtı yerel sanal denetleyiciye bağlayın (attach):
-
-```bash
-sudo usbip attach -r 10.0.2.2 -b 1-1
-```
-
-## 7. Doğrulama ve temiz ayırma
-
-İstemci makinede `lsusb` çalıştırın:
-
-```bash
+usbip --tcp-port 33240 list -r 10.0.2.2
+sudo usbip --tcp-port 33240 attach -r 10.0.2.2 -b 1-1
+# USB enumeration is asynchronous; wait for the expected device to appear.
+sudo udevadm settle
 lsusb
+sudo usbip port
+sudo dmesg | tail -n 10
 ```
 
-Beklenen çıktı:
+Fiziksel FTDI kabulü istemcide doğru VID:PID, seri aygıt oluşması ve gerçek seri veri aktarımı gerektirir; yalnız `lsusb` yeterli değildir. Sanal disk testinde mass-storage aygıtı beklenir, `/dev/ttyUSB0` değil. PCI/xHCI sysfs yolları ve bus numaraları değişir.
 
-```text
-Bus 001 Device 002: ID 0403:6001 Future Technology Devices International, Ltd FT232 Serial (UART) IC
-Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-```
-
-`dmesg` çıktısında `vhci_hcd` sürücüsünün aygıtı tanıdığını ve `/dev/ttyUSB0` seri portunun
-açıldığını görebilirsiniz:
+## 6. Ayırma ve kapatma
 
 ```bash
-dmesg | tail -n 10
-```
-
-Bağlantı durumunu kontrol etmek için:
-
-```bash
-usbip port
-```
-
-### Bağlantıyı kesme (Teardown):
-
-İstemcide portu serbest bırakın:
-
-```bash
+# Client: replace 00 with the port shown by sudo usbip port.
 sudo usbip detach -p 00
-```
-
-Sunucuda aygıtı yerel kullanıma geri döndürmek için:
-
-```bash
+# Server: use the actual exported busid.
 sudo usbip unbind -b 1-1
 ```
 
-## Pratik alternatif: Lima (`limactl`)
 
-Komut satırından karmaşık QEMU parametreleriyle uğraşmak istemiyorsanız, macOS için geliştirilmiş
-**Lima** aracı tek bir YAML dosyasıyla USB passthrough ve köprülenmiş Linux sanal makineleri
-açmanıza imkan tanır.
+```bash
+# macOS: shut down each guest cleanly, retaining overlays and vars files.
+ssh -i ./lab_ed25519 -p 2223 ubuntu@127.0.0.1 'sudo poweroff'
+ssh -i ./lab_ed25519 -p 2222 ubuntu@127.0.0.1 'sudo poweroff'
+```
 
-## Kaynaklar ve doğrulama ortamı
+## Kaynaklar ve doğrulama kapsamı
 
-- [Linux Kernel USB/IP Documentation](https://docs.kernel.org/usb/usbip_protocol.html)
-- [QEMU USB Emulation & Passthrough Reference](https://www.qemu.org/docs/master/system/devices/usb.html)
-- [Apple DriverKit USBDriverKit Reference](https://developer.apple.com/documentation/usbdriverkit)
+- [QEMU virt firmware](https://www.qemu.org/docs/master/system/arm/virt.html)
+- [QEMU user-mode networking](https://www.qemu.org/docs/master/system/devices/net.html)
+- [QEMU USB passthrough](https://www.qemu.org/docs/master/system/devices/usb.html)
+- [Linux USB/IP protocol](https://docs.kernel.org/usb/usbip_protocol.html)
+- [Ubuntu ARM64 cloud images](https://cloud-images.ubuntu.com/noble/current/)
 
-Bu kılavuz, Apple Silicon Mac (macOS Sonoma 14.5) üzerinde QEMU 9.0 (`-device usb-host`),
-Ubuntu 24.04 sanal makineleri ve FTDI USB-UART donanımı ile test edilmiştir.
+8–9 Kasım 2026: QEMU 11.1.3/HVF üzerinde iki Ubuntu ARM64 konuk ayrı UEFI vars dosyalarıyla boot edildi ve ağ yolu kontrol edildi. Sanal 64 MiB USB diskin bind/list/attach, istemcide yazma-okuma ve detach/unbind adımları da çalıştırıldı. Fiziksel USB passthrough ve FTDI veri aktarımı **doğrulanmadı**. Bu koşu veya sanal USB disk testi fiziksel donanım kabulü oluşturmaz.

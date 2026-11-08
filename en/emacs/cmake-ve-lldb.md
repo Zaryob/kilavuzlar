@@ -2,13 +2,13 @@
 title: Using CMake and LLDB in Emacs
 permalink: /en/emacs/cmake-ve-lldb/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-09
 scope: Modern C++ development and lldb-dap debugging in GNU Emacs 29+ with Eglot,
   project.el, compile and dape.
 lang: en
 translation_key: guide-emacs-cmake-ve-lldb
 translation_of: /emacs/cmake-ve-lldb/
-translated: '2026-11-03'
+translated: '2026-11-09'
 ---
 
 # Using CMake and LLDB in Emacs
@@ -21,7 +21,7 @@ This guide configures and builds a CMake-based C++ project in Emacs, then debugs
 
 Historically, debugging in Emacs had two main approaches:
 
-1. **GUD (`gud-lldb` / `gud-gdb`)**: the long-established terminal-oriented interface. Parsing LLDB output with regular expressions can be fragile, and does not provide the same modern object-tree, watch and complex-stack views.
+1. **GUD**: a long-established debugger interface; `gud-lldb` itself was added in Emacs 30. Dape uses the structured DAP protocol instead of parsing terminal output.
 2. **`dap-mode`**: brought the VS Code debugging protocol to Emacs, but is closely tied to the larger `lsp-mode` ecosystem.
 
 **`dape` — Debug Adapter Protocol for Emacs:**
@@ -101,7 +101,7 @@ Add this configuration to `~/.emacs.d/init.el` or `~/.config/emacs/init.el`:
                    command "lldb-dap"
                    :type "executable"
                    :request "launch"
-                   :cwd dape-cwd-fn
+                   :cwd "."
                    :program (lambda ()
                               (read-file-name "İkili dosya seçin: "
                                               (expand-file-name "build/" (dape-cwd))))
@@ -110,11 +110,13 @@ Add this configuration to `~/.emacs.d/init.el` or `~/.config/emacs/init.el`:
   :bind
   (("C-x C-a d" . dape)
    ("C-x C-a b" . dape-breakpoint-toggle)
-   ("C-x C-a c" . dape-breakpoint-expression)
-   ("C-x C-a r" . dape-repl)
+   ("C-x C-a e" . dape-breakpoint-expression)
+   ("C-x C-a R" . dape-repl)
    ("C-x C-a i" . dape-info)))
 ```
 {: data-filename="init.el"}
+
+The `e` and uppercase `R` bindings preserve dape’s `c` (continue) and `r` (restart), including their repeat-map actions.
 
 ## 3. Project-level CMake and Clangd configuration
 
@@ -155,7 +157,7 @@ cmake --build build -j
 
 Move to the source line where execution should stop:
 - `C-x C-a b` (`dape-breakpoint-toggle`): toggles a breakpoint and displays a red marker at the start of the line.
-- `C-x C-a c` (`dape-breakpoint-expression`): adds a conditional breakpoint, for example stopping when a loop counter satisfies `i == 100`.
+- `C-x C-a e` (`dape-breakpoint-expression`): adds a conditional breakpoint, for example stopping when a loop counter satisfies `i == 100`.
 
 ### Step 3: Start a dape session
 
@@ -198,4 +200,4 @@ x/16xb pointer_address
 - [LLVM lldb-dap documentation](https://lldb.llvm.org/)
 - [GNU Emacs Eglot manual](https://www.gnu.org/software/emacs/manual/html_node/eglot/)
 
-This guide was tested and verified on macOS Sonoma 14 and Ubuntu 24.04 using GNU Emacs 29.4, Clang 18 (`lldb-dap`), Eglot and dape 0.19.
+8–9 November 2026: configuration and key/repeat maps were checked in batch Emacs 31.1 with dape 0.19.0 and 0.28.0. No interactive LLDB/DAP session was run.

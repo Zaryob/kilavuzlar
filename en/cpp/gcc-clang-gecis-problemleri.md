@@ -2,20 +2,20 @@
 title: Problems when migrating from GCC to Clang
 permalink: /en/cpp/gcc-clang-gecis-problemleri/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-09
 scope: 'Migrating C++17/C++20/C++23 projects from GCC to LLVM/Clang: ABI, linker and
   standard-library differences.'
 lang: en
 translation_key: guide-cpp-gcc-clang-gecis-problemleri
 translation_of: /cpp/gcc-clang-gecis-problemleri/
-translated: '2026-11-03'
+translated: '2026-11-09'
 ---
 
 # Problems when migrating from GCC to Clang
 
 Moving a large C++ codebase from GCC to LLVM/Clang promises faster builds, advanced static analysis (`clang-tidy`), a modern linker (`lld`) and improved debugging information. In practice, however, code that builds without GCC warnings is not guaranteed to build with Clang.
 
-Clang applies ISO C++ rules and two-phase template lookup strictly. Differences in linkers, standard libraries (`libstdc++` vs `libc++`) and ABI compatibility also introduce important pitfalls.
+Both compilers implement two-phase template lookup; this is not a general “GCC accepts, Clang rejects” distinction. Differences in linkers, standard libraries (`libstdc++` vs `libc++`) and ABI compatibility also introduce important pitfalls.
 
 ## 1. Standard-library pitfalls: `libstdc++` vs `libc++`
 
@@ -25,11 +25,10 @@ On Linux, Clang uses the system GNU `libstdc++` by default. On macOS, Apple Clan
 
 Historically, GCC’s `libstdc++` headers such as `<vector>` and `<iostream>` have included many other standard headers transitively. Developers may inadvertently use `uint32_t`, `std::pair` or `std::numeric_limits` without including `<cstdint>`, `<utility>` or `<limits>` explicitly.
 
-LLVM’s `libc++` is stricter about header independence. Building such code can produce errors such as:
+Transitive includes vary by library and release; they are not guaranteed compiler differences. For a deterministic missing-header example, compile `std::uint32_t value = 0;` with no includes. Clang reports:
 
 ```text
-error: 'uint32_t' does not name a type; did you mean 'u_int32_t'?
-error: no member named 'pair' in namespace 'std'
+error: use of undeclared identifier 'std'
 ```
 
 **Solution:** add the missing `#include <cstdint>`, `#include <utility>` or `#include <limits>` directly to the relevant source or header file.
@@ -41,7 +40,7 @@ You cannot freely link a library compiled with GCC and `libstdc++` to an applica
 - `libc++` mangles C++ symbols in the `std::__1::` inline namespace, while `libstdc++` uses `std::__cxx11::` for parts of its newer ABI.
 - The memory layouts of `std::string` and `std::vector` differ between the two libraries.
 
-Mixing their C++ interfaces in one process can produce undefined behaviour, crashes and linker errors.
+Passing C++ library objects across this boundary can produce undefined behaviour, crashes and linker errors. A deliberately designed C ABI boundary with separate ownership is a different case.
 
 ### The `libstdc++` dual ABI (`_GLIBCXX_USE_CXX11_ABI`)
 
@@ -65,23 +64,23 @@ GCC commonly uses GNU `ld` (`ld.bfd`) or `gold`. LLVM’s `lld` is an option for
 clang++ -fuse-ld=lld main.o -o uygulama
 ```
 
-`lld` can expose One Definition Rule violations and duplicate symbol definitions that went unnoticed with another linker.
+Both linkers normally reject duplicate strong definitions. Many ODR violations need not be diagnosed; choosing `lld` is not an ODR correctness check.
 
 ### Incompatible link-time optimisation representations
 
 GCC and Clang generate different intermediate representations for LTO:
 
 - GCC `-flto`: **GIMPLE** bytecode in ELF sections.
-- Clang `-flto`: **LLVM Bitcode** (`.llvmbc`) in ELF sections.
+- Clang `-flto`: **LLVM bitcode** as the object file. Embedding bitcode into ELF with `-fembed-bitcode` is a separate workflow.
 
 > [!WARNING]
 > A static library (`.a`) built with GCC LTO cannot be linked into a Clang LTO project. `lld` cannot interpret GIMPLE. When using LTO, build all dependencies with the same compiler family.
 
-## 3. Strict language rules and template checks
+## 3. Portable language rules and template checks
 
 ### Two-phase template lookup
 
-GCC has historically accepted some template-derived-class member lookups more permissively. Clang applies the standard’s dependent-name rules strictly:
+GCC has implemented two-phase lookup since 3.4. Both compilers reject this unqualified dependent-base call in normal standards mode. GCC’s `-fpermissive` can downgrade some errors but is not a portable fix:
 
 ```cpp
 template <typename T>
@@ -92,7 +91,7 @@ struct Taban {
 template <typename T>
 struct Turemis : Taban<T> {
     void baslat() {
-        calis(); // GCC derleyebilir; Clang HATA verir!
+        calis(); // Both GCC and Clang reject this call.
     }
 };
 ```
@@ -101,7 +100,6 @@ Clang’s error message:
 
 ```text
 error: use of undeclared identifier 'calis'
-note: must qualify identifier to find this declaration in dependent base class
 ```
 
 **Cause:** `Taban<T>` is a dependent base type. At parse time, the compiler cannot assume that the base class contains `calis`.
@@ -112,7 +110,18 @@ note: must qualify identifier to find this declaration in dependent base class
 
 Under C++11 (§12.8), declaring a **move constructor** or **move assignment operator** causes the implicitly declared copy constructor to be defined as deleted.
 
-Code that appeared to pass under a permissive or older GCC configuration may fail when Clang diagnoses this rule:
+Both GCC and Clang reject an attempted copy in this case. For example, compile the following complete program:
+
+```cpp
+struct Baglanti {
+    Baglanti() = default;
+    Baglanti(Baglanti&&) = default;
+};
+int main() {
+    Baglanti a;
+    Baglanti b(a); // Both GCC and Clang reject copying.
+}
+```
 
 ```text
 error: call to implicitly-deleted copy constructor of 'Baglanti'
@@ -158,6 +167,6 @@ clang++ -fopenmp main.cpp -o uygulama
 
 - [LLVM Clang Compiler User’s Manual](https://clang.llvm.org/docs/UsersManual.html)
 - [GCC to Clang Migration Guide — Chromium Project](https://chromium.googlesource.com/chromium/src/+/main/docs/clang.md)
-- [C++ standard core-language defect reports — two-phase lookup](https://www.open-std.org/jtc1/sc22/wg21/)
+- [C++ standard core-language defect reports — two-phase lookup](https://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html)
 
-These scenarios were tested and verified on Ubuntu 24.04 using GCC 14.2 and Clang 18.1.
+8–9 November 2026: missing-header, dependent-base, deleted-copy and VLA cases were compiled with GCC 12 and Clang 14 on Debian 12 ARM64, including corrected variants. This does not verify every ABI, OpenMP or linker combination discussed above.

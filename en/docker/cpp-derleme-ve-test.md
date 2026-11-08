@@ -2,13 +2,13 @@
 title: Building and testing a C++ application in Docker
 permalink: /en/docker/cpp-derleme-ve-test/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-09
 scope: Multi-stage Dockerfiles, BuildKit cache mounts, CMake/Ninja, CTest and a Distroless
   runtime.
 lang: en
 translation_key: guide-docker-cpp-derleme-ve-test
 translation_of: /docker/cpp-derleme-ve-test/
-translated: '2026-11-03'
+translated: '2026-11-09'
 ---
 
 # Building and testing a C++ application in Docker
@@ -21,7 +21,7 @@ A modern solution combines **multi-stage builds**, **BuildKit cache mounts (`--m
 
 ## 1. Multi-stage architecture
 
-The pipeline has four logical stages:
+The pipeline has five logical stages:
 
 ```text
 [ 1. Derleme Ortamı ]   ──► Derleyici araçlar (GCC/Clang, CMake, Ninja, Ccache)
@@ -32,7 +32,7 @@ The pipeline has four logical stages:
           │
 [ 4. Test Koşucusu ]    ──► CTest ile birim testler (Başarısız olursa imaj üretimi durur)
           │
-[ 5. Minimal Çalışma ]  ──► Yalnızca ikili dosya (Distroless / Scratch - ~25 MB)
+[ 5. Minimal Çalışma ]  ──► Yalnızca ikili dosya (Distroless; boyut ölçülmelidir)
 ```
 
 ## 2. A production-oriented multi-stage Dockerfile
@@ -51,7 +51,11 @@ ENV DEBIAN_FRONTEND=noninteractive \
     VCPKG_ROOT=/opt/vcpkg \
     VCPKG_FORCE_SYSTEM_BINARIES=1
 
-# APT paketlerini BuildKit önbelleği ile kur (tekrar indirilmez)
+# APT arşivlerinin docker-clean tarafından silinmesini engelle
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
+# APT paketlerini BuildKit önbelleği ile kur
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
@@ -68,7 +72,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         ccache
 
 # vcpkg aracını kur
-RUN git clone --depth 1 https://github.com/microsoft/vcpkg.git /opt/vcpkg && \
+RUN git clone --branch 2024.09.30 https://github.com/microsoft/vcpkg.git /opt/vcpkg && \
     /opt/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 
 # ==============================================================================
@@ -81,8 +85,10 @@ WORKDIR /proje
 COPY vcpkg.json ./
 
 # vcpkg ikili önbelleği ile bağımlılıkları derle
+ARG TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/vcpkg \
-    ${VCPKG_ROOT}/vcpkg install --triplet x64-linux
+    case "$TARGETARCH" in amd64) triplet=x64-linux ;; arm64) triplet=arm64-linux ;; *) exit 1 ;; esac && \
+    ${VCPKG_ROOT}/vcpkg install --triplet "$triplet"
 
 # ==============================================================================
 # AŞAMA 3: Projeyi Derleme
@@ -91,7 +97,7 @@ FROM bagimlilik-derleyici AS derleyici
 WORKDIR /proje
 
 # Kaynak kodları kopyala
-COPY CMakeLists.txt CMakePresets.json ./
+COPY CMakeLists.txt ./
 COPY src/ ./src/
 COPY tests/ ./tests/
 
@@ -101,6 +107,8 @@ RUN --mount=type=cache,target=/root/.cache/vcpkg \
     --mount=type=cache,target=/root/.cache/ccache \
     cmake -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+        -DVCPKG_INSTALLED_DIR=/proje/vcpkg_installed \
         -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
         -DBUILD_TESTING=ON && \
     cmake --build build -j
@@ -121,12 +129,33 @@ RUN ctest --test-dir build --output-on-failure
 FROM gcr.io/distroless/cc-debian12:nonroot AS calisma-zamani
 
 WORKDIR /app
-COPY --from=derleyici /proje/build/bin/uygulama /app/uygulama
+COPY --from=test-kosucu /proje/build/bin/uygulama /app/uygulama
 
 USER nonroot:nonroot
 ENTRYPOINT ["/app/uygulama"]
 ```
 {: data-filename="Dockerfile"}
+
+The complete build context consists of `Dockerfile`, `vcpkg.json`, `CMakeLists.txt`, `src/main.cpp` and `tests/test_main.cpp`. No presets file is needed. The final COPY depends on `test-kosucu`, so BuildKit must execute CTest for the runtime target too.
+
+```json
+{
+  "name": "docker-cpp-ornek",
+  "version": "1.0.0",
+  "builtin-baseline": "c82f74667287d3dc386bce81e44964370c91a289",
+  "dependencies": ["fmt"]
+}
+```
+{: data-filename="vcpkg.json"}
+
+```cpp
+#include <fmt/core.h>
+
+int main() {
+    fmt::print("Uygulama calisti!\n");
+}
+```
+{: data-filename="src/main.cpp"}
 
 ## 3. Example CMakeLists.txt and test definition
 
@@ -164,12 +193,15 @@ Example test file, `tests/test_main.cpp`:
 
 ```cpp
 #include <iostream>
-#include <cassert>
 
 int topla(int a, int b) { return a + b; }
 
 int main() {
-    assert(topla(2, 3) == 5);
+    const int beklenen = 5;
+    if (topla(2, 3) != beklenen) {
+        std::cerr << "topla(2, 3): beklenen " << beklenen << ", alinan " << topla(2, 3) << "\n";
+        return 1;
+    }
     std::cout << "Tüm testler başarıyla geçti.\n";
     return 0;
 }
@@ -199,21 +231,27 @@ You can split CI into stages instead of running every step at once:
    docker build --target calisma-zamani -t cpp-uygulama:prod .
    ```
 
-## 5. Comparing image sizes
+### Proving the failure gate
 
-The difference between a traditional single-stage image and a multi-stage Distroless image:
+In a temporary copy of the project, change `const int beklenen = 5;` to `const int beklenen = 6;`. Both builds below must exit nonzero, including the final runtime target. Restore the expectation afterwards. This explicit check remains active with `-DNDEBUG`.
 
-```text
-Geleneksel GCC + CMake İmajı:       ~1.85 GB
-Multi-Stage Distroless İmajı:        ~28.4 MB
+```bash
+docker build --target test-kosucu -t cpp-test-negatif .
+docker build --target calisma-zamani -t cpp-runtime-negatif .
 ```
 
-The final image contains no unnecessary compilers, header files (`.h`/`.hpp`), package manager or shell. This keeps startup quick and reduces the attack surface.
+## 5. Comparing image sizes
+
+Measure image size for the chosen platform and tag; no size or startup-time guarantee is implied:
+
+```bash
+docker image inspect cpp-uygulama:latest --format '{% raw %}{{.Size}}{% endraw %}'
+```
 
 ## Sources and verification environment
 
 - [Docker multi-stage builds guide](https://docs.docker.com/build/building/multi-stage/)
 - [Google Container Tools — Distroless images](https://github.com/GoogleContainerTools/distroless)
-- [BuildKit cache mounts documentation](https://docs.docker.com/build/cache/backends/)
+- [BuildKit cache mounts documentation](https://docs.docker.com/build/cache/optimize/#use-cache-mounts)
 
-These steps were tested and verified using Docker Engine 26.1 and BuildKit on a Debian 12 base with GCC 12, CMake 3.25 and Ninja.
+8–9 November 2026: the final image was built and run with Docker 29.6.2/BuildKit, Debian 12 ARM64, GCC 12.2.0 and CMake 3.25.1. The compile command used `ccache` and `-DNDEBUG`. A deliberately wrong expectation stopped both `test-kosucu` and `calisma-zamani` with exit 1. A successful build does not establish performance or image-size claims.

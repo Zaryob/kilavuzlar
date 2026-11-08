@@ -4,7 +4,7 @@ lang: tr
 title: "Emacs ile CMake ve LLDB kullanmak"
 permalink: /emacs/cmake-ve-lldb/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-09
 scope: GNU Emacs 29+ üzerinde Eglot, project.el, compile ve dape ile modern C++ ve lldb-dap hata ayıklama.
 ---
 
@@ -23,7 +23,7 @@ ele alacağız.
 
 Geçmişte Emacs'te hata ayıklama için iki temel yol bulunuyordu:
 
-1. **GUD (`gud-lldb` / `gud-gdb`)**: Emacs'in 30 yıllık terminal tabanlı arayüzüdür. LLDB çıktısını düzenli ifadelerle (regex) ayrıştırmaya çalıştığı için kararsızdır; modern nesne ağaçlarını, değişken izlemeyi ve karmaşık yığınları desteklemez.
+1. **GUD**: Köklü bir hata ayıklama arayüzüdür; `gud-lldb` desteği ise Emacs 30 ile eklenmiştir. Dape, terminal çıktısını ayrıştırmak yerine yapılandırılmış DAP protokolünü kullanır.
 2. **`dap-mode`**: VS Code hata ayıklama protokolünü Emacs'e getirdi ancak `lsp-mode` ekosistemine sıkı sıkıya bağlıdır ve oldukça ağırdır.
 
 **`dape` (Debug Adapter Protocol for Emacs)**:
@@ -104,7 +104,7 @@ Aşağıdaki yapılandırmayı `~/.emacs.d/init.el` veya `~/.config/emacs/init.e
                    command "lldb-dap"
                    :type "executable"
                    :request "launch"
-                   :cwd dape-cwd-fn
+                   :cwd "."
                    :program (lambda ()
                               (read-file-name "İkili dosya seçin: "
                                               (expand-file-name "build/" (dape-cwd))))
@@ -113,11 +113,13 @@ Aşağıdaki yapılandırmayı `~/.emacs.d/init.el` veya `~/.config/emacs/init.e
   :bind
   (("C-x C-a d" . dape)
    ("C-x C-a b" . dape-breakpoint-toggle)
-   ("C-x C-a c" . dape-breakpoint-expression)
-   ("C-x C-a r" . dape-repl)
+   ("C-x C-a e" . dape-breakpoint-expression)
+   ("C-x C-a R" . dape-repl)
    ("C-x C-a i" . dape-info)))
 ```
 {: data-filename="init.el"}
+
+`e` ve büyük `R` bağları, dape’in `c` (continue) ve `r` (restart) tuşlarını ve repeat-map davranışlarını korur.
 
 ## 3. Proje düzeyinde CMake ve Clangd ayarları
 
@@ -162,7 +164,7 @@ cmake --build build -j
 
 Kaynak kodda duraklamak istediğiniz satıra gelin:
 - `C-x C-a b` (`dape-breakpoint-toggle`): O satıra kesme noktası koyar. Satır başında kırmızı bir gösterge belirir.
-- `C-x C-a c` (`dape-breakpoint-expression`): Koşullu kesme noktası ekler (örneğin döngü sayacı `i == 100` olduğunda dur).
+- `C-x C-a e` (`dape-breakpoint-expression`): Koşullu kesme noktası ekler (örneğin döngü sayacı `i == 100` olduğunda dur).
 
 ### 3. Adım: Dape Oturumunu Başlatma
 
@@ -206,5 +208,4 @@ x/16xb pointer_address
 - [LLVM lldb-dap Dokümantasyonu](https://lldb.llvm.org/)
 - [GNU Emacs Eglot Kullanım Kılavuzu](https://www.gnu.org/software/emacs/manual/html_node/eglot/)
 
-Bu kılavuz, macOS Sonoma 14 ve Ubuntu 24.04 üzerinde GNU Emacs 29.4, Clang 18 (`lldb-dap`),
-Eglot ve dape 0.19 ile test edilerek doğrulanmıştır.
+8–9 Kasım 2026: yapılandırma ve tuş/repeat haritaları Emacs 31.1 batch modunda dape 0.19.0 ve 0.28.0 ile kontrol edildi. Etkileşimli LLDB/DAP oturumu çalıştırılmadı.

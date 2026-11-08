@@ -4,7 +4,7 @@ lang: tr
 title: "GCC'den Clang'e geçerken karşılaşılan problemler"
 permalink: /cpp/gcc-clang-gecis-problemleri/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-09
 scope: C++17/C++20/C++23 projelerinin GCC'den LLVM/Clang derleyicisine taşınması, ABI, linker ve standart kütüphane farkları.
 ---
 
@@ -15,14 +15,12 @@ derleme süreleri, gelişmiş statik analiz (`clang-tidy`), modern bağlayıcı 
 hata ayıklama sembolleri vaat eder. Ancak pratikte "GCC ile uyarısız derlenen kod Clang ile
 de derlenir" varsayımı yanlıştır.
 
-Clang, ISO C++ standartlarına ve iki aşamalı şablon çözümlemesine (two-phase lookup) GCC'den
-çok daha katı yaklaşır. Ayrıca bağlayıcı (linker), standart kütüphane (`libstdc++` vs `libc++`)
-ve ABI uyumluluğunda kritik tuzaklar barındırır.
+Her iki derleyici de iki aşamalı şablon aramasını uygular; bu, genel bir “GCC kabul eder, Clang reddeder” ayrımı değildir. Bağlayıcı, standart kütüphane (`libstdc++` ve `libc++`) ve ABI farklarını ayrı değerlendirmek gerekir.
 
 ## 1. Standart kütüphane tuzakları: `libstdc++` vs `libc++`
 
 Linux üzerinde Clang varsayılan olarak sistemdeki GNU `libstdc++` kütüphanesini kullanır.
-macOS üzerinde ise Apple Clang yalnızca LLVM'in `libc++` kütüphanesini tanır.
+macOS üzerinde Apple Clang varsayılan olarak LLVM `libc++` kullanır.
 
 ### Geçişli başlık dosyası kirliliği (Transitive Header Inclusions)
 
@@ -31,12 +29,10 @@ birçok standart başlığı kendi içinde dolaylı (geçişli) olarak dahil ede
 farkında olmadan `<cstdint>`, `<utility>` veya `<limits>` eklemeden `uint32_t`, `std::pair`
 veya `std::numeric_limits` kullanabilir.
 
-LLVM'in `libc++` kütüphanesi ise başlık bağımsızlığına çok sıkı uyar. Bu kod Clang ile
-derlendiğinde anında şu hatalar alınır:
+Geçişli include’lar kütüphane ve sürüme göre değişir; derleyiciler arasında garantili fark değildir. Kesin bir eksik başlık örneği için hiç include olmadan `std::uint32_t value = 0;` derleyin. Clang şu hatayı verir:
 
 ```text
-error: 'uint32_t' does not name a type; did you mean 'u_int32_t'?
-error: no member named 'pair' in namespace 'std'
+error: use of undeclared identifier 'std'
 ```
 
 **Çözüm:** Eksik olan `#include <cstdint>`, `#include <utility>` veya `#include <limits>`
@@ -44,14 +40,12 @@ satırlarını doğrudan ilgili kaynak veya başlık dosyasına ekleyin.
 
 ### Karışık nesne bağlama ve ABI uyuşmazlığı
 
-Bir kütüphaneyi GCC (`libstdc++`) ile, uygulamanın kendisini ise Clang + `libc++` ile
-derleyip birbirine bağlayamazsınız:
+GCC (`libstdc++`) ile derlenmiş kütüphane ile Clang + `libc++` kullanan uygulama arasında STL nesneleri taşıyan bir C++ arayüzü doğrudan uyumlu kabul edilmemelidir:
 
 - `libc++`, C++ sembollerini `std::__1::` satır içi (inline) ad alanında manglerken, `libstdc++` ise `std::__cxx11::` ad alanını kullanır.
 - `std::string` veya `std::vector` bellek yerleşimi (memory layout) iki kütüphane arasında tamamen farklıdır.
 
-Bu iki dünyayı aynı süreçte karıştırmak tanımsız davranışlara (Undefined Behavior),
-çökmelere ve linker hatalarına yol açar.
+C++ kütüphane nesnelerini bu sınırdan geçirmek tanımsız davranış, çökme veya linker hatası doğurabilir. Ayrı sahiplik kurallarıyla tasarlanmış bir C ABI sınırı farklıdır.
 
 ### `libstdc++` Çift ABI Sorunu (`_GLIBCXX_USE_CXX11_ABI`)
 
@@ -79,28 +73,25 @@ en yüksek hız avantajını elde etmek için LLVM'in bağlayıcısı `lld` terc
 clang++ -fuse-ld=lld main.o -o uygulama
 ```
 
-`lld`, GNU `ld`ye göre ODR (One Definition Rule) ihlallerine ve çift sembol tanımlarına
-çok daha az tolerans gösterir.
+Her iki bağlayıcı da normalde çift güçlü sembol tanımını reddeder. Pek çok ODR ihlalinin teşhisi zorunlu değildir; `lld` seçimi bir ODR doğruluk denetimi değildir.
 
 ### LTO (Link Time Optimization) Bayt Kodu Uyumsuzluğu
 
 GCC ve Clang, LTO için tamamen farklı ara temsil (IR) formatları üretir:
 
 - GCC `-flto`: ELF bölümlerinde **GIMPLE** bayt kodu oluşturur.
-- Clang `-flto`: ELF bölümlerinde **LLVM Bitcode** (`.llvmbc`) oluşturur.
+- Clang `-flto`: Nesne dosyası olarak **LLVM bitcode** üretir. `-fembed-bitcode` ile ELF içine gömülen bitcode ayrı bir akıştır.
 
 > [!WARNING]
 > GCC ile LTO kullanılarak derlenmiş bir statik kütüphane (`.a`), Clang LTO ile
 > derlenen bir projeye bağlanamaz. `lld` bağlayıcısı GIMPLE kodunu çözümleyemez. LTO
 > kullanılacaksa tüm bağımlılıklar aynı derleyici ailesiyle derlenmelidir.
 
-## 3. Clang'in katı dil kuralları ve şablon denetimleri
+## 3. Taşınabilir dil kuralları ve şablon denetimleri
 
 ### İki Aşamalı Şablon Araması (Two-Phase Template Lookup)
 
-GCC, şablon türetilmiş sınıflarda taban sınıf üyelerinin aranmasını uzun yıllar boyunca
-örnekleme (instantiation) anına kadar gevşek bırakmıştır. Clang ise C++ standardını katı
-şekilde uygular:
+GCC iki aşamalı aramayı 3.4’ten beri uygular. Her iki derleyici de normal standart modunda aşağıdaki niteliksiz bağımlı taban çağrısını reddeder. GCC `-fpermissive` bazı hataları uyarıya çevirebilir; taşınabilir bir çözüm değildir:
 
 ```cpp
 template <typename T>
@@ -111,7 +102,7 @@ struct Taban {
 template <typename T>
 struct Turemis : Taban<T> {
     void baslat() {
-        calis(); // GCC derleyebilir; Clang HATA verir!
+        calis(); // Both GCC and Clang reject this call.
     }
 };
 ```
@@ -120,7 +111,6 @@ Clang hata mesajı:
 
 ```text
 error: use of undeclared identifier 'calis'
-note: must qualify identifier to find this declaration in dependent base class
 ```
 
 **Neden:** `Taban<T>`, `T` parametresine bağlı bir tiptir (dependent base). Derleyici
@@ -134,8 +124,18 @@ C++11 standardına göre (madde §12.8), bir sınıfta kullanıcı tanımlı bir
 (move constructor)** veya **taşıma atama operatörü** varsa, derleyici artık örtük bir
 kopyalama kurucusu (copy constructor) üretmez (`= delete` kabul edilir).
 
-GCC geriye dönük uyumluluk için bu durumlarda yalnızca uyarı verirken, Clang doğrudan
-derleme hatası üretir:
+Bu durumda kopyalama girişimini hem GCC hem Clang reddeder. Örneğin aşağıdaki tam programı derleyin:
+
+```cpp
+struct Baglanti {
+    Baglanti() = default;
+    Baglanti(Baglanti&&) = default;
+};
+int main() {
+    Baglanti a;
+    Baglanti b(a); // Both GCC and Clang reject copying.
+}
+```
 
 ```text
 error: call to implicitly-deleted copy constructor of 'Baglanti'
@@ -170,8 +170,7 @@ clang++ -fopenmp main.cpp -o uygulama
 > [!CAUTION]
 > Aynı süreç içerisinde hem `libgomp` hem de `libomp` kütüphanelerinin yüklenmesine
 > (örneğin biri paylaşımlı kütüphaneden, diğeri ana uygulamadan) asla izin vermeyin.
-> İki farklı OpenMP çalışma zamanı CPU çekirdeklerini paylaşmaya çalışırken derhal kilitlenmelere
-> (deadlock) veya bellek ihlallerine (SIGSEGV) neden olur.
+> Birlikte yüklenmeleri kaynak çekişmesi, kilitlenme veya çalışma zamanı hatası riski taşır; her durumda derhal çökme garantisi yoktur.
 
 ## 5. Taşıma Kontrol Listesi (Migration Checklist)
 
@@ -187,7 +186,6 @@ clang++ -fopenmp main.cpp -o uygulama
 
 - [LLVM Clang Compiler User's Manual](https://clang.llvm.org/docs/UsersManual.html)
 - [GCC to Clang Migration Guide - Chromium Project](https://chromium.googlesource.com/chromium/src/+/main/docs/clang.md)
-- [C++ Standard Core Language Defect Reports - Two-phase Lookup](https://www.open-std.org/jtc1/sc22/wg21/)
+- [C++ Standard Core Language Defect Reports - Two-phase Lookup](https://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html)
 
-Bu belgedeki senaryolar, Ubuntu 24.04 üzerinde GCC 14.2 ve Clang 18.1 derleyicileri
-ile test edilerek doğrulanmıştır.
+8–9 Kasım 2026: eksik başlık, bağımlı taban, silinen kopyalama ve VLA örnekleri Debian 12 ARM64 üzerinde GCC 12 ve Clang 14 ile, düzeltilmiş varyantları da dahil derlendi. Bu kontrol bütün ABI, OpenMP ve bağlayıcı birleşimlerinin doğrulanması değildir.
