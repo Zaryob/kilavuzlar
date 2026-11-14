@@ -16,7 +16,7 @@ redirect_from:
 
 ## VNC Nedir
 
-VNC (virtual network computing), ağ üzerinden bilgisayarınızın ekranını yönetmenizi sağlayan bir sunucu yazılımıdır. Özellikle digitalocean veya azure gibi clientlerde işleri kolaylaştırmak için kurulu olan dropletteki sistemde Xorg server açmak için kullanılır. VNC'nin kendi haberleşme protokolü ve port yapısı bulunmaktadır. Bu sayede tamamen güvenli ve sızmakara karşı dayanıklıdır.
+VNC (virtual network computing), ağ üzerinden bilgisayarınızın ekranını yönetmenizi sağlayan bir sunucu yazılımıdır. Özellikle digitalocean veya azure gibi clientlerde işleri kolaylaştırmak için kurulu olan dropletteki sistemde Xorg server açmak için kullanılır. VNC'nin kendi haberleşme protokolü ve port yapısı bulunmaktadır. Bu, VNC'yi güvenli yapmaz: klasik VNC trafiği şifrelenmez ve parola doğrulaması zayıftır. VNC portunu internete açmayın; bağlantıyı yalnızca aşağıdaki SSH tüneli üzerinden kurun.
 
 ## VNC Kurulumu
 
@@ -55,7 +55,7 @@ Password:
 Verify:
 ```
 
-Hemen aynı adım içerisinde sizden ikinci bir şifre isteyip istemediğinizi soran bir mesaj gelecek. Bu ise yönetim koruması şifresi. Zaruri değil hatta uzak sunucu için ise koymamanızı tavsiye ederim. O yüzden ben atlayacağım
+Hemen aynı adım içerisinde sizden ikinci bir şifre isteyip istemediğinizi soran bir mesaj gelecek. Bu, yalnızca izleme (view-only) parolasıdır. Zaruri değil hatta uzak sunucu için ise koymamanızı tavsiye ederim. O yüzden ben atlayacağım
 
 ```
 auth:  file /home/zaryob/.Xauthority does not exist
@@ -131,10 +131,9 @@ GNU/Linux Dağıtımları için ssh komutu vnc sunucusuna bağlanmak için kulla
 ssh -L 5901:127.0.0.1:5901 -C -N -l zaryob sunucu_ip_adresi
 ```
 
-`zaryob` buradaki benim kullanıcı adım siz de bunu kendi sunucunuzdaki kullanıcı adınız ile değiştirebilirsiniz. Bu ssh komutu bir pencere açarak sizi vnc sunucuna bağlayacaktır.
-Bu ssh komutu tünelleme yaparak vnc sunucusuna bağlanacaktır.
+`zaryob` buradaki benim kullanıcı adım siz de bunu kendi sunucunuzdaki kullanıcı adınız ile değiştirebilirsiniz. Bu komut pencere açmaz; yalnızca kendi bilgisayarınızdaki 5901 portunu sunucudaki VNC portuna taşıyan şifreli bir tünel kurar. Tünel açıkken VNC istemcinizi `localhost:5901` adresine bağlayın.
 
 
 ### VNCViewer
 
-İndirip kurduğunuz realvnc-viewer ya da tightvnc-viewer ile bağlantı yaparken ip adresinizin haricinde port bilginizi de :5901 olarak ayarlamanızı öneririm. Çünkü eğer başka bir ayarlama yapmadıysanız `Xvnc` tanımlamak gibi, varsayılan sunucu portu bu olacaktıır.
+Sunucunun açık IP adresine doğrudan bağlanmak yerine yukarıdaki tüneli açıp istemciyi `localhost:5901` adresine yönlendirin. İndirip kurduğunuz realvnc-viewer ya da tightvnc-viewer ile bağlantı yaparken ip adresinizin haricinde port bilginizi de :5901 olarak ayarlamanızı öneririm. Çünkü eğer başka bir ayarlama yapmadıysanız `Xvnc` tanımlamak gibi, varsayılan sunucu portu bu olacaktıır.

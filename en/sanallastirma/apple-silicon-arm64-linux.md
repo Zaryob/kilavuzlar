@@ -83,20 +83,24 @@ cp /opt/homebrew/share/qemu/edk2-arm-vars.fd efi_vars.fd
 
 ### Step 3: Configure Cloud-Init
 
-Create a NoCloud ISO to define the `ubuntu` username, example password `sifre123` and sudo access at first boot.
+Create a NoCloud ISO to configure the guest at first boot. Password login stays disabled; the cloud image’s default `ubuntu` user (which already has passwordless `sudo`) receives an SSH key generated only for this machine.
 
-`cidata/user-data`:
+> **Warning:** Do not give the guest a fixed password published in a guide. A well-known password on a user with passwordless `sudo` turns every network-reachable forward into root access.
 
-```yaml
+Create `cidata/user-data`:
+
+```bash
+# Yalnızca bu sanal makine için bir SSH anahtar çifti üret
+ssh-keygen -t ed25519 -N "" -f vm_ed25519
+
+cat > cidata/user-data <<EOF
 #cloud-config
-password: sifre123
-chpasswd: { expire: False }
-ssh_pwauth: True
 users:
-  - name: ubuntu
-    sudo: ALL=(ALL) NOPASSWD:ALL
-    shell: /bin/bash
-    lock_passwd: False
+  - default
+ssh_authorized_keys:
+  - $(cat vm_ed25519.pub)
+ssh_pwauth: false
+EOF
 ```
 
 `cidata/meta-data`:
@@ -130,7 +134,7 @@ exec qemu-system-aarch64 \
     -drive if=none,id=hd0,file=disk.qcow2,format=qcow2 \
     -device virtio-blk-pci,drive=cloudinit \
     -drive if=none,id=cloudinit,file=cloud-init.iso,format=raw \
-    -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+    -netdev user,id=net0,hostfwd=tcp:127.0.0.1:2222-:22 \
     -device virtio-net-pci,netdev=net0 \
     -nographic
 ```
@@ -140,7 +144,7 @@ exec qemu-system-aarch64 \
 
 - `-m 4G -smp 4`: allocates 4 GB RAM and four virtual CPUs.
 - `virtio-blk-pci` and `virtio-net-pci`: paravirtualised disk and network devices.
-- `hostfwd=tcp::2222-:22`: forwards Mac port `2222` to guest SSH port `22`.
+- `hostfwd=tcp:127.0.0.1:2222-:22`: forwards port `2222` on the Mac’s loopback address (`127.0.0.1`) only to guest SSH port `22`. Without the address QEMU listens on every interface and the guest becomes reachable from the local network.
 - `-nographic`: uses the terminal’s serial console without opening a graphical window.
 
 ## 7. Start the VM and connect over SSH
@@ -157,10 +161,10 @@ UEFI and Linux boot logs appear in the terminal. Cloud-Init should finish config
 Open another Mac terminal and connect over SSH:
 
 ```bash
-ssh -p 2222 ubuntu@localhost
+ssh -i vm_ed25519 -p 2222 ubuntu@localhost
 ```
 
-Enter the example password `sifre123`.
+Login uses the `vm_ed25519` key generated in step 3; no password is requested. Password login on the serial console is disabled in this configuration.
 
 Check the guest kernel and architecture:
 

@@ -116,10 +116,10 @@ mysql> SELECT user,authentication_string,plugin,host FROM mysql.user;
 4 rows in set (0.00 sec)
 ```
 
-Burada göründüğü üzere `auth_socket` şifresi verelim. Burada 'password' bizim belirleyeceğimiz şifre olacak. Öntanımlı olarak ben `password` olarak belirledim.
+Burada göründüğü üzere `auth_socket` şifresi verelim. Komuttaki `GUCLU_BIR_PAROLA` yerine kendi belirlediğiniz güçlü ve benzersiz bir parola yazın; `password` gibi tahmin edilebilir bir değer kullanmayın. Not: `mysql_native_password` eklentisi MySQL 8.4'te varsayılan olarak kapalıdır ve 9.0'da kaldırılmıştır; bu komut güncel sürümlerde çalışmaz.
 
 ```sql
-mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'GUCLU_BIR_PAROLA';
 ```
 Bu değişikliğin okunması için tablomuzu güncelleyelim
 

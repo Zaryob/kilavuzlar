@@ -35,6 +35,8 @@ The Linux storage stack with LVM manages storage in layers. Expand them in order
 [ Dosya Sistemi: / (root) ]
 ```
 
+> **Warning:** These steps modify the partition table and LVM metadata of a running system. A wrong disk or partition number, an interrupted operation or a faulty hypervisor action can cause data loss. Take a disk snapshot or a backup you have tested restoring before you start, and replace the device names in the commands with those from your own `lsblk` output.
+
 ## Prerequisites
 
 - Ubuntu 22.04 LTS or 24.04 LTS.
@@ -221,11 +223,11 @@ Filesystem                        Type  Size  Used Avail Use% Mounted on
 /dev/mapper/ubuntu--vg-ubuntu--lv ext4   95G   40G   52G  44% /
 ```
 
-In this example, capacity was doubled without stopping services or rebooting the server.
+In this example, capacity was doubled without stopping services or rebooting the server. A correctly executed online expansion leaves existing data untouched, but it should never be done without a backup.
 
 ## Sources and verification environment
 
-- [Ubuntu Server LVM documentation](https://ubuntu.com/server/docs/storage-lvm)
+- [Ubuntu Server LVM documentation](https://ubuntu.com/server/docs/how-to/storage/manage-logical-volumes/)
 - Linux kernel SCSI rescan documentation (`Documentation/scsi/scsi_eh.rst`).
 - LVM2 `lvextend(8)`, `pvresize(8)` and `growpart(1)` manual pages.
 

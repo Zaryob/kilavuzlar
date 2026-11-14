@@ -91,21 +91,28 @@ cp /opt/homebrew/share/qemu/edk2-arm-vars.fd efi_vars.fd
 
 ### 3. Adım: Cloud-Init yapılandırması
 
-Sanal makine açılır açılmaz kullanıcı adı (`ubuntu`), şifre (`sifre123`) ve sudo yetkilerini
-otomatik tanımlamak için NoCloud ISO'su üretilir:
+Sanal makine ilk açılışta yapılandırılsın diye bir NoCloud ISO'su üretilir. Parola ile giriş
+kapalı tutulur; bulut imajının varsayılan `ubuntu` kullanıcısına (parolasız `sudo` yetkisi
+hazır gelir) yalnızca bu makine için üretilen SSH anahtarı tanımlanır.
 
-`cidata/user-data`:
+> **Uyarı:** Kılavuzlarda yayımlanmış sabit bir parolayı sanal makinede kullanmayın. Parolasız `sudo`
+> yetkisi olan bir kullanıcıya herkesin bildiği bir parola vermek, ağdan erişilebilen her
+> yönlendirmeyi kök erişimine çevirir.
 
-```yaml
+`cidata/user-data` dosyasını oluşturun:
+
+```bash
+# Yalnızca bu sanal makine için bir SSH anahtar çifti üret
+ssh-keygen -t ed25519 -N "" -f vm_ed25519
+
+cat > cidata/user-data <<EOF
 #cloud-config
-password: sifre123
-chpasswd: { expire: False }
-ssh_pwauth: True
 users:
-  - name: ubuntu
-    sudo: ALL=(ALL) NOPASSWD:ALL
-    shell: /bin/bash
-    lock_passwd: False
+  - default
+ssh_authorized_keys:
+  - $(cat vm_ed25519.pub)
+ssh_pwauth: false
+EOF
 ```
 
 `cidata/meta-data`:
@@ -139,7 +146,7 @@ exec qemu-system-aarch64 \
     -drive if=none,id=hd0,file=disk.qcow2,format=qcow2 \
     -device virtio-blk-pci,drive=cloudinit \
     -drive if=none,id=cloudinit,file=cloud-init.iso,format=raw \
-    -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+    -netdev user,id=net0,hostfwd=tcp:127.0.0.1:2222-:22 \
     -device virtio-net-pci,netdev=net0 \
     -nographic
 ```
@@ -148,7 +155,7 @@ exec qemu-system-aarch64 \
 ### Parametrelerin detayları:
 - `-m 4G -smp 4`: 4 GB RAM ve 4 sanal CPU çekirdeği tahsis eder.
 - `virtio-blk-pci` ve `virtio-net-pci`: Yüksek hızlı paravirtualized disk ve ağ sürücüleri.
-- `hostfwd=tcp::2222-:22`: Mac üzerindeki `2222` portunu sanal makinenin SSH portuna (`22`) bağlar.
+- `hostfwd=tcp:127.0.0.1:2222-:22`: Mac'in yalnızca yerel döngü adresindeki (`127.0.0.1`) `2222` portunu sanal makinenin SSH portuna (`22`) bağlar. Adres yazılmazsa QEMU tüm ağ arayüzlerini dinler ve sanal makine yerel ağdan erişilebilir olur.
 - `-nographic`: Grafik penceresi açmaz; seri konsolu doğrudan terminale bağlar.
 
 ## 7. Çalıştırma ve SSH bağlantısı
@@ -166,10 +173,11 @@ kurulumu tamamlar.
 İkinci bir terminal açarak Mac'inizden sanal makineye SSH ile bağlanın:
 
 ```bash
-ssh -p 2222 ubuntu@localhost
+ssh -i vm_ed25519 -p 2222 ubuntu@localhost
 ```
 
-Şifre olarak `sifre123` girin.
+Giriş, 3. adımda üretilen `vm_ed25519` anahtarıyla yapılır; parola sorulmaz. Seri konsolda
+parolalı giriş bu yapılandırmada kapalıdır.
 
 Sanal makinede çekirdeği ve mimariyi doğrulayın:
 

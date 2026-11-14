@@ -121,10 +121,10 @@ Example output:
 4 rows in set (0.00 sec)
 ```
 
-The output shows `auth_socket`. The original example changes authentication using the literal sample password `password`; review the archive warning before treating it as a usable setup.
+The output shows `auth_socket`. The original example switches authentication to a password. Replace `GUCLU_BIR_PAROLA` (“a strong password”) with a strong, unique password of your own; never use a guessable value such as `password`. Note that `mysql_native_password` is disabled by default in MySQL 8.4 and removed in 9.0, so this command fails on current releases.
 
 ```sql
-mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'GUCLU_BIR_PAROLA';
 ```
 
 Apply the privilege-table change:

@@ -14,7 +14,7 @@ Bulut sunucularında (AWS, GCP, Hetzner), sanallaştırma platformlarında (VMwa
 veya fiziksel sunucularda disk boyutu artırıldığında, bu alanı çalışan işletim sistemini
 kapatmadan (zero downtime) dosya sistemine dahil etmek mümkündür.
 
-Linux Depolama Yığını (LVM), depolamayı katmanlar halinde yönetir. Alanı güvenle
+LVM (Logical Volume Manager, Mantıksal Hacim Yöneticisi) kullanan Linux depolama yığını, depolamayı katmanlar halinde yönetir. Alanı güvenle
 büyütmek için bu katmanları aşağıdan yukarıya doğru sırayla genişletmek gerekir:
 
 ```text
@@ -35,6 +35,11 @@ büyütmek için bu katmanları aşağıdan yukarıya doğru sırayla genişletm
                  ▼  resize2fs (ext4) / xfs_growfs (xfs)
 [ Dosya Sistemi: / (root) ]
 ```
+
+> **Uyarı:** Bu adımlar çalışan sistemin bölüm tablosunu ve LVM üstverisini değiştirir. Yanlış disk ya da
+> bölüm numarası, yarıda kesilen bir işlem veya hatalı bir hipervizör işlemi veri kaybına yol
+> açabilir. Başlamadan önce diskin anlık görüntüsünü (snapshot) ya da geri yüklenebildiğini
+> sınadığınız bir yedeğini alın; komutlardaki aygıt adlarını kendi `lsblk` çıktınıza göre yazın.
 
 ## Ön koşullar
 
@@ -235,12 +240,13 @@ Filesystem                        Type  Size  Used Avail Use% Mounted on
 /dev/mapper/ubuntu--vg-ubuntu--lv ext4   95G   40G   52G  44% /
 ```
 
-İşlem boyunca hiçbir hizmet durdurulmamış, sunucu yeniden başlatılmamış ve veri kaybı
-riski olmadan kullanılabilir alan iki katına çıkarılmıştır.
+Bu örnekte hiçbir hizmet durdurulmadan ve sunucu yeniden başlatılmadan kullanılabilir alan
+iki katına çıkarılmıştır. Çevrimiçi genişletme doğru uygulandığında mevcut veriye dokunmaz;
+yine de yedeksiz yapılmamalıdır.
 
 ## Kaynaklar ve doğrulama ortamı
 
-- [Ubuntu Server LVM Belgeleri](https://ubuntu.com/server/docs/storage-lvm)
+- [Ubuntu Server LVM Belgeleri](https://ubuntu.com/server/docs/how-to/storage/manage-logical-volumes/)
 - Linux Çekirdeği SCSI Yeniden Tarama Kılavuzu (`Documentation/scsi/scsi_eh.rst`)
 - LVM2 `lvextend(8)`, `pvresize(8)` ve `growpart(1)` kılavuz sayfaları
 
