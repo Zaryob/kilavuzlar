@@ -71,9 +71,9 @@ details[open] > summary > .tree-chevron { transform: rotate(0); }
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-@media (min-width: 1280px) {
+@media (min-width: 1440px) {
   .guide-article-layout:has(> .guide-toc) { display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: 24px; }
-  .guide-toc { position: sticky; top: 98px; align-self: start; width: 220px; max-height: calc(100vh - 120px); overflow-y: auto; }
+  .guide-toc { position: sticky; top: 98px; align-self: start; width: 250px; max-height: calc(100vh - 120px); overflow-y: auto; }
 }
 @media (max-width: 1080px) {
   .guide-shell { grid-template-columns: 280px minmax(0,1fr); }
@@ -91,3 +91,13 @@ details[open] > summary > .tree-chevron { transform: rotate(0); }
   .guide-content { padding: 20px; }
 }
 @media (max-width: 560px) { .guide-content, .guide-sidebar { padding-inline: 16px; } }
+
+.guide-directory > summary { display: none; }
+.guide-content .guide-breadcrumb { margin-bottom: 16px; padding-bottom: 12px; }
+.guide-content .article-meta { margin: 0 0 20px; font-family: var(--font-mono); font-size: var(--text-sm); }
+.guide-toc > details > summary { min-height: 44px; display: flex; align-items: center; }
+@media (max-width: 760px) {
+  .guide-sidebar { padding-block: 6px; }
+  .guide-directory > summary { display: flex; padding: 4px; color: var(--accent); }
+  .guide-directory__content { padding-top: 8px; }
+}

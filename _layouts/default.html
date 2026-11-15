@@ -37,12 +37,13 @@
   <body class="console-site console-guides">
     <a class="skip-link" href="#icerik"><span data-i18n="Skip to content">İçeriğe geç</span></a>
     {%- include console-header.html %}
+    <main id="icerik" tabindex="-1">
     {%- if page.translation_key == 'guide-README' %}{% include guides-hero.html %}{% endif %}
     <div class="guide-shell">
       <aside class="guide-sidebar" aria-label="Kılavuz dizini" data-i18n-aria-label="Guide directory">
         {%- assign directory_lang = page.lang | default: 'tr' %}
         {%- assign language_prefix = '' %}{% if directory_lang == 'en' %}{% assign language_prefix = '/en' %}{% endif %}
-        <div class="guide-directory">
+        <details class="guide-directory" open><summary><span lang="{{ directory_lang }}">{% if directory_lang == 'en' %}Guide directory{% else %}Kılavuz dizini{% endif %}</span><svg class="tree-chevron" aria-hidden="true"><use href="{{ '/assets/console/site.svg' | relative_url }}#chevron-down"></use></svg></summary><div class="guide-directory__content">
           {%- assign tree_sections = 'guides,archive' | split: ',' %}
           {%- for tree_section in tree_sections %}
             {%- if tree_section == 'guides' %}
@@ -55,7 +56,7 @@
               <nav aria-label="{% if tree_section == 'guides' %}Konu ağacı{% else %}Arşiv dizini{% endif %}" data-i18n-aria-label="{% if tree_section == 'guides' %}Topic tree{% else %}Archive directory{% endif %}">
                 {%- if tree_section == 'archive' %}
                   {%- assign archive_url = language_prefix | append: '/arsiv/' %}
-                  <a href="{{ archive_url | relative_url }}" class="tree-index"{% if page.url == archive_url %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ directory_lang }}">README.md</span></a>
+                  <a href="{{ archive_url | relative_url }}" class="tree-index"{% if page.url == archive_url %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ directory_lang }}">{% if directory_lang == 'en' %}Overview{% else %}Genel bakış{% endif %}</span></a>
                 {%- endif %}
                 {%- for group in groups %}
                   {%- assign prefix = language_prefix | append: '/' | append: group | append: '/' %}
@@ -64,7 +65,7 @@
                   <details class="tree-group{% if current_prefix == prefix %} is-current{% endif %}"{% if current_prefix == prefix %} open{% endif %}>
                     <summary><svg class="tree-icon tree-folder-closed" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder"></use></svg><svg class="tree-icon tree-folder-open" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#folder-open"></use></svg><span class="tree-group-name">{{ group | split: "/" | last }}/</span><svg class="tree-chevron" aria-hidden="true"><use href="{{ '/assets/console/site.svg' | relative_url }}#chevron-down"></use></svg></summary>
                     <div class="tree-children">
-                    <a href="{{ prefix | relative_url }}" class="tree-index"{% if page.url == prefix %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ directory_lang }}">README.md</span></a>
+                    <a href="{{ prefix | relative_url }}" class="tree-index"{% if page.url == prefix %} aria-current="page"{% endif %}><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg><span lang="{{ directory_lang }}">{% if directory_lang == 'en' %}Overview{% else %}Genel bakış{% endif %}</span></a>
                     {%- assign documents = site.pages | sort: 'url' %}
                     {%- for item in documents %}
                       {%- assign item_lang = item.lang | default: 'tr' %}
@@ -85,12 +86,12 @@
             <a href="{{ about_url | relative_url }}"{% if page.url == about_url %} aria-current="page"{% endif %}><span data-i18n="about">hakkında</span></a>
             <a href="{{ contribution_url | relative_url }}"{% if page.url == contribution_url %} aria-current="page"{% endif %}><span data-i18n="contribution guide">katkı rehberi</span></a>
           </div>
-        </div>
+        </div></details>
       </aside>
-      <main id="icerik" class="guide-content">
-        <p class="guide-breadcrumb"><a href="{{ language_prefix | append: '/' | relative_url }}">~/{% if page.lang == 'en' %}guides{% else %}kılavuzlar{% endif %}</a>{{ page.url | escape }}</p>
-        <p class="guide-filename"><svg class="tree-icon" aria-hidden="true"><use href="{{ '/assets/console/regular.svg' | relative_url }}#file"></use></svg>{{ page.path | escape }}</p>
+      <div class="guide-content">
+        <nav class="guide-breadcrumb" aria-label="{% if page.lang == 'en' %}Breadcrumb{% else %}Konum{% endif %}"><a href="{{ language_prefix | append: '/' | relative_url }}">{% if page.lang == 'en' %}Guides{% else %}Kılavuzlar{% endif %}</a></nav>
         {%- capture provenance %}
+        <p class="article-meta console-meta" lang="{{ page.lang | default: 'tr' }}">{% if page.status == 'duzenlendi' %}{% if page.lang == 'en' %}Edited{% else %}Düzenlendi{% endif %} · {% elsif page.status == 'arsiv' %}{% if page.lang == 'en' %}Archive{% else %}Arşiv{% endif %} · {% endif %}{% if page.reviewed %}{% if page.lang == 'en' %}Reviewed{% else %}İnceleme{% endif %}: <time datetime="{{ page.reviewed | date: '%Y-%m-%d' }}">{{ page.reviewed | date: '%d.%m.%Y' }}</time> · {% endif %}<a href="https://github.com/Zaryob/kilavuzlar/blob/main/{{ page.path | uri_escape }}">{% if page.lang == 'en' %}Source{% else %}Kaynak{% endif %} ↗</a></p>
         {%- if page.status == 'arsiv' %}
           <aside class="notice archive" aria-label="Arşiv notu" data-i18n-aria-label="Archive note">
             <strong><span data-i18n="Archive · Revalidation required">Arşiv · Yeniden doğrulama gerekiyor</span></strong>
@@ -99,7 +100,7 @@
             <p><span data-i18n="These commands have not been verified for current systems.">Bu komutlar güncel sistemler için doğrulanmadı.</span> <a href="{{ language_prefix | append: '/arsiv/' | relative_url }}"><span data-i18n="Archive directory">Arşiv dizini</span></a></p>
           </aside>
         {%- elsif page.status == 'duzenlendi' %}
-          <p class="notice guide-scope"><span data-i18n="Edited · Scope:">Düzenlendi · Kapsam:</span> <span lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</span></p>
+          <p class="notice guide-scope"><span lang="{{ page.lang | default: 'tr' }}">{% if page.lang == 'en' %}Scope:{% else %}Kapsam:{% endif %}</span> <span lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</span></p>
         {%- endif %}
         {%- endcapture %}
         {%- include console-content-language.html %}
@@ -113,14 +114,12 @@
             {%- endif %}
           </article>
         </div>
-        {%- if page.reviewed %}
-          <p class="reviewed"><span data-i18n="Last content review:">Son içerik incelemesi:</span> {{ page.reviewed | date: '%d.%m.%Y' }}.</p>
-        {%- endif %}
         <nav class="guide-related" aria-label="İlgili kaynaklar" data-i18n-aria-label="Related resources"><a href="{{ site.suite_url }}/syscall/"><span data-i18n="Linux system call reference">Linux sistem çağrıları referansı</span></a> · <a href="{{ site.suite_url }}/posts/"><span data-i18n="technical posts">teknik yazılar</span></a></nav>
-      </main>
+      </div>
     </div>
+    </main>
     {% include console-suite.html %}
     <footer class="console-footer"><span>{{ site.author | escape }} · <a href="{{ language_prefix | append: '/about/' | relative_url }}"><span data-i18n="About the guides">Kılavuzlar hakkında</span></a> · <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></span><span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span></footer>
-    <script src="{{ '/assets/guides.js' | relative_url }}?v=sections" defer></script>
+    <script src="{{ '/assets/guides.js' | relative_url }}?v=directory-layout-20261115" defer></script>
   </body>
 </html>
