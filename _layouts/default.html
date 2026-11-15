@@ -118,8 +118,21 @@
       </div>
     </div>
     </main>
-    {% include console-suite.html %}
-    <footer class="console-footer"><span>{{ site.author | escape }} · <a href="{{ language_prefix | append: '/about/' | relative_url }}"><span data-i18n="About the guides">Kılavuzlar hakkında</span></a> · <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></span><span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span></footer>
+    {%- assign footer_en = false %}{% if page.lang == 'en' %}{% assign footer_en = true %}{% endif %}
+    {%- capture footer_columns %}
+      <nav class="suite-footer__col" aria-label="{% if footer_en %}Guides{% else %}Kılavuzlar{% endif %}" data-i18n-aria-label="Guides">
+        <p class="suite-footer__title">~/kilavuzlar/</p>
+        <ul>
+          <li><a href="{{ language_prefix | append: '/' | relative_url }}"><span data-i18n="Guides">{% if footer_en %}Guides{% else %}Kılavuzlar{% endif %}</span></a></li>
+          <li><a href="{{ language_prefix | append: '/arsiv/' | relative_url }}"><span data-i18n="Archive directory">{% if footer_en %}Archive directory{% else %}Arşiv dizini{% endif %}</span></a></li>
+          <li><a href="{{ language_prefix | append: '/about/' | relative_url }}"><span data-i18n="About the guides">{% if footer_en %}About the guides{% else %}Kılavuzlar hakkında{% endif %}</span></a></li>
+          <li><a href="https://github.com/Zaryob/kilavuzlar">GitHub <span aria-hidden="true">↗</span></a></li>
+        </ul>
+      </nav>
+    {%- endcapture %}
+    {%- capture footer_legal %}<span aria-hidden="true"># </span>© {{ site.author | escape }} · <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>{% endcapture %}
+    {%- capture footer_links %}<span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span>{% endcapture %}
+    {% include console-footer.html cwd="~/kilavuzlar" columns=footer_columns legal=footer_legal links=footer_links top="#icerik" %}
     <script src="{{ '/assets/guides.js' | relative_url }}?v=directory-layout-20261115" defer></script>
   </body>
 </html>
