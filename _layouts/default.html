@@ -93,11 +93,11 @@
         {%- capture provenance %}
         <p class="article-meta console-meta" lang="{{ page.lang | default: 'tr' }}">{% if page.status == 'duzenlendi' %}{% if page.lang == 'en' %}Edited{% else %}Düzenlendi{% endif %} · {% elsif page.status == 'arsiv' %}{% if page.lang == 'en' %}Archive{% else %}Arşiv{% endif %} · {% endif %}{% if page.reviewed %}{% if page.lang == 'en' %}Reviewed{% else %}İnceleme{% endif %}: <time datetime="{{ page.reviewed | date: '%Y-%m-%d' }}">{{ page.reviewed | date: '%d.%m.%Y' }}</time> · {% endif %}<a href="https://github.com/Zaryob/kilavuzlar/blob/main/{{ page.path | uri_escape }}">{% if page.lang == 'en' %}Source{% else %}Kaynak{% endif %} ↗</a></p>
         {%- if page.status == 'arsiv' %}
-          <aside class="notice archive" aria-label="Arşiv notu" data-i18n-aria-label="Archive note">
-            <strong><span data-i18n="Archive · Revalidation required">Arşiv · Yeniden doğrulama gerekiyor</span></strong>
+          <aside class="notice archive" lang="{{ page.lang | default: 'tr' }}" aria-label="{% if page.lang == 'en' %}Archive note{% else %}Arşiv notu{% endif %}">
+            <strong>{% if page.lang == 'en' %}Archive · Revalidation required{% else %}Arşiv · Yeniden doğrulama gerekiyor{% endif %}</strong>
             <p lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</p>
             <p lang="{{ page.lang | default: 'tr' }}">{{ page.archive_reason | escape }}</p>
-            <p><span data-i18n="These commands have not been verified for current systems.">Bu komutlar güncel sistemler için doğrulanmadı.</span> <a href="{{ language_prefix | append: '/arsiv/' | relative_url }}"><span data-i18n="Archive directory">Arşiv dizini</span></a></p>
+            <p lang="{{ page.lang | default: 'tr' }}">{% if page.lang == 'en' %}These commands have not been verified for current systems.{% else %}Bu komutlar güncel sistemler için doğrulanmadı.{% endif %} <a href="{{ language_prefix | append: '/arsiv/' | relative_url }}">{% if page.lang == 'en' %}Archive directory{% else %}Arşiv dizini{% endif %}</a></p>
           </aside>
         {%- elsif page.status == 'duzenlendi' %}
           <p class="notice guide-scope"><span lang="{{ page.lang | default: 'tr' }}">{% if page.lang == 'en' %}Scope:{% else %}Kapsam:{% endif %}</span> <span lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</span></p>
@@ -114,7 +114,7 @@
             {%- endif %}
           </article>
         </div>
-        <nav class="guide-related" aria-label="İlgili kaynaklar" data-i18n-aria-label="Related resources"><a href="{{ site.suite_url }}/syscall/"><span data-i18n="Linux system call reference">Linux sistem çağrıları referansı</span></a> · <a href="{{ site.suite_url }}/posts/"><span data-i18n="technical posts">teknik yazılar</span></a></nav>
+        <nav class="guide-related" lang="{{ page.lang | default: 'tr' }}" aria-label="{% if page.lang == 'en' %}Related resources{% else %}İlgili kaynaklar{% endif %}"><a href="{{ site.suite_url }}/syscall/">{% if page.lang == 'en' %}Linux system call reference{% else %}Linux sistem çağrıları referansı{% endif %}</a> · <a href="{{ site.suite_url }}/posts/">{% if page.lang == 'en' %}technical posts{% else %}teknik yazılar{% endif %}</a></nav>
       </div>
     </div>
     </main>
