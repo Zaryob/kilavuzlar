@@ -17,18 +17,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
           bundler-cache: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
       - name: Build Jekyll site
         env:
           JEKYLL_ENV: production
-          JEKYLL_GITHUB_TOKEN: ${{ github.token }}
         run: bundle exec jekyll build --trace
       - name: Check generated pages and local assets
         run: python3 scripts/check_site.py _site --baseurl /kilavuzlar
@@ -39,7 +38,7 @@ jobs:
           test -s _site/pagefind/pagefind.en*.pf_meta
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
@@ -55,4 +54,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
