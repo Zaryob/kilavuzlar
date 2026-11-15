@@ -51,4 +51,4 @@ orada yapın.
 
 ## Lisans
 
-Kılavuzlar ve arşiv notları [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.tr) ile lisanslıdır ([LICENSE-CONTENT](LICENSE-CONTENT)). Sitenin kaynak kodu GPL-3.0-or-later ile lisanslıdır ([LICENSE](LICENSE)). Üçüncü taraf malzeme kendi lisansını korur.
+Kılavuzlar ve arşiv notları [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.tr) ile lisanslıdır ([LICENSE-CONTENT](LICENSE-CONTENT), [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt)). Sitenin kaynak kodu GPL-3.0-or-later ile lisanslıdır ([LICENSE](LICENSE)). Üçüncü taraf malzeme kendi lisansını korur.

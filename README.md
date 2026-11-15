@@ -51,4 +51,4 @@ The files under `assets/console/` and the shared includes come from the
 
 ## License
 
-Guides and archive notes are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) ([LICENSE-CONTENT](LICENSE-CONTENT)). The site's source code is licensed under GPL-3.0-or-later ([LICENSE](LICENSE)). Third-party material keeps its own licence.
+Guides and archive notes are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) ([LICENSE-CONTENT](LICENSE-CONTENT), [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt)). The site's source code is licensed under GPL-3.0-or-later ([LICENSE](LICENSE)). Third-party material keeps its own licence.
