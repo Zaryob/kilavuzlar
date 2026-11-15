@@ -11,7 +11,7 @@
     {% assign guides_title = site.title %}{% if page.lang == 'en' %}{% assign guides_title = 'Guides' %}{% endif %}
     {% capture guides_page_title %}{{ page.title }}{% if page.title == guides_title %}{% if page.lang == 'en' %} — C++, Docker, Linux and virtualisation{% else %} — C++, Docker, Linux ve sanallaştırma{% endif %}{% else %} · {{ guides_title }}{% endif %}{% endcapture %}
     <title>{{ guides_page_title | escape }}</title>
-    <link rel="icon" href="{{ site.suite_url | default: 'https://zaryob.github.io' }}/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' | relative_url }}">
     {% capture guides_description %}{% if page.lang == 'en' %}{{ page.scope | default: 'Software development and system administration guides by Süleyman Poyraz.' }}{% else %}{{ page.scope | default: site.description }}{% endif %}{% endcapture %}
     {% assign guides_card = '/assets/social-card-tr.png' %}{% if page.lang == 'en' %}{% assign guides_card = '/assets/social-card-en.png' %}{% endif %}
     <meta name="description" content="{{ guides_description | escape }}">
