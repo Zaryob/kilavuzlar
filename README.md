@@ -1,68 +1,54 @@
----
-translation_key: guide-README
-lang: tr
-title: "Kılavuzlar"
-permalink: /
-nav_order: 1
-redirect_from:
-  - /README.html
-  - /c/
-  - /c/README.html
-  - /python/
-  - /python/README.html
-  - /rpi/
-  - /rpi/README.html
----
-
 # Kılavuzlar
 
-Süleyman Poyraz'ın yazılım geliştirme ve sistem yönetimi notları.
-Kılavuzlar konuya ve bakım durumuna göre ayrılır.
+**English** · [Türkçe](README.tr.md)
 
-## Docker
+Süleyman Poyraz's notes on software development and system administration, published as a
+Jekyll site with Turkish originals and English translations.
 
-- [Çok mimarili imaj oluşturma](docker/coklu-mimari-imajlar.md): Buildx ile AMD64 ve ARM64 için derleme.
-- [scratch ile statik uygulama](docker/scratch-ile-statik-uygulama.md): C++ uygulamasını derleyip boş taban imajda çalıştırma.
-- [GUI uygulaması çalıştırmak](docker/gui-uygulamasi-calistirmak.md): X11, Wayland, display socket, GPU hızlandırma ve izinler.
-- [C++ uygulaması derleyip test etmek](docker/cpp-derleme-ve-test.md): Multi-stage build, CMake, CTest ve dependency caching.
-- [USB aygıt erişimi neden başarısız olur?](docker/usb-aygit-erisimi.md): Aygıt eşleme, çekirdek modülleri ve host kısıtlamaları.
+[Read the site](https://zaryob.github.io/kilavuzlar/) · [English edition](https://zaryob.github.io/kilavuzlar/en/)
 
-## Linux
+## What is in the repository
 
-- [LVM bölümünü veri kaybetmeden büyütmek](linux/lvm-bolumunu-buyutmek.md): lsblk, pvresize, lvextend ve resize2fs ile çevrimiçi disk genişletme.
-- [perf ile CPU darboğazı bulmak](linux/perf-ile-cpu-darbogazi.md): Profilleme, çağrı grafikleri ve flame graph analizi.
-- [NVIDIA Jetson Orin Nano üzerinde OpenClaw kurulumu](linux/jetson-orin-nano-openclaw-kurulumu.md): 8 GB ARM64 ortamında Ollama, Qwen 3.5 2B ve sistem servisleri ile yerel yapay zeka asistanı.
+- `docker/`, `linux/`, `cpp/`, `emacs/`, `sanallastirma/`, `vim/` — the guides, one folder per topic.
+- `arsiv/` — older Linux and image-processing notes, kept with their original content. Each
+  one states its scope and what must be completed before it is reused.
+- `en/` — English translations, mirroring the Turkish folders.
+- `index.md` — the Turkish home page of the site (`/`); `en/README.md` is the English one (`/en/`).
+- `README.md` inside each topic folder — that folder's index page on the site.
+- `_layouts/`, `_includes/`, `_data/`, `assets/` — the site layout and the shared console theme.
+- `scripts/` — the Jekyll wrapper and the link check.
 
-## C++
+This file and `README.tr.md` describe the repository and are not published on the site.
 
-- [CMake ile taşınabilir C++ projesi oluşturmak](cpp/tasinabilir-cmake-projesi.md): Target tabanlı mimari, CMakePresets, toolchain ve build türleri.
-- [vcpkg ile C++ bağımlılıklarını yönetmek](cpp/vcpkg-bagimlilik-yonetimi.md): Manifest modu (vcpkg.json) ve modern CMake entegrasyonu.
-- [GCC'den Clang'e geçerken karşılaşılan problemler](cpp/gcc-clang-gecis-problemleri.md): Standart kütüphane farkları, linker uyumu ve derleyici katılığı.
-- [Tracy ile C++ uygulamasını profillemek](cpp/tracy-ile-profilleme.md): Enstrümantasyon, frame ve zone analizi ile gerçek zamanlı inceleme.
+## Preview and checks
 
-## Emacs
+You need Python 3, Ruby 3.3 or newer, and Bundler. From the repository root:
 
-- [Emacs ile CMake ve LLDB kullanmak](emacs/cmake-ve-lldb.md): Eglot, project.el, compile ve dape ile modern hata ayıklama.
+```sh
+python3 scripts/jekyll.py install
+python3 scripts/jekyll.py serve
+```
 
-## Sanallaştırma
+The preview is at <http://localhost:4000/kilavuzlar/>. Before publishing:
 
-- [Apple Silicon Mac üzerinde ARM64 Linux sanallaştırmak](sanallastirma/apple-silicon-arm64-linux.md): QEMU, HVF hızlandırma, guest imajı ve mimari farkları.
-- [macOS'ta Linux USB/IP altyapısını test etmek](sanallastirma/macos-linux-usbip.md): vhci_hcd kısıtları, QEMU USB passthrough ve sanal Linux ağı.
+```sh
+python3 scripts/jekyll.py build --strict_front_matter
+python3 scripts/check_site.py _site --baseurl /kilavuzlar
+npx --yes pagefind@1.6.0 --site _site
+```
 
-## Vim
+GitHub Actions runs the same build, link check and Pagefind indexing on every push and pull
+request, and publishes `main` to GitHub Pages.
 
-- [Tuş kombinasyonları](vim/vim-tus-kombinasyonlari.md): hareket, düzenleme, arama, makrolar ve pencere yönetimi.
+## Contributing
 
-## Arşiv
+The rules for adding and maintaining guides are in [CONTRIBUTING.md](CONTRIBUTING.md)
+([English](en/CONTRIBUTING.md)); the findings of the latest content review are in
+[BAKIM.md](BAKIM.md) ([English](en/BAKIM.md)).
 
-[Linux ve görüntü işleme notları](arsiv/README.md), özgün içerikleri korunarak
-ayrı bir bölümde tutulur. Her belgenin başında kapsamı ve yeniden kullanılmadan
-önce tamamlanması gereken işler yazılıdır.
+The files under `assets/console/` and the shared includes come from the
+[console-theme](https://github.com/Zaryob/console-theme) repository; change them there.
 
-Arşivdeki kurulum komutları güncel bir sistemde denenmiş kabul edilmemelidir.
-Düzenlenmiş belgelerde de kaynak kontrolü ile uygulamalı test ayrı belirtilir.
+## License
 
-## Bu depoya katkı
-
-Yeni belge ekleme ve bakım kuralları için [katkı rehberine](CONTRIBUTING.md),
-son incelemenin bulguları için [bakım notlarına](BAKIM.md) bakın.
+MIT. See [LICENSE](LICENSE).
