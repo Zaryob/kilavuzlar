@@ -9,9 +9,25 @@
     <script src="{{ '/assets/console/i18n.js' | relative_url }}"></script>
     <script src="{{ '/assets/console/theme.js' | relative_url }}"></script>
     {% assign guides_title = site.title %}{% if page.lang == 'en' %}{% assign guides_title = 'Guides' %}{% endif %}
-    <title>{{ page.title | escape }}{% unless page.title == guides_title %} · {{ guides_title | escape }}{% endunless %}</title>
+    {% capture guides_page_title %}{{ page.title }}{% if page.title == guides_title %}{% if page.lang == 'en' %} — C++, Docker, Linux and virtualisation{% else %} — C++, Docker, Linux ve sanallaştırma{% endif %}{% else %} · {{ guides_title }}{% endif %}{% endcapture %}
+    <title>{{ guides_page_title | escape }}</title>
     <link rel="icon" href="{{ site.suite_url | default: 'https://zaryob.github.io' }}/favicon.ico">
-    <meta name="description" content="{% if page.lang == 'en' %}{{ page.scope | default: 'Software development and system administration guides by Süleyman Poyraz.' | escape }}{% else %}{{ page.scope | default: site.description | escape }}{% endif %}">
+    {% capture guides_description %}{% if page.lang == 'en' %}{{ page.scope | default: 'Software development and system administration guides by Süleyman Poyraz.' }}{% else %}{{ page.scope | default: site.description }}{% endif %}{% endcapture %}
+    {% assign guides_card = '/assets/social-card-tr.png' %}{% if page.lang == 'en' %}{% assign guides_card = '/assets/social-card-en.png' %}{% endif %}
+    <meta name="description" content="{{ guides_description | escape }}">
+    <meta property="og:type" content="{% if page.reviewed %}article{% else %}website{% endif %}">
+    <meta property="og:site_name" content="{{ guides_title | escape }}">
+    <meta property="og:title" content="{{ page.title | escape }}">
+    <meta property="og:description" content="{{ guides_description | escape }}">
+    <meta property="og:url" content="{{ page.url | absolute_url }}">
+    <meta property="og:locale" content="{% if page.lang == 'en' %}en_US{% else %}tr_TR{% endif %}">
+    <meta property="og:image" content="{{ guides_card | absolute_url }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{ guides_card | absolute_url }}">
+    {% if page.reviewed %}<meta property="article:modified_time" content="{{ page.reviewed | date_to_xmlschema }}">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":{{ page.title | jsonify }},"description":{{ guides_description | strip | jsonify }},"inLanguage":{{ page.lang | default: 'tr' | jsonify }},"dateModified":{{ page.reviewed | date: '%Y-%m-%d' | jsonify }},"url":{{ page.url | absolute_url | jsonify }},"author":{"@type":"Person","name":{{ site.author | jsonify }},"url":"https://zaryob.github.io/"},"license":"https://creativecommons.org/licenses/by-sa/4.0/"}</script>{% endif %}
     <meta data-pagefind-meta="title[content]" content="{{ page.title | escape }}">
     <meta data-pagefind-meta="type[content]" content="{% if page.status == 'arsiv' %}kılavuzlar/arşiv/{% else %}kılavuzlar/{% endif %}">
     <link rel="canonical" href="{{ page.url | absolute_url }}">
@@ -102,6 +118,7 @@
         <nav class="guide-related" aria-label="İlgili kaynaklar" data-i18n-aria-label="Related resources"><a href="{{ site.suite_url }}/syscall/"><span data-i18n="Linux system call reference">Linux sistem çağrıları referansı</span></a> · <a href="{{ site.suite_url }}/posts/"><span data-i18n="technical posts">teknik yazılar</span></a></nav>
       </main>
     </div>
+    {% include console-suite.html %}
     <footer class="console-footer"><span>{{ site.author | escape }} · <a href="{{ language_prefix | append: '/about/' | relative_url }}"><span data-i18n="About the guides">Kılavuzlar hakkında</span></a> · <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></span><span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span></footer>
     <script src="{{ '/assets/guides.js' | relative_url }}?v=sections" defer></script>
   </body>
