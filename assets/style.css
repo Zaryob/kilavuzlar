@@ -101,3 +101,5 @@ details[open] > summary > .tree-chevron { transform: rotate(0); }
   .guide-directory > summary { display: flex; padding: 4px; color: var(--accent); }
   .guide-directory__content { padding-top: 8px; }
 }
+
+.guide-content .article-meta a { white-space: nowrap; }
