@@ -24,6 +24,7 @@ Süleyman Poyraz’s notes on software development and system administration. Gu
 
 - [Expanding an LVM volume without losing data](linux/lvm-bolumunu-buyutmek.md): online disk expansion with lsblk, pvresize, lvextend and resize2fs.
 - [Finding CPU bottlenecks with perf](linux/perf-ile-cpu-darbogazi.md): profiling, call graphs and flame graph analysis.
+- [Installing OpenClaw on NVIDIA Jetson Orin Nano](linux/jetson-orin-nano-openclaw-kurulumu.md): local AI assistant with Ollama, Qwen 3.5 2B, and system services in an 8 GB ARM64 environment.
 
 ## C++
 

@@ -31,6 +31,7 @@ Kılavuzlar konuya ve bakım durumuna göre ayrılır.
 
 - [LVM bölümünü veri kaybetmeden büyütmek](linux/lvm-bolumunu-buyutmek.md): lsblk, pvresize, lvextend ve resize2fs ile çevrimiçi disk genişletme.
 - [perf ile CPU darboğazı bulmak](linux/perf-ile-cpu-darbogazi.md): Profilleme, çağrı grafikleri ve flame graph analizi.
+- [NVIDIA Jetson Orin Nano üzerinde OpenClaw kurulumu](linux/jetson-orin-nano-openclaw-kurulumu.md): 8 GB ARM64 ortamında Ollama, Qwen 3.5 2B ve sistem servisleri ile yerel yapay zeka asistanı.
 
 ## C++
 
