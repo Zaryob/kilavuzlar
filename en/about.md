@@ -10,7 +10,7 @@ translated: '2026-11-03'
 
 # About
 
-This repository contains Süleyman Poyraz’s working notes, originally written in Turkish, on software development and system administration.
+This site contains Süleyman Poyraz’s working notes, originally written in Turkish, on software development and system administration.
 
 The C++, Docker, Emacs, Linux, virtualisation and Vim documents have been reorganised as guides. Older Linux, OpenCV and Caffe notes awaiting verification are kept in the [archive](arsiv/README.md). Each archived page describes its scope and omissions. Source review and practical testing are reported separately.
 
