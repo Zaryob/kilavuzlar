@@ -14,4 +14,4 @@ This repository contains Süleyman Poyraz’s working notes, originally written 
 
 The C++, Docker, Emacs, Linux, virtualisation and Vim documents have been reorganised as guides. Older Linux, OpenCV and Caffe notes awaiting verification are kept in the [archive](arsiv/README.md). Each archived page describes its scope and omissions. Source review and practical testing are reported separately.
 
-The site is generated with [Jekyll](https://jekyllrb.com/). Its templates and styles live in this repository. Content and source code are covered by the [MIT licence]({{ '/LICENSE' | relative_url }}).
+The site is generated with [Jekyll](https://jekyllrb.com/). Its templates and styles live in this repository. The guide texts are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); the site's source code is licensed under [GPL-3.0-or-later]({{ '/LICENSE' | relative_url }}).
