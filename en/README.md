@@ -7,11 +7,6 @@ translation_key: guide-README
 translation_of: /
 translated: '2026-11-03'
 ---
-
-# Guides
-
-Süleyman Poyraz’s notes on software development and system administration. Guides are organised by topic and maintenance status.
-
 ## Docker
 
 - [Multi-architecture images](docker/coklu-mimari-imajlar.md): building for AMD64 and ARM64 with Buildx.

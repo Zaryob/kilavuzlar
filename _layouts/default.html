@@ -37,6 +37,7 @@
   <body class="console-site console-guides">
     <a class="skip-link" href="#icerik"><span data-i18n="Skip to content">İçeriğe geç</span></a>
     {%- include console-header.html %}
+    {%- if page.translation_key == 'guide-README' %}{% include guides-hero.html %}{% endif %}
     <div class="guide-shell">
       <aside class="guide-sidebar" aria-label="Kılavuz dizini" data-i18n-aria-label="Guide directory">
         {%- assign directory_lang = page.lang | default: 'tr' %}

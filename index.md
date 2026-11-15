@@ -14,10 +14,6 @@ redirect_from:
   - /rpi/README.html
 ---
 
-# Kılavuzlar
-
-Süleyman Poyraz'ın yazılım geliştirme ve sistem yönetimi notları.
-Kılavuzlar konuya ve bakım durumuna göre ayrılır.
 
 ## Docker
 
