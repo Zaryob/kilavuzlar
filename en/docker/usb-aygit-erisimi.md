@@ -2,7 +2,7 @@
 title: Why USB device access fails in Docker
 permalink: /en/docker/usb-aygit-erisimi/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: Docker device mapping, cgroup rules and kernel-module limitations on Linux,
   macOS and Windows (WSL2).
 lang: en
@@ -34,13 +34,13 @@ macOS uses the XNU (Darwin) kernel. Docker Desktop runs a lightweight **Linux vi
 
 - **Problem:** the macOS hypervisor layer does **not directly pass through** physical USB devices connected to the Mac’s USB-C/Thunderbolt ports to the Linux VM.
 - The macOS kernel (IOKit) owns the device. The Linux VM, and therefore the Docker container, cannot see it.
-- **Solution:** `docker run --device` alone does not work for a physical macOS device. Serial ports need a network bridge using `socat`, or a **USB/IP** arrangement through a Linux VM.
+- **Solution:** `docker run --device` alone does not work for a physical macOS device. Serial ports need a network bridge using `socat`, or **USB/IP**. Docker Desktop has its own [USB/IP support](https://docs.docker.com/desktop/features/usbip/) (Mac, Linux and Windows with the Hyper-V backend): a USB/IP server runs on the host and the device is attached to Docker Desktop’s VM over the network. The flow Docker documents needs a privileged helper container; USB/IP through a separate Linux VM remains a valid option.
 
 ### Docker Desktop on Windows (WSL2)
 
 Docker Desktop runs in a WSL2 (Windows Subsystem for Linux 2) VM. The Hyper-V architecture does not forward USB devices to WSL2 by default.
 
-- **Solution:** use **`usbipd-win`**. On Windows, `usbipd bind` and `usbipd attach --wsl` attach the USB device to the WSL2 kernel.
+- **Solution:** use **`usbipd-win`**. It is an independent developer’s (`dorssel`) open-source project rather than a Microsoft tool; Microsoft’s WSL documentation recommends it for connecting USB devices. On Windows, `usbipd bind` and `usbipd attach --wsl` attach the USB device to the WSL2 kernel.
 
 ## 2. Device mapping and security: `--device` vs `--privileged` vs cgroups
 
@@ -60,8 +60,7 @@ Many online guides suggest `--privileged` to bypass USB problems. This removes m
 - Sets the cgroup filter to `a *:* rwm`, granting broad device access.
 - Disables AppArmor and Seccomp profiles.
 
-> [!CAUTION]
-> Malicious code or a vulnerability in a container running with `--privileged` can gain direct access to host disks (`/dev/sda`), UEFI variables and main memory (`/dev/mem`). Do not use `--privileged` merely to obtain USB access!
+> **Caution:** Malicious code or a vulnerability in a container running with `--privileged` can gain direct access to host disks (`/dev/sda`), UEFI variables and main memory (`/dev/mem`). Do not use `--privileged` merely to obtain USB access!
 
 ### A modern, restricted solution: `--device-cgroup-rule`
 
@@ -141,15 +140,17 @@ If you see only `new USB device found`, without an `attached to tty...` line, th
 
 | Symptom / error | Root cause | Remedy |
 | :--- | :--- | :--- |
-| Device never appears on macOS | Docker Desktop’s VM does not forward USB | Use USB/IP or a Linux VM bridge. |
+| Device never appears on macOS | Docker Desktop’s VM does not forward USB | Use Docker Desktop’s USB/IP support or a Linux VM bridge. |
 | Connection is lost after reconnecting the cable | udev hotplug does not reach the container | Use `-v /dev:/dev` and `--device-cgroup-rule`. |
-| `Permission denied` on /dev/ttyUSB0 | Missing dialout group permissions | Use `--group-add dialout` or run the container as root. |
+| `Permission denied` on /dev/ttyUSB0 | The container user is not in the device’s group | Pass the device’s numeric group ID from the host: `--group-add "$(stat -c '%g' /dev/ttyUSB0)"`. The name `dialout` is resolved against the container’s own `/etc/group` and may not match the host GID. Do not run the container as root for this. |
 | `lsusb` works but `/dev/ttyUSB0` is absent | Host kernel driver is missing | Load `cp210x` / `ch341` with `modprobe` on the host. |
 
 ## Sources and verification environment
 
 - [Linux kernel documentation — Devices and Cgroups](https://docs.kernel.org/admin-guide/cgroup-v2.html)
 - [usbipd-win repository](https://github.com/dorssel/usbipd-win)
-- [Docker Engine device specification](https://docs.docker.com/engine/reference/commandline/run/#device)
+- [Microsoft WSL documentation: Connect USB devices](https://learn.microsoft.com/en-us/windows/wsl/connect-usb)
+- [Docker Desktop: USB/IP support](https://docs.docker.com/desktop/features/usbip/)
+- [Docker Engine device specification](https://docs.docker.com/reference/cli/docker/container/run/#device)
 
-This guide was tested and verified on Ubuntu 24.04 (Linux 6.8), macOS Sonoma (Docker Desktop 4.30) and FTDI/CH340 hardware.
+This guide was tested and verified on Ubuntu 24.04 (Linux 6.8), macOS Sonoma (Docker Desktop 4.30) and FTDI/CH340 hardware. Docker Desktop’s USB/IP support and the numeric `--group-add` advice were added from documentation on 14 November 2026 and were not tested with a device.

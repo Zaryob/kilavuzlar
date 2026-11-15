@@ -4,7 +4,7 @@ lang: tr
 title: "Ubuntu'da LVM bölümünü veri kaybetmeden büyütmek"
 permalink: /linux/lvm-bolumunu-buyutmek/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: Ubuntu 22.04/24.04 LTS üzerinde ext4 ve XFS dosya sistemleri için LVM2 çevrimiçi genişletme.
 ---
 
@@ -71,6 +71,11 @@ sda                                   100G
   └─ubuntu--vg-ubuntu--lv ext4       46.5G    4.2G    86% /
 ```
 
+Bu kılavuzdaki komutlar bu örnek düzeni, yani `sda` diskini ve `sda2` bölüntüsünü kullanır. Kendi sisteminizde `LVM2_member`
+satırındaki adı ve numarayı esas alın: Ubuntu Server kurucusunun varsayılan LVM düzeninde fiziksel hacim genellikle üçüncü
+bölüntüdür (`sda3`), NVMe disklerde `nvme0n1p3`, virtio disklerde `vda3` gibi adlar görülür. Sonraki adımlardaki `sda` ve `2`
+değerlerini buna göre değiştirin.
+
 Burada görüldüğü gibi ana disk (`sda`) 100G boyutuna çıkarılmış, ancak bölüntü (`sda2`)
 ve mantıksal hacim (`ubuntu--vg-ubuntu--lv`) halen yaklaşık 48G seviyesindedir.
 
@@ -96,11 +101,15 @@ anında fark etmeyebilir. `sda` diski için yeniden tarama sinyali gönderin:
 echo 1 | sudo tee /sys/class/block/sda/device/rescan
 ```
 
-Tüm SCSI veri yollarını topluca taratmak isterseniz:
+Tüm SCSI disklerinin boyutunu topluca yeniden okutmak isterseniz:
 
 ```bash
-for host in /sys/class/scsi_host/host*/scan; do echo "- - -" | sudo tee "$host"; done
+for dev in /sys/class/block/sd*/device/rescan; do echo 1 | sudo tee "$dev"; done
 ```
+
+`/sys/class/scsi_host/host*/scan` dosyasına `- - -` yazmak bu iş için uygun değildir: o tarama yeni eklenen aygıtları bulur,
+mevcut bir diskin değişen boyutunu yeniden okumaz. virtio disklerde (`vda`) yeniden tarama gerekmez; yeni boyut çekirdeğe
+kendiliğinden bildirilir.
 
 `lsblk` çıktısında `sda` diskinin toplam boyutunun güncellendiğini doğrulayın.
 
@@ -109,8 +118,7 @@ for host in /sys/class/scsi_host/host*/scan; do echo "- - -" | sudo tee "$host";
 LVM fiziksel hacmi doğrudan ham disk yerine bir bölüntü üzerindeyse (`/dev/sda2`),
 bölüntü tablosunu güncellemek için `growpart` kullanılır.
 
-> [!IMPORTANT]
-> `growpart` komutunda disk aygıtı ile bölüntü numarası arasında **boşluk** bırakılmalıdır.
+> **Önemli:** `growpart` komutunda disk aygıtı ile bölüntü numarası arasında **boşluk** bırakılmalıdır.
 > `/dev/sda2` şeklinde tek parametre verilirse hata alınır.
 
 ```bash
@@ -221,7 +229,7 @@ sudo xfs_growfs /
 | Yetenek | ext4 | XFS |
 | :--- | :--- | :--- |
 | **Çevrimiçi Büyütme (Online Grow)** | Desteklenir (sistem çalışırken kesintisiz) | Desteklenir (bağlı olmak zorundadır) |
-| **Çevrimdışı Büyütme (Offline Grow)** | Desteklenir | Yaygın değildir (bağlıyken genişletilir) |
+| **Çevrimdışı Büyütme (Offline Grow)** | Desteklenir | Desteklenmez (`xfs_growfs` bağlı bir dosya sistemi ister) |
 | **Çevrimiçi Küçültme (Online Shrink)** | Desteklenmez | Desteklenmez |
 | **Çevrimdışı Küçültme (Offline Shrink)** | Desteklenir (`umount` ve `e2fsck` şarttır) | **Asla desteklenmez** (XFS mimari gereği küçülemez) |
 
@@ -251,4 +259,5 @@ yine de yedeksiz yapılmamalıdır.
 - LVM2 `lvextend(8)`, `pvresize(8)` ve `growpart(1)` kılavuz sayfaları
 
 Bu kılavuzdaki adımlar, Ubuntu 24.04 LTS (Kernel 6.8, LVM 2.03.16, ext4 ve XFS)
-üzerinde çalışan canlı bir sanal makinede test edilmiş ve doğrulanmıştır.
+üzerinde çalışan canlı bir sanal makinede test edilmiş ve doğrulanmıştır. 14 Kasım 2026'da değiştirilen toplu yeniden tarama
+döngüsü yalnızca sözdizimi açısından denetlendi; bir sanal makinede yeniden çalıştırılmadı.

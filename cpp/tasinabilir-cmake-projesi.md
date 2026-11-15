@@ -4,7 +4,7 @@ lang: tr
 title: "CMake ile taşınabilir C++ projesi oluşturmak"
 permalink: /cpp/tasinabilir-cmake-projesi/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: Modern CMake (3.21+) ile target tabanlı mimari, CMakePresets, toolchain ve çoklu platform desteği.
 ---
 
@@ -147,8 +147,7 @@ Proje kökünde `CMakePresets.json`:
 ```
 {: data-filename="CMakePresets.json"}
 
-> [!TIP]
-> Geliştiricilerin yerel makineye özel yapılandırmaları için `CMakeUserPresets.json` dosyası
+> **İpucu:** Geliştiricilerin yerel makineye özel yapılandırmaları için `CMakeUserPresets.json` dosyası
 > oluşturulabilir. Bu dosya `.gitignore` listesine eklenmeli, sürüm kontrolüne dahil edilmemelidir.
 
 ## 3. Toolchain dosyaları ile derleyici ve ortam ayrımı
@@ -163,14 +162,20 @@ başlatmadan önce derleyiciyi ve hedef mimariyi temiz şekilde tanımlamasını
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
 
-# macOS ve Linux üzerinde modern lld bağlayıcısını tercih et (varsa)
-find_program(LLD_EXECUTABLE ld.lld)
+# -fuse-ld=lld, Mach-O hedeflerinde ld64.lld, ELF hedeflerinde ld.lld sürücüsünü arar
+if(CMAKE_HOST_APPLE)
+    find_program(LLD_EXECUTABLE ld64.lld)
+else()
+    find_program(LLD_EXECUTABLE ld.lld)
+endif()
 if(LLD_EXECUTABLE)
     set(CMAKE_EXE_LINKER_FLAGS_INIT "-fuse-ld=lld")
     set(CMAKE_SHARED_LINKER_FLAGS_INIT "-fuse-ld=lld")
 endif()
 ```
 {: data-filename="cmake/toolchains/clang.cmake"}
+
+Clang sürücüsü `-fuse-ld=lld` bayrağını hedef biçimine göre çözer: macOS'ta (Mach-O) `ld64.lld`, Linux'ta (ELF) `ld.lld` çalıştırılır. Bu yüzden macOS'ta yalnızca `ld.lld` bulmak yeterli değildir; `ld64.lld` yoksa bağlama `invalid linker name` hatasıyla durur. Homebrew'da `lld` ayrı bir pakettir (`brew install lld`).
 
 Presets içine toolchain bağlamak için `configurePresets` alanına `"toolchainFile": "${sourceDir}/cmake/toolchains/clang.cmake"` eklemek yeterlidir.
 
@@ -185,7 +190,7 @@ Tek bir derleme dizininde tek bir mod barındırır. Yapılandırma anında `CMA
 - `Debug`: Hata ayıklama sembolleri (`-g`), optimizasyon kapalı (`-O0`).
 - `Release`: Yüksek optimizasyon (`-O3` veya `/O2`), `NDEBUG` makrosu tanımlı.
 - `RelWithDebInfo`: Optimizasyonlu derleme (`-O2`) ve hata ayıklama sembolleri (`-g`). Profilleme ve canlı hata analizi için idealdir.
-- `MinSizeRel`: Kod boyutunu küçültmeye odaklanan optimizasyon (`-Os` veya `/Os`).
+- `MinSizeRel`: Kod boyutunu küçültmeye odaklanan optimizasyon (GCC/Clang'de `-Os`, MSVC'de `/O1 /Ob1`), `NDEBUG` makrosu tanımlı.
 
 ### 2. Çoklu yapılandırıcılar (Multi-Config: Ninja Multi-Config, Visual Studio, Xcode)
 
@@ -285,6 +290,9 @@ Beklenen çıktı:
 - [CMake Resmi Belgesi - Presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html)
 - [Craig Scott - Professional CMake: A Practical Guide](https://crascit.com/professional-cmake/)
 - [Modern CMake Guidelines](https://cliutils.gitlab.io/modern-cmake/)
+- [CMake kaynak kodu: `Modules/Platform/Windows-MSVC.cmake`](https://github.com/Kitware/CMake/blob/master/Modules/Platform/Windows-MSVC.cmake) (MSVC derleme türü bayrakları)
 
 Bu kılavuz, macOS Sonoma (ARM64) ve Ubuntu 24.04 (Linux x86_64) ortamlarında CMake 3.28,
 Ninja 1.11, Clang 18 ve GCC 14 ile test edilerek doğrulanmıştır.
+
+14 Kasım 2026: toolchain dosyası macOS (ARM64) üzerinde CMake 4.4.3 ve Apple clang 21 ile yeniden yapılandırıldı. `ld64.lld` kurulu olmayan bu makinede bayrak eklenmedi ve proje sistem bağlayıcısıyla derlendi; `lld` ile bağlama bu turda sınanmadı.

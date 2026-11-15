@@ -4,7 +4,7 @@ lang: tr
 title: "Docker'da USB aygıt erişimi neden başarısız olur?"
 permalink: /docker/usb-aygit-erisimi/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: Linux, macOS ve Windows (WSL2) üzerinde Docker aygıt eşleme (device mapping), cgroup kuralları ve çekirdek modülü kısıtlamaları.
 ---
 
@@ -38,14 +38,14 @@ macOS'un çekirdeği XNU'dur (Darwin). Docker Desktop, macOS üzerinde Apple'ın
 
 - **Sorun:** macOS hipervizör katmanı, Mac'in USB-C/Thunderbolt girişine takılan fiziksel USB aygıtlarını Linux sanal makinesine **doğrudan aktarmaz (passthrough yapmaz)**.
 - macOS çekirdeği (IOKit) aygıtı kendisi sahiplenir. Linux VM'i ve dolayısıyla Docker konteyneri donanımı göremez.
-- **Çözüm:** macOS üzerinde doğrudan `docker run --device` çalışmaz. Seri portlar için `socat` ile ağ köprüsü kurulmalı ya da bir Linux VM üzerinden **USB/IP** kullanılmalıdır.
+- **Çözüm:** macOS üzerinde doğrudan `docker run --device` çalışmaz. Seri portlar için `socat` ile ağ köprüsü kurulmalı ya da **USB/IP** kullanılmalıdır. Docker Desktop'ın kendi [USB/IP desteği](https://docs.docker.com/desktop/features/usbip/) vardır (Mac, Linux ve Hyper-V arka uçlu Windows): ana makinede bir USB/IP sunucusu çalıştırılır ve aygıt Docker Desktop'ın sanal makinesine ağ üzerinden iliştirilir. Docker'ın anlattığı akış ayrıcalıklı bir yardımcı konteyner gerektirir; ayrı bir Linux VM üzerinden USB/IP de geçerli bir seçenektir.
 
 ### Windows Üzerinde Docker Desktop (WSL2)
 
 Docker Desktop Windows'ta WSL2 (Windows Subsystem for Linux 2) sanal makinesinde çalışır.
 Hyper-V mimarisi WSL2'ye varsayılan olarak USB iletimi sağlamaz.
 
-- **Çözüm:** Microsoft'un resmi açık kaynaklı aracı **`usbipd-win`** kullanılmalıdır. Windows tarafında `usbipd bind` ve `usbipd attach --wsl` komutlarıyla USB aygıtı WSL2 çekirdeğine iliştirilir.
+- **Çözüm:** **`usbipd-win`** kullanılmalıdır. Bu, Microsoft'un değil, bağımsız bir geliştiricinin (`dorssel`) açık kaynaklı projesidir; Microsoft'un WSL belgeleri USB bağlantısı için bu aracı önerir. Windows tarafında `usbipd bind` ve `usbipd attach --wsl` komutlarıyla USB aygıtı WSL2 çekirdeğine iliştirilir.
 
 ## 2. Aygıt eşleme ve güvenlik: `--device` vs `--privileged` vs cgroups
 
@@ -67,8 +67,7 @@ Bu bayrak konteyner tecridini tamamen kaldırır:
 - cgroup filtresini `a *:* rwm` (tüm disklere ve belleğe tam erişim) yapar.
 - AppArmor ve Seccomp profillerini kapatır.
 
-> [!CAUTION]
-> `--privileged` ile çalışan bir konteyner içindeki zararlı bir kod veya güvenlik açığı,
+> **Dikkat:** `--privileged` ile çalışan bir konteyner içindeki zararlı bir kod veya güvenlik açığı,
 > ana makinenin sabit disklerine (`/dev/sda`), UEFI değişkenlerine ve ana belleğe (`/dev/mem`)
 > doğrudan erişebilir. USB erişimi için asla `--privileged` kullanılmamalıdır!
 
@@ -155,16 +154,18 @@ ana makinenizde ilgili sürücü modülü eksiktir (`sudo modprobe ch341` çalı
 
 | Belirti / Hata | Kök Neden | Çözüm Yolu |
 | :--- | :--- | :--- |
-| macOS'ta aygıt hiç görünmüyor | Docker Desktop VM USB aktarımı yapmaz | USB/IP veya Linux VM köprüsü kullanın |
+| macOS'ta aygıt hiç görünmüyor | Docker Desktop VM USB aktarımı yapmaz | Docker Desktop USB/IP desteğini veya Linux VM köprüsünü kullanın |
 | Kablo sökülüp takılınca bağlantı kopuyor | udev hotplug konteynere yansımıyor | `-v /dev:/dev` ve `--device-cgroup-rule` kullanın |
-| `Permission denied` (/dev/ttyUSB0) | Dialout grup izinleri eksik | `--group-add dialout` veya konteyneri root çalıştırın |
+| `Permission denied` (/dev/ttyUSB0) | Konteyner kullanıcısı aygıtın grubunda değil | Aygıtın ana makinedeki sayısal grup kimliğini verin: `--group-add "$(stat -c '%g' /dev/ttyUSB0)"`. `dialout` adı konteynerin kendi `/etc/group` dosyasına göre çözülür ve ana makinedeki GID ile eşleşmeyebilir. Konteyneri bunun için root çalıştırmayın |
 | `lsusb` var ama `/dev/ttyUSB0` yok | Ana makinede çekirdek sürücüsü eksik | Ana makinede `modprobe cp210x` / `ch341` yapın |
 
 ## Kaynaklar ve doğrulama ortamı
 
 - [Linux Kernel Documentation - Devices and Cgroups](https://docs.kernel.org/admin-guide/cgroup-v2.html)
-- [Microsoft usbipd-win Deposu](https://github.com/dorssel/usbipd-win)
-- [Docker Engine Device Specification](https://docs.docker.com/engine/reference/commandline/run/#device)
+- [usbipd-win Deposu](https://github.com/dorssel/usbipd-win)
+- [Microsoft WSL belgesi: USB aygıtlarını bağlama](https://learn.microsoft.com/en-us/windows/wsl/connect-usb)
+- [Docker Desktop: USB/IP desteği](https://docs.docker.com/desktop/features/usbip/)
+- [Docker Engine Device Specification](https://docs.docker.com/reference/cli/docker/container/run/#device)
 
 Bu kılavuz, Ubuntu 24.04 (Linux 6.8), macOS Sonoma (Docker Desktop 4.30) ve FTDI/CH340
-donanımları üzerinde test edilerek doğrulanmıştır.
+donanımları üzerinde test edilerek doğrulanmıştır. Docker Desktop'ın USB/IP desteği ve sayısal `--group-add` önerisi 14 Kasım 2026'da yalnızca belgelerden eklendi; bir aygıtla sınanmadı.

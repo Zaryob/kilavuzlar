@@ -16,6 +16,8 @@ translated: '2026-11-03'
 
 VirtualBox is open source virtualisation software developed and published by Oracle. Since Oracle VM VirtualBox 5.2, it requires SSE2 CPU extensions. This setup uses the vboxdrv, vboxnetflt and vboxnetadp kernel modules.
 
+> **Warning:** VirtualBox 6.1 is no longer supported and receives no security updates. This page is a record from the 6.1 period; use Oracle’s current release for a new installation.
+
 ## Add the VirtualBox repository
 
 ```shell
@@ -26,14 +28,16 @@ $ sudo mv virtualbox.repo /etc/yum.repos.d/
 
 ## Import the Oracle repository signing key
 
+The RPM packages and the `virtualbox.repo` file above use the `oracle_vbox_2016.asc` key. The `oracle_vbox.asc` key in the original notes is the earlier key, kept only for very old distributions.
+
 ```shell
-wget -q https://www.virtualbox.org/download/oracle_vbox.asc
-sudo rpm --import oracle_vbox.asc
+wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc
+sudo rpm --import oracle_vbox_2016.asc
 ```
 
 ## Install additional packages
 
-This step requires EPEL:
+This step requires EPEL (the `dkms` package comes from there). On CentOS, `sudo dnf -y install epel-release` is enough; on RHEL install the `epel-release` package for your release as described in the EPEL documentation:
 
 ```shell
 sudo dnf -y install binutils kernel-devel kernel-headers libgomp make patch gcc glibc-headers glibc-devel dkms

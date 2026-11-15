@@ -13,7 +13,7 @@ redirect_from:
 
 # AMD Radeon Pro ayarları
 
-AMD Radeon Pro ekran kartlarında amdgpu modülü ile Linux çekirdeğinde standlone destek verilmekte ancak bazı kartlar için amdgpu-pro eklemesi yapılması gerekmektedir ki düzgün bir şekilde kullanabilelim.
+AMD Radeon Pro ekran kartlarında amdgpu modülü ile Linux çekirdeğinde standalone destek verilmekte ancak bazı kartlar için amdgpu-pro eklemesi yapılması gerekmektedir ki düzgün bir şekilde kullanabilelim.
 Bu kılavuz 2019 ile 2021 arasında bu işi nasıl yaptığımı anlatmaktadır.
 
 ## PPA deposunu eklemek
@@ -36,7 +36,9 @@ Hala GPU modunda çalışmıyorsa şu komutu işletmeliyiz.
 
 ```shell
 $ sudo su
-# echo \"DRI_PRIME=1\" >> /etc/environment
+# echo 'DRI_PRIME=1' >> /etc/environment
 ```
 
-Bu bizim sistmeimizdeki Xorg'u DRI_PRIME modunda başlatacaktır.
+Bu satır `DRI_PRIME=1` değişkenini bütün oturumlar için tanımlar.
+
+> **Uyarı:** `/etc/environment` sistem genelidir: bu ayar yalnızca Xorg'u değil, her uygulamayı ikincil GPU'da çalışmaya zorlar. Yalnızca hibrit (iki GPU'lu) sistemlerde anlamlıdır; pil tüketimini artırır ve ikincil GPU kullanılamadığında uygulamalar açılmayabilir. Tek bir uygulama için `DRI_PRIME=1 uygulama` biçiminde çalıştırmak daha güvenlidir. Geri almak için satırı `/etc/environment` dosyasından silin.

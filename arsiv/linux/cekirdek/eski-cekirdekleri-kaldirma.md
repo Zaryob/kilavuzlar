@@ -15,7 +15,7 @@ redirect_from:
 
 Bu,  eski çekirdeklerin nasıl silineceği/kaldırılacağı/temizleneceği anlatan hızlı bir kılavuzdur. Burada örnek olarak iki çekirdek kullanıyorum, diğerini daha fazla veya daha az tutmak istiyorsanız, kurulu çekirdek miktarını istediğiniz gibi ayarlayın. Normalde çekirdekleri kaldırmak istemenizin nedeni sınırlı disk alanıdır, örneğin VPS sunucularında ve dizüstü bilgisayarda. Bu çok kolay işlemdir.
 
-## Yüklü Çekirdeklerin Listlenmesi
+## Yüklü Çekirdeklerin Listelenmesi
 
 RHEL'de kurulu çekirdeklerin listesini alalım.
 ```bash

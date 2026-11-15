@@ -2,7 +2,7 @@
 title: Problems when migrating from GCC to Clang
 permalink: /en/cpp/gcc-clang-gecis-problemleri/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: 'Migrating C++17/C++20/C++23 projects from GCC to LLVM/Clang: ABI, linker and
   standard-library differences.'
 lang: en
@@ -37,8 +37,8 @@ error: use of undeclared identifier 'std'
 
 You cannot freely link a library compiled with GCC and `libstdc++` to an application built with Clang and `libc++`:
 
-- `libc++` mangles C++ symbols in the `std::__1::` inline namespace, while `libstdc++` uses `std::__cxx11::` for parts of its newer ABI.
-- The memory layouts of `std::string` and `std::vector` differ between the two libraries.
+- `libc++` mangles C++ symbols in the `std::__1::` inline namespace, while `libstdc++` uses `std::__cxx11::` only for its dual-ABI types (such as `std::string` and `std::list`); other types sit directly in `std::`.
+- The memory layout of `std::string` differs between the two libraries. `std::vector` is three pointers in both, but the symbols are mangled in different namespaces and the layout is not an ABI guarantee, so the similarity cannot be relied on.
 
 Passing C++ library objects across this boundary can produce undefined behaviour, crashes and linker errors. A deliberately designed C ABI boundary with separate ownership is a different case.
 
@@ -58,7 +58,7 @@ If rebuilding the third-party library is impossible, a temporary compatibility m
 
 ### Choosing a linker: `ld.bfd` vs `lld`
 
-GCC commonly uses GNU `ld` (`ld.bfd`) or `gold`. LLVM’s `lld` is an option for improving link speed with Clang:
+GCC uses GNU `ld` (`ld.bfd`) by default; some older distributions ship `gold`, which has been deprecated since binutils 2.44. LLVM’s `lld` is an option for improving link speed with Clang:
 
 ```bash
 clang++ -fuse-ld=lld main.o -o uygulama
@@ -73,8 +73,7 @@ GCC and Clang generate different intermediate representations for LTO:
 - GCC `-flto`: **GIMPLE** bytecode in ELF sections.
 - Clang `-flto`: **LLVM bitcode** as the object file. Embedding bitcode into ELF with `-fembed-bitcode` is a separate workflow.
 
-> [!WARNING]
-> A static library (`.a`) built with GCC LTO cannot be linked into a Clang LTO project. `lld` cannot interpret GIMPLE. When using LTO, build all dependencies with the same compiler family.
+> **Warning:** A static library (`.a`) built with GCC LTO cannot be linked into a Clang LTO project. `lld` cannot interpret GIMPLE. When using LTO, build all dependencies with the same compiler family.
 
 ## 3. Portable language rules and template checks
 
@@ -91,7 +90,7 @@ struct Taban {
 template <typename T>
 struct Turemis : Taban<T> {
     void baslat() {
-        calis(); // Both GCC and Clang reject this call.
+        calis(); // GCC de Clang de bu çağrıyı reddeder.
     }
 };
 ```
@@ -119,7 +118,7 @@ struct Baglanti {
 };
 int main() {
     Baglanti a;
-    Baglanti b(a); // Both GCC and Clang reject copying.
+    Baglanti b(a); // GCC de Clang de kopyalamayı reddeder.
 }
 ```
 
@@ -138,7 +137,7 @@ Baglanti& operator=(const Baglanti&) = default;
 
 GCC accepts C99-style VLAs such as `int dizi[n];` in C++ as a GNU extension. They are not standard C++.
 
-Clang rejects VLAs of classes or complex objects and emits `-Wvla` diagnostics. Use `std::vector<int> dizi(n);` or dynamic storage for a portable alternative.
+Clang also compiles VLAs as an extension, including arrays of class types; it does not reject them. Since Clang 18 it warns by default in C++ with `-Wvla-cxx-extension`, so a project built with `-Werror` turns that warning into an error. Older releases need `-Wvla` for a warning. Use `std::vector<int> dizi(n);` or dynamic storage for a portable alternative.
 
 ## 4. OpenMP runtime conflicts
 
@@ -150,8 +149,7 @@ sudo apt-get install -y libomp-dev
 clang++ -fopenmp main.cpp -o uygulama
 ```
 
-> [!CAUTION]
-> Avoid loading both `libgomp` and `libomp` into the same process, for example through different shared libraries and the main application. Competing OpenMP runtimes can cause deadlocks or memory faults (SIGSEGV).
+> **Caution:** Avoid loading both `libgomp` and `libomp` into the same process, for example through different shared libraries and the main application. Competing OpenMP runtimes can cause deadlocks or memory faults (SIGSEGV).
 
 ## 5. Migration checklist
 
@@ -168,5 +166,9 @@ clang++ -fopenmp main.cpp -o uygulama
 - [LLVM Clang Compiler User’s Manual](https://clang.llvm.org/docs/UsersManual.html)
 - [GCC to Clang Migration Guide — Chromium Project](https://chromium.googlesource.com/chromium/src/+/main/docs/clang.md)
 - [C++ standard core-language defect reports — two-phase lookup](https://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html)
+- [Clang 18 release notes: VLA diagnostic in C++](https://releases.llvm.org/18.1.0/tools/clang/docs/ReleaseNotes.html)
+- [GNU Binutils 2.44 announcement: gold deprecated](https://lists.gnu.org/archive/html/info-gnu/2025-02/msg00001.html)
 
 8–9 November 2026: missing-header, dependent-base, deleted-copy and VLA cases were compiled with GCC 12 and Clang 14 on Debian 12 ARM64, including corrected variants. This does not verify every ABI, OpenMP or linker combination discussed above.
+
+14 November 2026: the `std::string dizi[n];` case was recompiled with Apple clang 21 on macOS; it built with a `-Wvla-cxx-extension` warning.

@@ -2,7 +2,7 @@
 title: Running GUI applications in Docker
 permalink: /en/docker/gui-uygulamasi-calistirmak/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: X11 and Wayland display servers on Linux, GPU acceleration (/dev/dri) and secure
   socket authentication.
 lang: en
@@ -32,11 +32,13 @@ X11 servers use Unix domain sockets for fast, low-latency local connections. On 
 
 #### Why avoid `xhost +`?
 
-Many online guides suggest `xhost +local:docker` or `xhost +`. These commands loosen or disable X11 access control. Because X11 does not isolate clients from one another, malicious software inside the container could monitor keyboard input in other host windows, capture screenshots or generate synthetic input events (`XSendEvent`).
+Many online guides suggest `xhost +local:docker` or `xhost +`. `xhost +` disables X11 access control entirely; forms such as `xhost +local:docker` only loosen it (they admit local connections or one local user). Because X11 does not isolate clients from one another, malicious software inside the container could monitor keyboard input in other host windows, capture screenshots or generate synthetic input events (`XSendEvent`).
 
-#### Secure method: XAUTHORITY (MIT-MAGIC-COOKIE-1)
+#### Narrower method: XAUTHORITY (MIT-MAGIC-COOKIE-1)
 
-The secure approach is to copy the X server’s 16-byte secret cookie into an isolated file and provide that file to the container.
+The way to narrow access is to copy the X server’s 16-byte secret cookie into an isolated file and provide that file to the container. Only clients holding the cookie can then connect to the display.
+
+> **Warning:** The cookie limits *who* may connect; it does not limit what a connected client can do. A container holding the cookie is a fully authorised X client, and the keylogging, screenshot and synthetic-input risks listed above apply to it unchanged. Do not connect an application you do not trust to your main display over X11; prefer Wayland or a separate nested X server such as Xephyr.
 
 To prevent authentication failures (`No protocol specified`) caused by the container’s random hostname, the address family is set to `ffff` (FamilyWild):
 
@@ -53,6 +55,8 @@ chmod 600 "$XAUTH"
 X11 applications transfer high-resolution images using shared memory (`shmget`/`shmat`) rather than copying every byte through the socket. An isolated IPC namespace can cause the application to fail with `BadShmAttach` or `BadAccess`.
 
 **Solution:** add `--ipc=host` to the container command.
+
+> **Warning:** `--ipc=host` places the container in the host’s IPC namespace: it can see the host’s System V shared-memory segments and POSIX message queues, which noticeably weakens isolation. For Qt applications you can instead disable MIT-SHM with `-e QT_X11_NO_MITSHM=1`; drawing is slower but the IPC namespace stays separate.
 
 ### X11 container command
 

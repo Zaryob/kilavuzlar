@@ -2,7 +2,7 @@
 title: Testing Linux USB/IP infrastructure on macOS
 permalink: /en/sanallastirma/macos-linux-usbip/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: vhci_hcd limitations on macOS, QEMU USB passthrough (-device usb-host) and
   USB/IP testing between Linux VMs.
 lang: en
@@ -108,7 +108,7 @@ Keep `server-boot.log` and `client-boot.log`; a QEMU process starting alone does
 
 ## 3. Physical USB passthrough (hardware required)
 
-Use `system_profiler SPUSBDataType` to identify the real vendor/product IDs. With the server shut down, add the following option to its QEMU command (FTDI example IDs only):
+Use `system_profiler SPUSBHostDataType` to identify the real vendor/product IDs (checked on macOS 27.2). Older macOS releases called the data type `SPUSBDataType`; `system_profiler -listDataTypes | grep USB` shows which one your system has. With the server shut down, add the following option to its QEMU command (FTDI example IDs only):
 
 ```text
 -device usb-host,vendorid=0x0403,productid=0x6001

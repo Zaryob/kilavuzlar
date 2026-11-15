@@ -2,7 +2,7 @@
 title: Managing C++ dependencies with vcpkg
 permalink: /en/cpp/vcpkg-bagimlilik-yonetimi/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: vcpkg manifest mode (vcpkg.json), CMakePresets integration and binary caching.
 lang: en
 translation_key: guide-cpp-vcpkg-bagimlilik-yonetimi
@@ -22,7 +22,7 @@ Modern vcpkg offers **manifest mode**, much like Rust’s `Cargo.toml` or Node.j
 | :--- | :--- | :--- |
 | **Dependency definition** | Commands run by the user | A version-controlled JSON file in the project root |
 | **Version pinning** | Difficult; depends on the current vcpkg repository commit | Baseline versions through `builtin-baseline`; selected versions through `overrides` |
-| **Installation location** | Global, under the central vcpkg directory | In the project’s `build/vcpkg_installed` directory |
+| **Installation location** | Global, under the central vcpkg directory | Under the project’s build directory (`<build dir>/vcpkg_installed`; `build/dev-debug/vcpkg_installed` in this guide) |
 | **Team consistency** | Each developer installs packages manually | Anyone cloning the repository can reproduce the environment with `cmake` |
 
 ## 2. Creating a manifest (`vcpkg.json`)
@@ -145,8 +145,7 @@ Add the toolchain to `CMakePresets.json` so developers do not have to repeat `-D
 ```
 {: data-filename="CMakePresets.json"}
 
-> [!NOTE]
-> Make sure `VCPKG_ROOT` is defined in the environment, for example `export VCPKG_ROOT=/opt/vcpkg` or a path such as `$HOME/vcpkg` in your shell profile.
+> **Note:** Make sure `VCPKG_ROOT` is defined in the environment, for example `export VCPKG_ROOT=/opt/vcpkg` or a path such as `$HOME/vcpkg` in your shell profile.
 
 ## 4. Private registries and internal packages
 
@@ -260,14 +259,14 @@ JSON Çıktısı: {
 
 ## Common problems and solutions
 
-- **`VCPKG_ROOT not found`**: add the vcpkg installation directory to the shell environment with `export VCPKG_ROOT=...`.
+- **`Could not find toolchain file: "/scripts/buildsystems/vcpkg.cmake"`**: `VCPKG_ROOT` is not defined, so `$env{VCPKG_ROOT}` in the preset expanded to nothing. Add the vcpkg directory to the shell environment with `export VCPKG_ROOT=...`.
 - **Triplet mismatch**: use `arm64-osx` for ARM64 macOS, `x64-osx` for x86_64 macOS, and `x64-linux` or `arm64-linux` on Linux. If necessary, add `"VCPKG_TARGET_TRIPLET": "arm64-osx"` to the `vcpkg-temel` preset.
-- **Need for a clean install**: if the dependency tree develops an unexpected problem, remove the project’s `build/` and `vcpkg_installed/` directories and configure again.
+- **Need for a clean install**: if the dependency tree develops an unexpected problem, remove the project’s `build/` directory (including the `vcpkg_installed/` inside it) and configure again.
 
 ## Sources and verification environment
 
 - [Microsoft vcpkg documentation — Manifest mode](https://learn.microsoft.com/en-us/vcpkg/consume/manifest-mode)
 - [vcpkg binary caching guide](https://learn.microsoft.com/en-us/vcpkg/reference/binarycaching)
-- [vcpkg Git registries](https://learn.microsoft.com/en-us/vcpkg/users/registries)
+- [vcpkg Git registries](https://learn.microsoft.com/en-us/vcpkg/concepts/registries)
 
 8–9 November 2026: the pinned manifest was installed from sources on macOS 27.2 ARM64 and Debian 12 ARM64 with binary caching disabled; the CMake Debug application was built and run. The `files` provider restored 5/5 packages in a second clean Linux installation. The private registry and Actions service have not been executed.

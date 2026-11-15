@@ -2,7 +2,7 @@
 title: Profiling a C++ application with Tracy
 permalink: /en/cpp/tracy-ile-profilleme/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: C++ instrumentation, CMake integration and frame/zone analysis using Tracy
   Profiler (v0.11+).
 lang: en
@@ -36,35 +36,36 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Profilleme anahtarı
 option(PROFILING_ENABLED "Tracy Profiler'ı etkinleştir" ON)
 
-if(PROFILING_ENABLED)
-    include(FetchContent)
-    
-    # Yalnızca GUI bağlandığında veri toplayarak bellek tasarrufu yap
-    set(TRACY_ENABLE ON CACHE BOOL "" FORCE)
-    set(TRACY_ON_DEMAND ON CACHE BOOL "" FORCE)
-    
-    FetchContent_Declare(
-        tracy
-        GIT_REPOSITORY https://github.com/wolfpld/tracy.git
-        GIT_TAG        v0.11.1
-        GIT_SHALLOW    TRUE
-    )
-    FetchContent_MakeAvailable(tracy)
-endif()
+include(FetchContent)
+
+# Tracy her zaman indirilir: başlıklar profilleme kapalıyken de gerekir.
+# TRACY_ENABLE kapalıyken makrolar boş tanımlanır.
+set(TRACY_ENABLE ${PROFILING_ENABLED} CACHE BOOL "" FORCE)
+# Yalnızca GUI bağlandığında veri toplayarak bellek tasarrufu yap
+set(TRACY_ON_DEMAND ON CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    tracy
+    GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+    GIT_TAG        v0.15.0
+    GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(tracy)
 
 add_executable(oyun_motoru src/main.cpp)
 
 # Çağrı yığını unwinding için çerçeve işaretçilerini koru
 target_compile_options(oyun_motoru PRIVATE -fno-omit-frame-pointer)
 
-if(PROFILING_ENABLED)
-    target_link_libraries(oyun_motoru PRIVATE Tracy::TracyClient)
-    target_compile_definitions(oyun_motoru PRIVATE TRACY_ENABLE)
-endif()
+# TRACY_ENABLE tanımı açıkken Tracy::TracyClient hedefinden gelir
+target_link_libraries(oyun_motoru PRIVATE Tracy::TracyClient)
 ```
 
-> [!TIP]
-> Without `TRACY_ENABLE`, Tracy macros compile to no-ops (`((void)0)`). Background sockets and allocation tracking are removed, eliminating instrumentation overhead in Release builds distributed to users.
+Tracy is fetched even with `PROFILING_ENABLED=OFF`, because `#include <tracy/Tracy.hpp>` in your sources must resolve in both cases. The switch only turns the `TRACY_ENABLE` option on or off.
+
+The client version selected with `GIT_TAG` must match the version of the `tracy-profiler` interface you run: the interface refuses the connection when the network protocol versions differ. This example is pinned to 0.15.0, the version Homebrew ships; change the tag if you install the interface from another release.
+
+> **Tip:** Without `TRACY_ENABLE`, Tracy macros are defined empty (for example `#define ZoneScoped`) and generate no code. Background sockets and allocation tracking are removed, eliminating instrumentation overhead in Release builds distributed to users.
 
 ## 2. Instrumentation macros
 
@@ -130,8 +131,8 @@ void operator delete(void* ptr) noexcept {
 
 To run the graphical profiler:
 
-- **macOS (Homebrew):** `brew install tracy`
-- **Linux:** build from the repository’s `profiler/` directory:
+- **macOS (Homebrew):** `brew install tracy` (0.15.0 when this page was updated). Check the installed version with `brew info tracy` and compare it with `GIT_TAG`.
+- **Linux:** check out the Tracy repository at the tag used in the CMake file (`v0.15.0`) and build from its `profiler/` directory:
 
 ```bash
 cd tracy/profiler
@@ -175,4 +176,6 @@ Shows whether allocated memory grows continuously over time, suggesting a memory
 - [Tracy Profiler repository](https://github.com/wolfpld/tracy)
 - [Tracy user manual (PDF)](https://github.com/wolfpld/tracy/releases/latest/download/tracy.pdf)
 
-This guide was tested and verified on Ubuntu 24.04 and macOS Sonoma using Tracy v0.11.1, CMake 3.28 and Clang 18.
+This guide was first tested on Ubuntu 24.04 and macOS Sonoma using Tracy v0.11.1, CMake 3.28 and Clang 18.
+
+14 November 2026: the CMake file was rebuilt with Tracy v0.15.0 on macOS (ARM64), CMake 4.4.3 and Apple clang 21, with `PROFILING_ENABLED=ON` and `OFF`; a sample using the macros from this guide compiled and ran in both cases. Connecting the interface was not exercised in this pass.

@@ -4,7 +4,7 @@ lang: tr
 title: "Docker'da C++ uygulaması derleyip test etmek"
 permalink: /docker/cpp-derleme-ve-test/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: Multi-stage Dockerfile, BuildKit cache mounts, CMake/Ninja, CTest ve Distroless çalışma zamanı.
 ---
 
@@ -37,7 +37,7 @@ Boru hattı mantıksal olarak 5 aşamadan oluşur:
 Projenizin kök dizininde `Dockerfile` dosyasını oluşturun:
 
 ```dockerfile
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1
 
 # ==============================================================================
 # AŞAMA 1: Temel Derleme Ortamı
@@ -207,10 +207,10 @@ int main() {
 
 ## 4. Derleme, test ve hedef seçimi
 
-Docker BuildKit'in gelişmiş önbellek özelliklerinden yararlanmak için derlemeyi başlatın:
+Derlemeyi başlatın. BuildKit, Docker Engine 23.0'dan beri varsayılan derleyicidir; `DOCKER_BUILDKIT=1` yalnızca daha eski sürümlerde gerekir. Dockerfile'ın ilk satırındaki `# syntax=docker/dockerfile:1`, Dockerfile sözdiziminin güncel 1.x sürümünü seçer:
 
 ```bash
-DOCKER_BUILDKIT=1 docker build -t cpp-uygulama:latest .
+docker build -t cpp-uygulama:latest .
 ```
 
 ### CI/CD Boru Hattında Hedef Aşama Seçimi
@@ -252,3 +252,5 @@ docker image inspect cpp-uygulama:latest --format '{% raw %}{{.Size}}{% endraw %
 - [BuildKit Cache Mounts Belgesi](https://docs.docker.com/build/cache/optimize/#use-cache-mounts)
 
 8–9 Kasım 2026: Docker 29.6.2/BuildKit, Debian 12 ARM64, GCC 12.2.0 ve CMake 3.25.1 ile son imaj derlendi ve çalıştırıldı. Derleme komutunda `ccache` ve `-DNDEBUG` görüldü. Kasıtlı yanlış beklenti hem `test-kosucu` hem `calisma-zamani` hedefini exit 1 ile durdurdu. Başarılı derleme performans veya sabit imaj boyutu iddiası oluşturmaz.
+
+14 Kasım 2026: `# syntax=docker/dockerfile:1` satırıyla ve `DOCKER_BUILDKIT` değişkeni olmadan imaj Docker 29.6.2 üzerinde yeniden derlendi ve çalıştırıldı.

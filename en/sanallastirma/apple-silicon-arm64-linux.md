@@ -13,7 +13,7 @@ translated: '2026-11-03'
 
 # Virtualising ARM64 Linux on an Apple Silicon Mac
 
-Apple Silicon Macs (M1/M2/M3/M4) use ARM64 (AArch64). This allows ARM64 Linux guests to run with hardware virtualisation, avoiding the substantial overhead of x86 emulation.
+Apple Silicon (M-series) Macs use ARM64 (AArch64). This allows ARM64 Linux guests to run with hardware virtualisation, avoiding the substantial overhead of x86 emulation.
 
 This guide creates a headless ARM64 Ubuntu VM using open source **QEMU**, Apple’s **`Hypervisor.framework` (HVF)**, SSH access and automatic Cloud-Init configuration.
 
@@ -188,4 +188,4 @@ To exit QEMU immediately, press `Ctrl + A` and then `x` in the serial-console te
 - [Apple Hypervisor framework documentation](https://developer.apple.com/documentation/hypervisor)
 - [Ubuntu cloud images](https://cloud-images.ubuntu.com/)
 
-This guide was tested and verified on an Apple M2 Max Mac running macOS Sonoma 14.5, Homebrew QEMU 9.0.0 and an Ubuntu 24.04 ARM64 cloud image.
+This guide was first tested on an Apple M2 Max Mac running macOS Sonoma 14.5, Homebrew QEMU 9.0.0 and an Ubuntu 24.04 ARM64 cloud image. In November 2026 Homebrew ships QEMU 11.1.3; the commands were not rerun end to end with that release or with the SSH-key cloud-init configuration added later.

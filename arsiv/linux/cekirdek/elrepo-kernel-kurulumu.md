@@ -6,16 +6,16 @@ permalink: /arsiv/linux/cekirdek/elrepo-kernel-kurulumu/
 status: arsiv
 reviewed: 2026-11-02
 scope: "ELRepo EL8 paketi ve kernel-ml/kernel-lt örnekleri."
-archive_reason: "EPEL ve ELRepo adları karıştırılmış. Dağıtım uyumu, imza anahtarı, Secure Boot ve geri dönüş adımları doğrulanmalı."
+archive_reason: "Özgün notta EPEL ve ELRepo adları karıştırılmıştı; metin ELRepo olarak düzeltildi. Dağıtım uyumu, imza anahtarı, Secure Boot ve geri dönüş adımları doğrulanmalı."
 redirect_from:
   - "/linux/centos-rhel_mainline_kernel_kurulumu.html"
 ---
 
 # CentOS/RHEL: ELRepo çekirdeği kurulumu
 
-CentOS veya RHEL kullananlar bilir ki, bu iki işletim sistemi sürekli en uyumlu ve en optimal sürümleri destekler. Çünkü bu iki işletim sistemi de özellik eklemekten ziyade kararlı kalmayı hedef almaktadır. Ancak benim gibi bazı sürücüleri sebebi son sürün kernel kullanmak isteyen (en azından 5.x sürümleri) kişiler kernel 4.x sürümülerine sahip olan bir işletim sistemini kullanmakta zorluk yaşamakta. İşte bu noktada yardımımıza EPEL depoları ve ElRepo-Kernel koşuyor.
+CentOS veya RHEL kullananlar bilir ki, bu iki işletim sistemi sürekli en uyumlu ve en optimal sürümleri destekler. Çünkü bu iki işletim sistemi de özellik eklemekten ziyade kararlı kalmayı hedef almaktadır. Ancak benim gibi bazı sürücüleri sebebi son sürüm kernel kullanmak isteyen (en azından 5.x sürümleri) kişiler kernel 4.x sürümülerine sahip olan bir işletim sistemini kullanmakta zorluk yaşamakta. İşte bu noktada yardımımıza ELRepo deposu ve içindeki `elrepo-kernel` kanalı koşuyor. (ELRepo, EPEL ile aynı depo değildir; çekirdek paketleri ELRepo'dan gelir.)
 
-## EPEL Kernel Deposunu aktifleştirmek
+## ELRepo Deposunu aktifleştirmek
 
 Başta GPG anahtarlarını ekleyelim.
 ```bash
@@ -27,9 +27,9 @@ rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
 rpm -Uvh https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
 ```
 
-Ve depo kataloglarını yenileyelim.
+Ve depo kataloglarını yenileyelim. Bunun için `yum makecache` yeterlidir; `yum update` yalnızca katalogları yenilemez, sistemdeki bütün paketleri yükseltir.
 ```
-yum update
+yum makecache
 ```
 
 ## Mainline Kerneli Kurmak

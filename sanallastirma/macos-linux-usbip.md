@@ -4,7 +4,7 @@ lang: tr
 title: "macOS'ta Linux USB/IP altyapısını test etmek"
 permalink: /sanallastirma/macos-linux-usbip/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: macOS üzerinde vhci_hcd kısıtları, QEMU USB passthrough (-device usb-host) ve Linux VM'leri arasında USB/IP testi.
 ---
 
@@ -105,7 +105,7 @@ QEMU sürecinin başlaması Ubuntu’nun boot ettiğini kanıtlamaz; `server-boo
 
 ## 3. Fiziksel USB passthrough (donanım gerekir)
 
-Gerçek üretici/ürün kimliklerini `system_profiler SPUSBDataType` ile bulun. Sunucu kapalıyken QEMU komutuna aşağıdaki seçeneği ekleyin (kimlikler yalnız FTDI örneğidir):
+Gerçek üretici/ürün kimliklerini `system_profiler SPUSBHostDataType` ile bulun (macOS 27.2'de sınandı). Eski macOS sürümlerinde veri türünün adı `SPUSBDataType` idi; sisteminizde hangisinin bulunduğunu `system_profiler -listDataTypes | grep USB` gösterir. Sunucu kapalıyken QEMU komutuna aşağıdaki seçeneği ekleyin (kimlikler yalnız FTDI örneğidir):
 
 ```text
 -device usb-host,vendorid=0x0403,productid=0x6001

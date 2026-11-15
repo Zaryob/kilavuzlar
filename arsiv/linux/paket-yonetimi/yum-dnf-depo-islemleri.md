@@ -6,7 +6,7 @@ permalink: /arsiv/linux/paket-yonetimi/yum-dnf-depo-islemleri/
 status: arsiv
 reviewed: 2026-11-02
 scope: "YUM, yum-utils ve RHEL 8 depo örnekleri."
-archive_reason: "YUM ile DNF sürümleri ayrılmalı; topluca depo açma/kapatma örnekleri ve joker karakterlerin kabuk tarafından genişletilmesi gözden geçirilmeli."
+archive_reason: "YUM ile DNF sürümleri ayrılmalı. Topluca depo açma/kapatma komutları Kasım 2026'da yum-utils ve dnf config-manager belgelerine göre düzeltildi; bir RHEL sisteminde çalıştırılmadı."
 redirect_from:
   - "/linux/yum-dnf-ile-depo-islemleri.html"
 ---
@@ -108,8 +108,12 @@ RHEL spesifik bir depoyu deaktifleştirmek için:
 
 ## Bütün Depoları Aktifleştirmek
 
+`--enablerepo` ve `--disablerepo` yalnızca çalıştırılan tek komut için geçerlidir; depoyu kalıcı olarak açıp kapatmaz. Kalıcı değişiklik için `--enable` ve `--disable` kullanılır. Yıldız işaretinin kabuk tarafından dosya adlarına genişletilmemesi için `\*` biçiminde kaçırılması gerekir. DNF kullanan sistemlerde aynı işin karşılığı `dnf config-manager --set-enabled '*'` ve `dnf config-manager --set-disabled '*'` komutlarıdır.
+
+> **Uyarı:** Bütün depoları açmak; test, kaynak ve hata ayıklama depolarını da etkinleştirir. Üretim sisteminde yalnızca gereken depoyu açın.
+
 ```shell
-# yum-config-manager --enablerepo=*
+# yum-config-manager --enable \*
 ```
 
 RHEL spesifik depolar için
@@ -121,7 +125,7 @@ RHEL spesifik depolar için
 ## Bütün Depoları Deaktifleştirmek
 
 ```shell
-# yum-config-manager --disablerepo=*
+# yum-config-manager --disable \*
 ```
 
 RHEL spesifik depolar için

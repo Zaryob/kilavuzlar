@@ -2,7 +2,7 @@
 title: Building and testing a C++ application in Docker
 permalink: /en/docker/cpp-derleme-ve-test/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: Multi-stage Dockerfiles, BuildKit cache mounts, CMake/Ninja, CTest and a Distroless
   runtime.
 lang: en
@@ -40,7 +40,7 @@ The pipeline has five logical stages:
 Create `Dockerfile` in the project root:
 
 ```dockerfile
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1
 
 # ==============================================================================
 # AŞAMA 1: Temel Derleme Ortamı
@@ -210,10 +210,10 @@ int main() {
 
 ## 4. Building, testing and selecting a target
 
-Start a build using Docker BuildKit’s advanced caching features:
+Start the build. BuildKit has been the default builder since Docker Engine 23.0; `DOCKER_BUILDKIT=1` is only needed on older releases. The `# syntax=docker/dockerfile:1` line at the top of the Dockerfile selects the current 1.x Dockerfile syntax:
 
 ```bash
-DOCKER_BUILDKIT=1 docker build -t cpp-uygulama:latest .
+docker build -t cpp-uygulama:latest .
 ```
 
 ### Selecting target stages in CI/CD
@@ -255,3 +255,5 @@ docker image inspect cpp-uygulama:latest --format '{% raw %}{{.Size}}{% endraw %
 - [BuildKit cache mounts documentation](https://docs.docker.com/build/cache/optimize/#use-cache-mounts)
 
 8–9 November 2026: the final image was built and run with Docker 29.6.2/BuildKit, Debian 12 ARM64, GCC 12.2.0 and CMake 3.25.1. The compile command used `ccache` and `-DNDEBUG`. A deliberately wrong expectation stopped both `test-kosucu` and `calisma-zamani` with exit 1. A successful build does not establish performance or image-size claims.
+
+14 November 2026: the image was rebuilt and run on Docker 29.6.2 with the `# syntax=docker/dockerfile:1` line and without the `DOCKER_BUILDKIT` variable.

@@ -4,7 +4,7 @@ lang: tr
 title: "GCC'den Clang'e geçerken karşılaşılan problemler"
 permalink: /cpp/gcc-clang-gecis-problemleri/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: C++17/C++20/C++23 projelerinin GCC'den LLVM/Clang derleyicisine taşınması, ABI, linker ve standart kütüphane farkları.
 ---
 
@@ -42,8 +42,8 @@ satırlarını doğrudan ilgili kaynak veya başlık dosyasına ekleyin.
 
 GCC (`libstdc++`) ile derlenmiş kütüphane ile Clang + `libc++` kullanan uygulama arasında STL nesneleri taşıyan bir C++ arayüzü doğrudan uyumlu kabul edilmemelidir:
 
-- `libc++`, C++ sembollerini `std::__1::` satır içi (inline) ad alanında manglerken, `libstdc++` ise `std::__cxx11::` ad alanını kullanır.
-- `std::string` veya `std::vector` bellek yerleşimi (memory layout) iki kütüphane arasında tamamen farklıdır.
+- `libc++`, C++ sembollerini `std::__1::` satır içi (inline) ad alanında mangler. `libstdc++` ise `std::__cxx11::` ad alanını yalnızca çift ABI'lı türlerde (`std::string`, `std::list` gibi) kullanır; diğer türler doğrudan `std::` altındadır.
+- `std::string` bellek yerleşimi (memory layout) iki kütüphanede farklıdır. `std::vector` her ikisinde de üç işaretçiden oluşur; ama semboller farklı ad alanlarında manglendiği ve yerleşim ABI garantisi olmadığı için bu benzerliğe güvenilmez.
 
 C++ kütüphane nesnelerini bu sınırdan geçirmek tanımsız davranış, çökme veya linker hatası doğurabilir. Ayrı sahiplik kurallarıyla tasarlanmış bir C ABI sınırı farklıdır.
 
@@ -66,7 +66,7 @@ geçici olarak `-D_GLIBCXX_USE_CXX11_ABI=0` eklenmelidir.
 
 ### Bağlayıcı seçimi: `ld.bfd` vs `lld`
 
-GCC varsayılan olarak GNU `ld` (`ld.bfd`) veya `gold` kullanır. Clang ile çalışırken
+GCC varsayılan olarak GNU `ld` (`ld.bfd`) kullanır; bazı eski dağıtımlar `gold` ile gelir, ancak `gold` binutils 2.44 ile kullanımdan kaldırılmıştır. Clang ile çalışırken
 en yüksek hız avantajını elde etmek için LLVM'in bağlayıcısı `lld` tercih edilir:
 
 ```bash
@@ -82,8 +82,7 @@ GCC ve Clang, LTO için tamamen farklı ara temsil (IR) formatları üretir:
 - GCC `-flto`: ELF bölümlerinde **GIMPLE** bayt kodu oluşturur.
 - Clang `-flto`: Nesne dosyası olarak **LLVM bitcode** üretir. `-fembed-bitcode` ile ELF içine gömülen bitcode ayrı bir akıştır.
 
-> [!WARNING]
-> GCC ile LTO kullanılarak derlenmiş bir statik kütüphane (`.a`), Clang LTO ile
+> **Uyarı:** GCC ile LTO kullanılarak derlenmiş bir statik kütüphane (`.a`), Clang LTO ile
 > derlenen bir projeye bağlanamaz. `lld` bağlayıcısı GIMPLE kodunu çözümleyemez. LTO
 > kullanılacaksa tüm bağımlılıklar aynı derleyici ailesiyle derlenmelidir.
 
@@ -102,7 +101,7 @@ struct Taban {
 template <typename T>
 struct Turemis : Taban<T> {
     void baslat() {
-        calis(); // Both GCC and Clang reject this call.
+        calis(); // GCC de Clang de bu çağrıyı reddeder.
     }
 };
 ```
@@ -133,7 +132,7 @@ struct Baglanti {
 };
 int main() {
     Baglanti a;
-    Baglanti b(a); // Both GCC and Clang reject copying.
+    Baglanti b(a); // GCC de Clang de kopyalamayı reddeder.
 }
 ```
 
@@ -153,7 +152,9 @@ Baglanti& operator=(const Baglanti&) = default;
 GCC, C99 standardında bulunan VLA (`int dizi[n];`) yapısını C++ kodunda da bir GNU eklentisi
 olarak kabul eder. Ancak VLA standart C++'ta yer almaz.
 
-Clang, sınıflar veya karmaşık nesneler içeren VLA yapılarını reddeder ve `-Wvla` uyarıları üretir.
+Clang da VLA'ları, sınıf türünden elemanlar dahil, bir eklenti olarak derler; reddetmez. Clang 18'den
+itibaren C++ kodunda varsayılan olarak `-Wvla-cxx-extension` uyarısı verir, dolayısıyla `-Werror` ile
+derlenen bir projede bu uyarı hataya dönüşür. Eski sürümlerde uyarı için `-Wvla` gerekir.
 Güvenli ve taşınabilir çözüm `std::vector<int> dizi(n);` veya dinamik bellek kullanmaktır.
 
 ## 4. OpenMP ve Dinamik Çalışma Zamanı Çakışmaları
@@ -167,8 +168,7 @@ sudo apt-get install -y libomp-dev
 clang++ -fopenmp main.cpp -o uygulama
 ```
 
-> [!CAUTION]
-> Aynı süreç içerisinde hem `libgomp` hem de `libomp` kütüphanelerinin yüklenmesine
+> **Dikkat:** Aynı süreç içerisinde hem `libgomp` hem de `libomp` kütüphanelerinin yüklenmesine
 > (örneğin biri paylaşımlı kütüphaneden, diğeri ana uygulamadan) asla izin vermeyin.
 > Birlikte yüklenmeleri kaynak çekişmesi, kilitlenme veya çalışma zamanı hatası riski taşır; her durumda derhal çökme garantisi yoktur.
 
@@ -187,5 +187,9 @@ clang++ -fopenmp main.cpp -o uygulama
 - [LLVM Clang Compiler User's Manual](https://clang.llvm.org/docs/UsersManual.html)
 - [GCC to Clang Migration Guide - Chromium Project](https://chromium.googlesource.com/chromium/src/+/main/docs/clang.md)
 - [C++ Standard Core Language Defect Reports - Two-phase Lookup](https://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html)
+- [Clang 18 sürüm notları: C++ kodunda VLA uyarısı](https://releases.llvm.org/18.1.0/tools/clang/docs/ReleaseNotes.html)
+- [GNU Binutils 2.44 duyurusu: gold kullanımdan kaldırıldı](https://lists.gnu.org/archive/html/info-gnu/2025-02/msg00001.html)
 
 8–9 Kasım 2026: eksik başlık, bağımlı taban, silinen kopyalama ve VLA örnekleri Debian 12 ARM64 üzerinde GCC 12 ve Clang 14 ile, düzeltilmiş varyantları da dahil derlendi. Bu kontrol bütün ABI, OpenMP ve bağlayıcı birleşimlerinin doğrulanması değildir.
+
+14 Kasım 2026: `std::string dizi[n];` örneği macOS üzerinde Apple clang 21 ile yeniden derlendi; derleme `-Wvla-cxx-extension` uyarısıyla tamamlandı.

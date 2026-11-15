@@ -21,7 +21,7 @@ permalink: /sitemap.xml
   </url>
 {% assign skip_urls = '/, /en/, /404.html, /search.json, /sitemap.xml' | split: ', ' %}
 {% for page in site.pages %}
-{% if page.url and page.title and page.title != 'empty' %}
+{% if page.url and page.title and page.title != 'empty' and page.translation_key != 'guide-404' %}
 {% unless skip_urls contains page.url %}
   <url>
     <loc>{{ page.url | absolute_url }}</loc>

@@ -6,6 +6,8 @@ reviewed: 2026-11-02
 scope: OpenCV 4.0.0, Python 2 and historical APT package names.
 archive_reason: Download versions are inconsistent, and x86/ARM build options are
   mixed. Rewrite the system-pip installation and virtual-environment linkage steps.
+  In November 2026 only the ~/.profile command and two CMake options absent from OpenCV 4.0.0
+  were corrected; the build was not repeated.
 lang: en
 translation_key: guide-arsiv-goruntu-isleme-opencv-kurulumu
 translation_of: /arsiv/goruntu-isleme/opencv-kurulumu/
@@ -37,6 +39,8 @@ The original notes suggest installing all of these:
 * Video files and H.264: ```sudo apt-get install libxvidcore-dev libx264-dev```
 * Additional codecs: ```sudo apt-get install libdc1394-22-dev libtheora-dev libvorbis-dev yasm libopencore-amrnb-dev libopencore-amrwb-dev libxine2-dev```
 
+Note: package names on this page such as `libdc1394-22-dev`, `qt5-default`, `libvtk6-dev` and `python-dev` belong to the period of the notes; current Debian/Ubuntu releases may not have them or ship them under another name.
+
 ### GUI tools
 
 Install GTK if using graphical output such as an OpenCV window:
@@ -65,7 +69,7 @@ sudo apt-get install libvtk6-dev
 
 ### Numerical optimisation tools
 
-The original notes add OpenCV’s numerical libraries for numerical processing, while noting a possible performance trade-off:
+`libatlas-base-dev` and `gfortran` provide BLAS/LAPACK back ends that OpenCV can use for linear algebra. The original notes said they reduce overall speed; that claim was never measured, and the purpose of these libraries is to speed those operations up:
 
 ```
 sudo apt-get install libatlas-base-dev gfortran
@@ -123,6 +127,8 @@ mv opencv_contrib-4.0.0 opencv_contrib
 
 The original notes offer this approach if not using virtualenv.
 
+> **Warning:** Installing packages into the system Python with `sudo pip` can break the distribution’s own Python packages; current Debian/Ubuntu releases refuse it with an `externally-managed-environment` error. The commands below are kept as a historical record; today, use a virtual environment created with `python3 -m venv`.
+
 Install NumPy system-wide:
 
 ```
@@ -146,13 +152,15 @@ sudo pip install virtualenv virtualenvwrapper
 sudo rm -rf ~/get-pip.py ~/.cache/pip
 ```
 
-Add it to the shell environment through ~/.profile:
+Add it to the shell environment through ~/.profile. (The `echo -e` command in the original notes wrote a single line starting with `#` because of the trailing `\` characters, so nothing was exported; the form below appends the four lines separately.)
 
 ```
-echo -e "# virtualenv and virtualenvwrapper \
-export WORKON_HOME=$HOME/.virtualenvs  \
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3 \
-source /usr/local/bin/virtualenvwrapper.sh" >> ~/.profile
+cat >> ~/.profile <<'EOF'
+# virtualenv and virtualenvwrapper
+export WORKON_HOME=$HOME/.virtualenvs
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+source /usr/local/bin/virtualenvwrapper.sh
+EOF
 ```
 
 Reload the shell configuration:
@@ -193,7 +201,7 @@ mkdir build
 cd build
 ```
 
-Configure with CMake:
+Configure with CMake. (The `FORCE_VTK` and `WITH_LIBV4L` options in the original notes do not exist in OpenCV 4.0.0 and are ignored; `WITH_VTK` and `WITH_V4L` replace them. `ENABLE_NEON` and `ENABLE_VFPV3` are ARM-only; remove them on x86.)
 
 ```
 cmake -D CMAKE_BUILD_TYPE=RELEASE \
@@ -203,8 +211,8 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D ENABLE_VFPV3=ON \
     -D WITH_OPENGL=ON \
     -D WITH_QT=ON \
-    -D FORCE_VTK=ON \
-    -D WITH_LIBV4L=ON \
+    -D WITH_VTK=ON \
+    -D WITH_V4L=ON \
     -D WITH_TBB=ON \
     -D WITH_GDAL=ON \
     -D WITH_FFMPEG=0 \

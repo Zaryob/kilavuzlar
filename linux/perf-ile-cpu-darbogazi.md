@@ -4,7 +4,7 @@ lang: tr
 title: "Linux'ta perf ile CPU darboğazı bulmak"
 permalink: /linux/perf-ile-cpu-darbogazi/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: Linux 6.x çekirdeğinde perf aracı ile CPU örnekleme, çağrı grafikleri ve Brendan Gregg Flame Graph analizi.
 ---
 
@@ -27,9 +27,14 @@ performans sayaçlarına erişimini varsayılan olarak kısıtlar.
 
 Bu ayar, kullanıcıların hangi seviyede profilleme yapabileceğini belirler:
 
-- `2`: Yalnızca kullanıcı seviyesi (userspace) izleme; çekirdek izleme kapalı (birçok dağıtımda varsayılan).
-- `1`: Çekirdek ve kullanıcı seviyesinde genel CPU profillemesine izin verir.
+- `4`: Ayrıcalıksız kullanıcılar için `perf` kullanımını tümüyle kapatır. Bu seviye ana çekirdekte yoktur; Ubuntu çekirdeği ekler ve Ubuntu 24.04'te varsayılan değerdir.
+- `2`: Kullanıcı kendi süreçlerini yalnızca kullanıcı seviyesinde (userspace) profilleyebilir; çekirdek profilleme kapalıdır (ana çekirdeğin varsayılanı).
+- `1`: Kullanıcı kendi süreçlerini çekirdek tarafıyla birlikte profilleyebilir. Sistem geneli (`-a`) veya CPU bazlı profilleme hâlâ kapalıdır.
+- `0`: Sistem geneli ve CPU bazlı profillemeye de izin verir; ham izleme noktaları kapalı kalır.
 - `-1`: Tüm kısıtlamaları kaldırır (ham izleme noktaları dahil).
+
+Bu kılavuzdaki komutlar yalnızca kendi başlattığınız süreci profillediği için `1` yeterlidir. Ayrıcalıksız bir
+kullanıcıyla sistem genelinde kayıt (`perf record -a`) için `0` veya daha düşük bir değer ya da `CAP_PERFMON` gerekir.
 
 Geliştirme ortamınızda geçici olarak izin vermek için:
 
@@ -86,7 +91,7 @@ perf record -F 99 -g -- ./hesaplayici
 | :--- | :--- | :--- | :--- |
 | **Frame Pointer** | `-g` veya `--call-graph fp` | **%1 - %2 (En düşük)** | `-fno-omit-frame-pointer` gerektirir. Üretim ortamında en temiz yöntemdir. |
 | **DWARF** | `--call-graph dwarf,8192` | **%15 - %30 (Yüksek)** | Yığın belleğini kopyalar. `perf.data` dosyası gigabaytlarca büyür; ancak çerçeve işaretçisi olmayan kodda çalışır. |
-| **LBR (Last Branch Record)** | `--call-graph lbr` | **Donanımsal (~%0)** | Intel/AMD işlemcilerdeki donanım kayıtçısını kullanır. Yığın derinliği sınırlıdır; sanal makinelerde genellikle bulunmaz. |
+| **LBR (Last Branch Record)** | `--call-graph lbr` | **Donanımsal (~%0)** | `perf` belgesine göre yalnızca Intel işlemcilerde (Haswell ve sonrası) kullanılabilir ve yalnızca kullanıcı seviyesindeki çağrı zincirini verir. Yığın derinliği sınırlıdır; sanal makinelerde genellikle bulunmaz. |
 
 ## 4. Raporlama ve analiz (`perf report` ve `perf annotate`)
 
@@ -152,8 +157,10 @@ perf script | /tmp/FlameGraph/stackcollapse-perf.pl | /tmp/FlameGraph/flamegraph
 ## Kaynaklar ve doğrulama ortamı
 
 - [Brendan Gregg - Linux perf Examples](https://www.brendangregg.com/perf.html)
-- [Linux Çekirdeği perf Wiki](https://perf.wiki.kernel.org/)
+- [Linux Çekirdeği perf Wiki](https://perfwiki.github.io/main/)
 - [FlameGraph Resmi GitHub Deposu](https://github.com/brendangregg/FlameGraph)
+- [Linux çekirdek belgesi: `perf_event_paranoid`](https://docs.kernel.org/admin-guide/sysctl/kernel.html#perf-event-paranoid)
+- [`perf-record(1)` kılavuz sayfası](https://man7.org/linux/man-pages/man1/perf-record.1.html)
 
 Bu kılavuz, Ubuntu 24.04 LTS (Linux 6.8 x86_64) üzerinde `linux-tools-generic` 6.8.0
 ve FlameGraph araç seti ile gerçek bir C++ iş yükü profillenerek test edilmiştir.

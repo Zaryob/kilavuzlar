@@ -2,7 +2,7 @@
 title: Expanding an LVM volume on Ubuntu without losing data
 permalink: /en/linux/lvm-bolumunu-buyutmek/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: Online LVM2 expansion for ext4 and XFS on Ubuntu 22.04/24.04 LTS.
 lang: en
 translation_key: guide-linux-lvm-bolumunu-buyutmek
@@ -66,6 +66,8 @@ sda                                   100G
   └─ubuntu--vg-ubuntu--lv ext4       46.5G    4.2G    86% /
 ```
 
+The commands in this guide use this example layout: disk `sda` and partition `sda2`. On your own system, go by the name and number on the `LVM2_member` line: in the Ubuntu Server installer’s default LVM layout the physical volume is usually the third partition (`sda3`), with names such as `nvme0n1p3` on NVMe disks and `vda3` on virtio disks. Replace `sda` and `2` in the following steps accordingly.
+
 Here, the main disk (`sda`) has been enlarged to 100G, while the partition (`sda2`) and logical volume (`ubuntu--vg-ubuntu--lv`) are still around 48G.
 
 Check the filesystem type separately:
@@ -89,11 +91,13 @@ After the disk is enlarged by a hypervisor or cloud provider, the kernel may not
 echo 1 | sudo tee /sys/class/block/sda/device/rescan
 ```
 
-To rescan all SCSI buses:
+To re-read the size of every SCSI disk:
 
 ```bash
-for host in /sys/class/scsi_host/host*/scan; do echo "- - -" | sudo tee "$host"; done
+for dev in /sys/class/block/sd*/device/rescan; do echo 1 | sudo tee "$dev"; done
 ```
+
+Writing `- - -` to `/sys/class/scsi_host/host*/scan` is not the right tool here: that scan discovers newly added devices and does not re-read the changed size of an existing disk. virtio disks (`vda`) need no rescan; the kernel is notified of the new size automatically.
 
 Confirm that `lsblk` reports the new total size of `sda`.
 
@@ -101,8 +105,7 @@ Confirm that `lsblk` reports the new total size of `sda`.
 
 If the LVM physical volume occupies a partition such as `/dev/sda2`, rather than a raw disk, use `growpart` to update the partition table.
 
-> [!IMPORTANT]
-> Leave a **space** between the disk device and partition number. Passing `/dev/sda2` as a single argument is incorrect.
+> **Important:** Leave a **space** between the disk device and partition number. Passing `/dev/sda2` as a single argument is incorrect.
 
 ```bash
 sudo growpart /dev/sda 2
@@ -204,7 +207,7 @@ sudo xfs_growfs /
 | Operation | ext4 | XFS |
 | :--- | :--- | :--- |
 | **Online grow** | Supported without stopping the running system | Supported; must be mounted |
-| **Offline grow** | Supported | Normally grown while mounted |
+| **Offline grow** | Supported | Not supported (`xfs_growfs` requires a mounted filesystem) |
 | **Online shrink** | Not supported | Not supported |
 | **Offline shrink** | Supported; requires `umount` and `e2fsck` | Not supported by the XFS versions covered here |
 
@@ -231,4 +234,4 @@ In this example, capacity was doubled without stopping services or rebooting the
 - Linux kernel SCSI rescan documentation (`Documentation/scsi/scsi_eh.rst`).
 - LVM2 `lvextend(8)`, `pvresize(8)` and `growpart(1)` manual pages.
 
-These steps were tested and verified in a running Ubuntu 24.04 LTS virtual machine with kernel 6.8, LVM 2.03.16, ext4 and XFS.
+These steps were tested and verified in a running Ubuntu 24.04 LTS virtual machine with kernel 6.8, LVM 2.03.16, ext4 and XFS. The bulk rescan loop changed on 14 November 2026 was only syntax-checked; it was not rerun in a virtual machine.

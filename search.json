@@ -2,7 +2,7 @@
 layout: null
 permalink: /search.json
 ---
-{% assign searchable = site.pages | where_exp: 'item', 'item.title' | where_exp: 'item', 'item.layout == "default"' %}
+{% assign searchable = site.pages | where_exp: 'item', 'item.title' | where_exp: 'item', 'item.layout == "default"' | where_exp: 'item', 'item.translation_key != "guide-404"' %}
 [
 {% for item in searchable %}
   {% assign desc = item.scope | default: '' %}

@@ -2,7 +2,7 @@
 title: Creating a portable C++ project with CMake
 permalink: /en/cpp/tasinabilir-cmake-projesi/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: Target-based architecture, CMakePresets, toolchains and cross-platform support
   using modern CMake (3.21+).
 lang: en
@@ -139,8 +139,7 @@ Create `CMakePresets.json` in the project root:
 ```
 {: data-filename="CMakePresets.json"}
 
-> [!TIP]
-> Developers can put machine-specific configuration in `CMakeUserPresets.json`. Add this file to `.gitignore` rather than committing it.
+> **Tip:** Developers can put machine-specific configuration in `CMakeUserPresets.json`. Add this file to `.gitignore` rather than committing it.
 
 ## 3. Separating the compiler and environment with toolchain files
 
@@ -152,14 +151,20 @@ Example Clang toolchain, `cmake/toolchains/clang.cmake`:
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
 
-# macOS ve Linux üzerinde modern lld bağlayıcısını tercih et (varsa)
-find_program(LLD_EXECUTABLE ld.lld)
+# -fuse-ld=lld, Mach-O hedeflerinde ld64.lld, ELF hedeflerinde ld.lld sürücüsünü arar
+if(CMAKE_HOST_APPLE)
+    find_program(LLD_EXECUTABLE ld64.lld)
+else()
+    find_program(LLD_EXECUTABLE ld.lld)
+endif()
 if(LLD_EXECUTABLE)
     set(CMAKE_EXE_LINKER_FLAGS_INIT "-fuse-ld=lld")
     set(CMAKE_SHARED_LINKER_FLAGS_INIT "-fuse-ld=lld")
 endif()
 ```
 {: data-filename="cmake/toolchains/clang.cmake"}
+
+The Clang driver resolves `-fuse-ld=lld` by target format: it runs `ld64.lld` on macOS (Mach-O) and `ld.lld` on Linux (ELF). Finding `ld.lld` alone is therefore not enough on macOS; without `ld64.lld` the link stops with `invalid linker name`. On Homebrew, `lld` is a separate package (`brew install lld`).
 
 To connect the toolchain to a preset, add `"toolchainFile": "${sourceDir}/cmake/toolchains/clang.cmake"` under `configurePresets`.
 
@@ -174,7 +179,7 @@ One build directory holds one configuration, selected at configure time using `C
 - `Debug`: debugging symbols (`-g`) with optimisation disabled (`-O0`).
 - `Release`: high optimisation (`-O3` or `/O2`) with `NDEBUG` defined.
 - `RelWithDebInfo`: optimisation (`-O2`) and debugging symbols (`-g`), useful for profiling and investigating production failures.
-- `MinSizeRel`: optimisation focused on code size (`-Os` or `/Os`).
+- `MinSizeRel`: optimisation focused on code size (`-Os` with GCC/Clang, `/O1 /Ob1` with MSVC) with `NDEBUG` defined.
 
 ### 2. Multi-config generators: Ninja Multi-Config, Visual Studio and Xcode
 
@@ -273,5 +278,8 @@ Expected output:
 - [CMake documentation — Presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html)
 - [Craig Scott — Professional CMake: A Practical Guide](https://crascit.com/professional-cmake/)
 - [Modern CMake Guidelines](https://cliutils.gitlab.io/modern-cmake/)
+- [CMake source: `Modules/Platform/Windows-MSVC.cmake`](https://github.com/Kitware/CMake/blob/master/Modules/Platform/Windows-MSVC.cmake) (MSVC build-type flags)
 
 This guide was tested and verified on macOS Sonoma (ARM64) and Ubuntu 24.04 (Linux x86_64) with CMake 3.28, Ninja 1.11, Clang 18 and GCC 14.
+
+14 November 2026: the toolchain file was configured again on macOS (ARM64) with CMake 4.4.3 and Apple clang 21. `ld64.lld` is not installed on that machine, so the flag was not added and the project linked with the system linker; linking with `lld` was not exercised in this pass.

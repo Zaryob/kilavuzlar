@@ -2,7 +2,7 @@
 title: Using CMake and LLDB in Emacs
 permalink: /en/emacs/cmake-ve-lldb/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: Modern C++ development and lldb-dap debugging in GNU Emacs 29+ with Eglot,
   project.el, compile and dape.
 lang: en
@@ -30,8 +30,7 @@ Historically, debugging in Emacs had two main approaches:
 - Displays variable values directly in source buffers as inlay hints.
 - Uses `repeat-mode` for single-key stepping (`n`, `s`, `c`, `o`).
 
-> [!NOTE]
-> In LLVM 18, `lldb-vscode` was renamed **`lldb-dap`** to reflect the protocol’s broader applicability.
+> **Note:** In LLVM 18, `lldb-vscode` was renamed **`lldb-dap`** to reflect the protocol’s broader applicability.
 
 ## 2. Emacs configuration (`init.el`)
 
@@ -65,15 +64,16 @@ Add this configuration to `~/.emacs.d/init.el` or `~/.config/emacs/init.el`:
 (use-package project
   :ensure nil
   :config
-  ;; Git deposu olmasa dahi CMakeLists.txt bulunan dizini proje kökü say
-  (add-to-list 'project-vc-extra-root-markers "CMakeLists.txt"))
+  ;; Git deposu olmasa dahi kökte duran .dir-locals.el dosyasını proje kökü say.
+  ;; CMakeLists.txt işaret olarak kullanılmaz: alt dizinlerde de bulunduğu için
+  ;; her alt dizini ayrı proje yapar.
+  (add-to-list 'project-vc-extra-root-markers ".dir-locals.el"))
 
 (use-package compile
   :ensure nil
   :custom
-  ;; Her defasında sormadan doğrudan son derleme komutunu çalıştır
-  ;; Komutu değiştirmek istediğinizde C-u M-x compile yapabilirsiniz
-  (compilation-read-command nil)
+  ;; compilation-read-command varsayılan değerinde (t) bırakılır: C-c c komutu
+  ;; çalıştırmadan önce gösterir. Sormadan yinelemek için C-c r (recompile) kullanın.
   (compilation-scroll-output 'first-error)
   (compilation-always-kill t)
   :bind
@@ -118,15 +118,17 @@ Add this configuration to `~/.emacs.d/init.el` or `~/.config/emacs/init.el`:
 
 The `e` and uppercase `R` bindings preserve dape’s `c` (continue) and `r` (restart), including their repeat-map actions.
 
+> **Warning:** Do not set `compilation-read-command` to `nil`. As the Emacs documentation notes, `compile` then runs whatever `compile-command` a file or a `.dir-locals.el` defines without showing it to you, so a repository you downloaded could run arbitrary commands this way. With the default value the command appears in the minibuffer first.
+
+`.dir-locals.el` is used as the project-root marker instead of `CMakeLists.txt`: `project.el` treats the nearest marker as the root, so in a project whose subdirectories also contain `CMakeLists.txt`, every subdirectory would become its own project. Inside a Git repository the setting is not needed.
+
 ## 3. Project-level CMake and Clangd configuration
 
-Add `.dir-locals.el` to the project root so the Clangd language server and Emacs compilation command recognise the project:
+Add `.dir-locals.el` to the project root so the Emacs compilation command recognises the project:
 
 ```elisp
 ((nil . ((compile-command . "cmake --build build -j")
-         (project-compilation-buffer-name-function . project-prefixed-buffer-name)))
- (c++-mode . ((eglot-workspace-configuration
-               . (:clangd (:compilationDatabasePath "build"))))))
+         (project-compilation-buffer-name-function . project-prefixed-buffer-name))))
 ```
 {: data-filename=".dir-locals.el"}
 
@@ -143,15 +145,14 @@ The following steps demonstrate debugging a C++ program.
 
 ### Step 1: Build
 
-With a source file open, use `C-c c` (`compile`) or `C-x p c` (`project-compile`). Output appears in `*compilation*`. Jump to a reported error with `C-x \`` (`next-error`).
+With a source file open, use `C-c c` (`compile`) or `C-x p c` (`project-compile`). Output appears in `*compilation*`. Jump to a reported error with ``C-x ` `` (`next-error`).
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build -j
 ```
 
-> [!IMPORTANT]
-> Build in **Debug** or **RelWithDebInfo** mode to make debugging symbols available.
+> **Important:** Build in **Debug** or **RelWithDebInfo** mode to make debugging symbols available.
 
 ### Step 2: Set breakpoints
 
@@ -175,7 +176,7 @@ Emacs rearranges the windows into the `gdb` layout:
 
 When execution stops at a breakpoint:
 - **Inline values:** current variable values appear as faint text beside the code.
-- **Watches:** press `i` in `*dape-info*` to watch an expression such as `dizi.size()`.
+- **Watches:** use `C-x C-a w` (`dape-watch-dwim`) to add an expression such as `dizi.size()` to the watch list; it is re-evaluated at every stop in the Watch section of `*dape-info*`. The same command removes an expression already on the list.
 - **Single-key stepping (`repeat-mode`):** after the first command, continue with individual letters without repeating the prefix:
   - `n`: step over / next line.
   - `s`: step into a function.
@@ -199,5 +200,9 @@ x/16xb pointer_address
 - [dape repository and documentation](https://github.com/svaante/dape)
 - [LLVM lldb-dap documentation](https://lldb.llvm.org/)
 - [GNU Emacs Eglot manual](https://www.gnu.org/software/emacs/manual/html_node/eglot/)
+- [clangd: project setup and the `compile_commands.json` search](https://clangd.llvm.org/installation#project-setup)
+- [clangd protocol extensions: `compilationDatabasePath`](https://clangd.llvm.org/extensions#compilation-commands)
 
 8–9 November 2026: configuration and key/repeat maps were checked in batch Emacs 31.1 with dape 0.19.0 and 0.28.0. No interactive LLDB/DAP session was run.
+
+14 November 2026: the updated `init.el` was loaded in batch Emacs 31.1 with dape 0.27.1; checks confirmed that `C-x C-a w` is bound to `dape-watch-dwim`, that the `.dir-locals.el` marker finds the project root from a subdirectory, and that `compile-command` is treated as unsafe while `compilation-read-command` is `nil`.

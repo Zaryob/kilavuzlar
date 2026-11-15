@@ -4,7 +4,7 @@ lang: tr
 title: "vcpkg ile C++ bağımlılıklarını yönetmek"
 permalink: /cpp/vcpkg-bagimlilik-yonetimi/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: vcpkg Manifest modu (vcpkg.json), CMakePresets entegrasyonu ve ikili önbellekleme (binary caching).
 ---
 
@@ -25,7 +25,7 @@ dosyasında bildirilir ve CMake yapılandırması başladığında otomatik olar
 | :--- | :--- | :--- |
 | **Bağımlılık Tanımı** | Kullanıcının terminalde çalıştırdığı komutlar | Proje kökünde sürüm kontrolüne giren JSON dosyası |
 | **Sürüm Kitleme (Pinning)** | Zordur; vcpkg deposunun güncel commit'ine bağlıdır | `builtin-baseline` ile taban sürümler; `overrides` ile seçili sürümler |
-| **Kurulum Konumu** | Merkezi vcpkg dizini altında global | Projenin kendi `build/vcpkg_installed` dizininde |
+| **Kurulum Konumu** | Merkezi vcpkg dizini altında global | Projenin derleme dizini altında (`<derleme dizini>/vcpkg_installed`, bu kılavuzda `build/dev-debug/vcpkg_installed`) |
 | **Ekip Uyumluluğu** | Her geliştirici paketleri elle kurmak zorundadır | Depoyu klonlayan herkes `cmake` çalıştırdığında aynı ortam kurulur |
 
 ## 2. Manifest dosyası oluşturma (`vcpkg.json`)
@@ -150,8 +150,7 @@ araç zinciri `CMakePresets.json` dosyasına eklenir:
 ```
 {: data-filename="CMakePresets.json"}
 
-> [!NOTE]
-> Ortamınızda `VCPKG_ROOT` değişkeninin tanımlı olduğundan emin olun (örneğin kabuk
+> **Not:** Ortamınızda `VCPKG_ROOT` değişkeninin tanımlı olduğundan emin olun (örneğin kabuk
 > profilinizde `export VCPKG_ROOT=/opt/vcpkg` veya `$HOME/vcpkg`).
 
 ## 4. Özel depolar ve şirket içi paketler (Registries)
@@ -269,14 +268,14 @@ JSON Çıktısı: {
 
 ## Sık karşılaşılan sorunlar ve çözümleri
 
-- **`VCPKG_ROOT not found`**: `vcpkg` komutunun bulunduğu dizini kabuk ortam değişkenlerine (`export VCPKG_ROOT=...`) ekleyin.
+- **`Could not find toolchain file: "/scripts/buildsystems/vcpkg.cmake"`**: `VCPKG_ROOT` tanımlı değildir; preset içindeki `$env{VCPKG_ROOT}` boşa açılmıştır. vcpkg dizinini kabuk ortamına ekleyin (`export VCPKG_ROOT=...`).
 - **Triplet uyuşmazlığı**: macOS üzerinde ARM64 için `arm64-osx`, x86_64 için `x64-osx`; Linux üzerinde `x64-linux` veya `arm64-linux` kullanılır. Gerekirse `vcpkg-temel` preseti içine `"VCPKG_TARGET_TRIPLET": "arm64-osx"` tanımlanabilir.
-- **Temiz kurulum ihtiyacı**: Bağımlılık ağacında beklenmedik bir sorun çıkarsa projedeki `build/` ve `vcpkg_installed/` dizinlerini silip yeniden yapılandırın.
+- **Temiz kurulum ihtiyacı**: Bağımlılık ağacında beklenmedik bir sorun çıkarsa projedeki `build/` dizinini (içindeki `vcpkg_installed/` ile birlikte) silip yeniden yapılandırın.
 
 ## Kaynaklar ve doğrulama ortamı
 
 - [Microsoft vcpkg Resmi Belgesi - Manifest Mode](https://learn.microsoft.com/en-us/vcpkg/consume/manifest-mode)
 - [vcpkg İkili Önbellekleme Kılavuzu](https://learn.microsoft.com/en-us/vcpkg/reference/binarycaching)
-- [vcpkg Git Registries](https://learn.microsoft.com/en-us/vcpkg/users/registries)
+- [vcpkg Git Registries](https://learn.microsoft.com/en-us/vcpkg/concepts/registries)
 
 8–9 Kasım 2026: sabit manifest macOS 27.2 ARM64 ve Debian 12 ARM64 üzerinde ikili önbellek kapalıyken kaynaklardan kuruldu; CMake Debug uygulaması derlenip çalıştırıldı. `files` sağlayıcısı ikinci temiz Linux kurulumunda 5/5 paketi önbellekten geri yükledi. Özel kayıt deposu ve Actions hizmeti çalıştırılmadı.

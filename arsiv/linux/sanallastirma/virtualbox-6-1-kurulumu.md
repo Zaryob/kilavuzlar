@@ -15,7 +15,9 @@ redirect_from:
 
 
 Virtualbox, Oracle tarafından yayımlanan ve geliştirilen, açık kaynak kodlu bir sanallaştırma programıdır.
-Oracle VM VirtualBox 5.2 sürümünden bu yana, SSE2 CPU uzantısı gerekmektedir.  Oracle VM VirtualBox kernel modülleri: vboxdrv, vboxnetflt, ve vboxnetadp bu kurulum ile veraber gelmektedir ve bu modüller sayesinde çalıştırılmaktadır.
+Oracle VM VirtualBox 5.2 sürümünden bu yana, SSE2 CPU uzantısı gerekmektedir.  Oracle VM VirtualBox kernel modülleri: vboxdrv, vboxnetflt, ve vboxnetadp bu kurulum ile beraber gelmektedir ve bu modüller sayesinde çalıştırılmaktadır.
+
+> **Uyarı:** VirtualBox 6.1 artık desteklenmiyor ve güvenlik güncellemesi almıyor. Bu sayfa 6.1 dönemine ait bir kayıttır; yeni kurulumda Oracle'ın güncel sürümünü kullanın.
 
 ## Virtualbox deposunu eklemek
 
@@ -27,14 +29,16 @@ $ sudo mv virtualbox.repo /etc/yum.repos.d/
 
 ## Oracle depo imzasını içeri aktarmak
 
+RPM paketleri ve yukarıdaki `virtualbox.repo` dosyası `oracle_vbox_2016.asc` anahtarını kullanır. Özgün nottaki `oracle_vbox.asc`, yalnızca çok eski dağıtımlar için tutulan önceki anahtardır.
+
 ```shell
-wget -q https://www.virtualbox.org/download/oracle_vbox.asc
-sudo rpm --import oracle_vbox.asc
+wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc
+sudo rpm --import oracle_vbox_2016.asc
 ```
 
 ## Ek paketleri kurmak
 
-Bu adım EPEL deposunun eklenmesini gerektirir.
+Bu adım EPEL deposunun eklenmesini gerektirir (`dkms` paketi oradan gelir). CentOS'ta `sudo dnf -y install epel-release` yeterlidir; RHEL'de EPEL belgelerindeki sürüme uygun `epel-release` paketini kurun.
 
 ```shell
 sudo dnf -y install binutils kernel-devel kernel-headers libgomp make patch gcc glibc-headers glibc-devel dkms

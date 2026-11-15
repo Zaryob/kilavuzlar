@@ -28,7 +28,7 @@ Weiliu89'un caffe deposunun ssd branch'ini [Github linkini](https://github.com/w
 2. Veri ağı içeriğini oluşturmak.
 Veri ağı içeriğini aşağıdaki adımları izleyerek oluşturabilirsiniz:
 
-(a)Orjinal yüz tanımlama veri seti içeriğini indirin -> (b) Fotoğraf alıntılarını uygun şekilde Pascal VOC formatına çevirin -> (c) LMDB veritabını oluşturun ve Pascal VOC formatındaki verileri kullanarak inşaa edin
+(a)Orjinal yüz tanımlama veri seti içeriğini indirin -> (b) Fotoğraf alıntılarını uygun şekilde Pascal VOC formatına çevirin -> (c) LMDB veritabanını oluşturun ve Pascal VOC formatındaki verileri kullanarak inşaa edin
 
 a) Yüz içeriğine sahip veri setlerini bulun. Lisans sebebiyle herhangi bir fotoğraf paylaşamıyorum ancak Google üzerinde yer alan fotoğrafları kullanarak kendinize bir veri seti hazırlayın. Veri seti mümkün olduğunca farklı tiplerde veriler içermeli. Ayrıca net olmayan fotoğraflar, parazitler ve yanlış tasnif ettiğiniz veriler işlem sonucunda oluşacak veri setinizi bozabilir. Bu sebeple olduğunca temiz ve anlaşılır verileri kullanmaya özen gösterin. Ayrıca farklı parlaklık ve derinliğe sahip fotoğraflar da mutlaka kullanın. Blur'lu, aşırı odaklanmış ya da flu fotoğraflardan kaçının
 
@@ -91,11 +91,11 @@ Bu komut dosyası, create_annoset.py dosyasını içinde çağırır, bu nedenle
 
 3. Dedektörünüzü eğitin
 
-Eğitim için 3 dosyanızın olması gerekir: train.prototxt, test.prototxt ve solver.prototxt. Bu dosyaların örneklerini benioku dosyasıyla aynı dizinde bulabilirsiniz.
+Eğitim için 3 dosyanızın olması gerekir: train.prototxt, test.prototxt ve solver.prototxt. Özgün not bu dosyaların örneklerinin benioku dosyasıyla aynı dizinde olduğunu söylüyordu; ancak bu dosyalar bu depoda yoktur. Kendi `prototxt` dosyalarınızı kullandığınız Caffe SSD dalındaki örneklerden uyarlamanız gerekir.
 Ayrıca, LMDB veritabanlarınızın yollarını 2. adımda oluşturduğunuz gerçek veritabanlarıyla değiştirmek için train.prototxt ve test.prototxt'yi düzenlemeniz gerekir.
 
 Şimdi her şey başlangıç eğitim süreci için yapıldı.
-Terminal'de şu adımları tahip edin:
+Terminal'de şu adımları takip edin:
 ```bash
 mkdir -p snapshot
 mkdir -p log

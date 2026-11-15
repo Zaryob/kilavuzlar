@@ -104,10 +104,10 @@ Burada ben startxfce4 yazarak önceki adımda kurduğum masaüstünü tetikleyen
 sudo chmod +x ~/.vnc/xstartup
 ```
 
-ve yeniden çalıştıralım
+ve yeniden çalıştıralım. `-localhost` seçeneği sunucunun yalnızca aynı makineden gelen bağlantıları kabul etmesini sağlar; böylece VNC portu ağa açılmaz ve bağlantı ancak aşağıdaki SSH tüneli üzerinden kurulabilir.
 
 ```bash
-vncserver
+vncserver -localhost
 ```
 
 yeniden çalıştırınca çıktımız da şu olacaktır.
@@ -122,7 +122,7 @@ Log file is /home/zaryob/.vnc/your_hostname:1.log
 
 ## VNC Sunucuna Bağlantı Sağlamak
 
-İki yöntem kullanabilirsiniz. Bunlar ssh komutu ile bağlantı sağlamak ve tigthvnc-viewer veya realvnc-viewer gibi bir vnc client'i ile bağlanmaktır
+İki yöntem kullanabilirsiniz. Bunlar ssh komutu ile bağlantı sağlamak ve tightvnc-viewer veya realvnc-viewer gibi bir vnc client'i ile bağlanmaktır
 
 ### SSH Kullanmak
 GNU/Linux Dağıtımları için ssh komutu vnc sunucusuna bağlanmak için kullanılabilir.
@@ -136,4 +136,4 @@ ssh -L 5901:127.0.0.1:5901 -C -N -l zaryob sunucu_ip_adresi
 
 ### VNCViewer
 
-Sunucunun açık IP adresine doğrudan bağlanmak yerine yukarıdaki tüneli açıp istemciyi `localhost:5901` adresine yönlendirin. İndirip kurduğunuz realvnc-viewer ya da tightvnc-viewer ile bağlantı yaparken ip adresinizin haricinde port bilginizi de :5901 olarak ayarlamanızı öneririm. Çünkü eğer başka bir ayarlama yapmadıysanız `Xvnc` tanımlamak gibi, varsayılan sunucu portu bu olacaktıır.
+Sunucunun açık IP adresine doğrudan bağlanmak yerine yukarıdaki tüneli açıp istemciyi `localhost:5901` adresine yönlendirin. İndirip kurduğunuz realvnc-viewer ya da tightvnc-viewer ile bağlantı yaparken ip adresinizin haricinde port bilginizi de :5901 olarak ayarlamanızı öneririm. Çünkü eğer başka bir ayarlama yapmadıysanız `Xvnc` tanımlamak gibi, varsayılan sunucu portu bu olacaktır.

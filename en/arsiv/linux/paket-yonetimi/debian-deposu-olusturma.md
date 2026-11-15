@@ -3,9 +3,11 @@ title: Creating a Debian repository
 permalink: /en/arsiv/linux/paket-yonetimi/debian-deposu-olusturma/
 status: arsiv
 reviewed: 2026-11-02
-scope: A Debian 10.5 example using apt-ftparchive and apt-key.
-archive_reason: Rework the package-install command, Release-file self-hashing and
-  key distribution. Prepare a repeatable example using signed-by.
+scope: A Debian 10.5 example using apt-ftparchive for the index and signed-by for key distribution.
+archive_reason: These notes date from Debian 10.5. In November 2026 the package-install command, the UTC Release date,
+  the exclusion of Release from its own hash list and signed-by key distribution were corrected; that flow was only
+  tried in a Debian 12 container with a local single-package repository. The web-server, multi-architecture and
+  Acquire-By-Hash parts were not verified.
 lang: en
 translation_key: guide-arsiv-linux-paket-yonetimi-debian-deposu-olusturma
 translation_of: /arsiv/linux/paket-yonetimi/debian-deposu-olusturma/
@@ -18,10 +20,10 @@ This document describes creating and updating a **Debian** package repository.
 
 ## Install the required packages
 
-The original command for installing the indexing tool is retained below; its typo is identified in the archive warning:
+The indexing tool, `apt-ftparchive`, is shipped in the `apt-utils` package:
 
 ```bash
-apt-get instal apt-ftparchive
+apt-get install apt-utils
 ```
 
 A web server is required to share the repository over the network.
@@ -146,10 +148,6 @@ Architectures: amd64 i386
 Components: main contrib non-free
 Description: Test repository
 MD5Sum:
-  09055bc807e6edb1d39b9478c3e979e6  2472    Release.key
-  a4acada35cf263239778004cc3a3052c  659 Release.gpg
-  6b41b0a0be8cc937b40b431f74f2321f  4427    InRelease
-  b15aade8df5dac635bb851713d5b30c0  396 Release
   8fcbf476f836a406733f7468d9be00fa  2280    main/binary-amd64/Packages
   17393ff93c41644879ba128ffb0b22d3  1348    main/binary-amd64/Packages.xz
   bb3d363cfd9263fce932c1cc12c18e68  1286    main/binary-amd64/Packages.gz
@@ -157,10 +155,6 @@ MD5Sum:
   aad80a1b6699ca9f538107937506ef70  820 main/binary-i386/Packages.xz
   af2c952ea91ad4d89f6259f2a3ac397d  747 main/binary-i386/Packages.gz
 SHA1:
-  bf969834bcf3fe37435317fec8ae6375f5cbfcab  2472    Release.key
-  be23df080f41ca983de08838452a6e2c77a31836  659 Release.gpg
-  e5a3ee28bae50959ee62a73270b9162f59884437  4427    InRelease
-  e7247091579e00f62a96a6b6d6957b1a2715732b  1035    Release
   0276cc6bd45abaed900a2dfdafe7b01dde21b89b  2280    main/binary-amd64/Packages
   f9ff41da670bf4836367cd170dfc5086bb80cb69  1348    main/binary-amd64/Packages.xz
   4ce6b6deaa2722bb9256e89dc8bbb28bb653847b  1286    main/binary-amd64/Packages.gz
@@ -168,10 +162,6 @@ SHA1:
   751dd84b265115e52ab482c9249b5d7205fa3e1b  820 main/binary-i386/Packages.xz
   9620d2eda8c4fc29f4130b0bbf603a0a35df8563  747 main/binary-i386/Packages.gz
 SHA256:
-  8ec32aa00483111e9552c03262a1704d6e44e42f4451265b66b2a0fe920a69f8  2472    Release.key
-  60af76151b979d0c0eb0ae859e33cc1f6f1be0c09cb201a81e303d536df796cf  659 Release.gpg
-  f7f32eba3c9fa2fe69832bbb12c0fb446c723f6fbe64ae992260702310981d68  4427    InRelease
-  254fefc722399f2316a3bf5d245939e99506e0589220f0d1549b7aa97c40089b  1805    Release
   52f805226b147e0e68c5b659f0efd42a4ab27033b6a13e6aac9b6a04ba808891  2280    main/binary-amd64/Packages
   55f622e5bb9e2fe7f9eae38488a3b7034b48e61774915ac88ed1b871c4f752a3  1348    main/binary-amd64/Packages.xz
   1576654604e7a85dc84862e234a23d89af7d020d048491b31baed92f6a066f58  1286    main/binary-amd64/Packages.gz
@@ -179,10 +169,6 @@ SHA256:
   b4a0d98a479cd9812ff79f15d9ee41edc13967c87f6800ed257f9fdc2f0eacb0  820 main/binary-i386/Packages.xz
   b2bca5e3c273f4b5a9df7bc8206a411c23dbdf5db329e4e969bcb38274b16feb  747 main/binary-i386/Packages.gz
 SHA512:
-  b3c7b2ca8c88639558b8f9d880e559d4ae6cca7f66f61d6db6f29c48b2e3bfbb0cc39f3ef9feccb4dfad616410c38a60f774e52df2ee0ee8f4ecf1420e662ef3  2472    Release.key
-  a679b02b193493c00a679d18e830447f60169a5689e3ae9678ee65ac925fdc4de44a3e1099da34889dca5ef01fa29befb3f493881a88e08bb1d21432d125c93f  659 Release.gpg
-  290ef238a374930f2cf08572e1a2cc024ef7184a00bd8c85f63ceb876952b008edfb5fea0dcafc2247b31cef72914609e1d51a943378571599c801ed24db56a2  4427    InRelease
-  16686a082d2b4f183ff5ddaa87328c7b0ba6788fa9e0f85cc66d70c8f9862e22acf235957acd36bb7ea3f77579ced07d54ae553c33d179c3b9f3913276575ee8  2935    Release
   591da357d487637d1b6b40286aaef08c599ee8f4f9894bdc1763e1102c68c37a3f57516cdb2d1267c71103adc0ec13e2ecf39c3014a10e9f905caa4c3f29af55  2280    main/binary-amd64/Packages
   f6bff31b379fd4aa99b960b15275f5db113c049587761d1f10dc8de33be831f360b1f4dd00223f206b57cbbec008e1aebf2b2c4fdb8a3b5aefbfa4f1c3810d33  1348    main/binary-amd64/Packages.xz
   69bc3bee91d222eeff12e479a44aeb7d22fc8aa71c597aeb3c4f9a42b6c737fcfb4422084dd6e1387540bc0b56e9cacfeb7818e1d09063624dba54170ffa5fab  1286    main/binary-amd64/Packages.gz
@@ -240,19 +226,19 @@ prepareLine(){
 }
 ```
 
-Combine the header and hashes with a command sequence such as:
+Combine the header and hashes with a command sequence such as the one below. The `Date` field in Release must be UTC, hence `date -R -u`. The `find` commands leave out `Release`, `Release.gpg`, `Release.key` and `InRelease`: a Release file cannot contain its own hash, and signature files do not belong in the hash list.
 
 ```bash
-cat baslik | sed "s/XdateX/$(date -R)/g" > dists/stable/Release
+cat baslik | sed "s/XdateX/$(date -R -u)/g" > dists/stable/Release
 cd dists/stable/
 echo "MD5Sum:" >>  Release
-find . -type f | xargs md5sum | prepareLine >> Release
+find . -type f ! -name 'Release*' ! -name 'InRelease' | xargs md5sum | prepareLine >> Release
 echo "SHA1:" >>  Release
-find . -type f | xargs sha1sum | prepareLine >> Release
+find . -type f ! -name 'Release*' ! -name 'InRelease' | xargs sha1sum | prepareLine >> Release
 echo "SHA256:" >>  Release
-find . -type f | xargs sha256sum | prepareLine >> Release
+find . -type f ! -name 'Release*' ! -name 'InRelease' | xargs sha256sum | prepareLine >> Release
 echo "SHA512:" >>  Release
-find . -type f | xargs sha512sum | prepareLine  >> Release
+find . -type f ! -name 'Release*' ! -name 'InRelease' | xargs sha512sum | prepareLine  >> Release
 ```
 
 ### Sign the repository
@@ -290,18 +276,22 @@ You can also use hosting or a static service such as github.io, provided that it
 
 ### Add the repository on a client
 
-Once the repository is available online, the original client procedure is:
+Once the repository is available online, clients follow these steps:
 
-1. Import the GPG key used to sign the repository:
+1. Download the GPG key used to sign the repository into a file used for this repository only. `apt-key` is deprecated and makes the key trusted for every repository; instead the key goes under `/etc/apt/keyrings/` and the source line points to it with `signed-by`.
+
+> **Warning:** Do not download the key over plain HTTP; someone in the path could replace the key, and with it the repository. Use HTTPS and verify the key fingerprint with the repository owner through a separate channel (`gpg --show-keys /etc/apt/keyrings/testrepo.asc`).
+
 
 ```bash
-wget -O - http://depo_sunucusu/depo_konumu/dists/stable/Release.key | apt-key add -
+install -d -m 0755 /etc/apt/keyrings
+wget -O /etc/apt/keyrings/testrepo.asc https://depo_sunucusu/depo_konumu/dists/stable/Release.key
 ```
 
-2. Add the source definition to a file under /etc/sources.list.d/, or to sources.list, as shown in the historical example:
+2. Add the source definition to a file under /etc/sources.list.d/, or to sources.list:
 
 ```bash
-echo "deb http://depo_sunucusu/depo_konumu stable main contrib non-free" > /etc/apt/sources.list.d/testrepo.list
+echo "deb [signed-by=/etc/apt/keyrings/testrepo.asc] https://depo_sunucusu/depo_konumu stable main contrib non-free" > /etc/apt/sources.list.d/testrepo.list
 ```
 
 3. Update repository metadata:

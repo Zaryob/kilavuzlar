@@ -5,12 +5,12 @@ title: "Apple Silicon Mac üzerinde ARM64 Linux sanallaştırmak"
 permalink: /sanallastirma/apple-silicon-arm64-linux/
 status: duzenlendi
 reviewed: 2026-11-03
-scope: macOS Sonoma/Sequoia üzerinde QEMU, Hypervisor.framework (HVF), EDK2 UEFI ve Ubuntu ARM64 cloud-init.
+scope: Apple Silicon macOS (ilk test Sonoma 14.5) üzerinde QEMU, Hypervisor.framework (HVF), EDK2 UEFI ve Ubuntu ARM64 cloud-init.
 ---
 
 # Apple Silicon Mac üzerinde ARM64 Linux sanallaştırmak
 
-Apple Silicon (M1/M2/M3/M4) işlemcili Mac bilgisayarlar, ARM64 (AArch64) mimarisine
+Apple Silicon (M serisi) işlemcili Mac bilgisayarlar, ARM64 (AArch64) mimarisine
 dayanır. Bu mimari, x86 emülasyonunun yarattığı ağır performans kaybı olmadan, ARM64
 Linux işletim sistemlerinin yerel donanım hızında çalıştırılmasına olanak tanır.
 
@@ -202,5 +202,6 @@ QEMU'yu anında kapatacaktır.
 - [Apple Developer Documentation - Hypervisor Framework](https://developer.apple.com/documentation/hypervisor)
 - [Ubuntu Cloud Images Resmi Dağıtım Portalı](https://cloud-images.ubuntu.com/)
 
-Bu kılavuz, Apple M2 Max işlemcili bir Mac (macOS Sonoma 14.5), Homebrew QEMU 9.0.0
-ve Ubuntu 24.04 ARM64 Cloud Image ile test edilerek doğrulanmıştır.
+Bu kılavuz ilk olarak Apple M2 Max işlemcili bir Mac (macOS Sonoma 14.5), Homebrew QEMU 9.0.0
+ve Ubuntu 24.04 ARM64 Cloud Image ile test edilmiştir. Kasım 2026'da Homebrew QEMU 11.1.3 dağıtıyor;
+komutlar bu sürümle ve sonradan eklenen SSH anahtarlı cloud-init yapılandırmasıyla baştan sona yeniden çalıştırılmadı.

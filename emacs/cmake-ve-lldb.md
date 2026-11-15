@@ -4,7 +4,7 @@ lang: tr
 title: "Emacs ile CMake ve LLDB kullanmak"
 permalink: /emacs/cmake-ve-lldb/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: GNU Emacs 29+ üzerinde Eglot, project.el, compile ve dape ile modern C++ ve lldb-dap hata ayıklama.
 ---
 
@@ -32,8 +32,7 @@ Geçmişte Emacs'te hata ayıklama için iki temel yol bulunuyordu:
 - Kaynak kodun içine doğrudan satır içi değişken değerlerini yazar (`inlay hints`).
 - `repeat-mode` desteğiyle tek bir tuşla (`n`, `s`, `c`, `o`) hızlı adımlama sağlar.
 
-> [!NOTE]
-> LLVM 18 sürümüyle birlikte `lldb-vscode` aracının adı protokolün evrenselliğini
+> **Not:** LLVM 18 sürümüyle birlikte `lldb-vscode` aracının adı protokolün evrenselliğini
 > vurgulamak için resmen **`lldb-dap`** olarak değiştirilmiştir.
 
 ## 2. Emacs yapılandırması (`init.el`)
@@ -68,15 +67,16 @@ Aşağıdaki yapılandırmayı `~/.emacs.d/init.el` veya `~/.config/emacs/init.e
 (use-package project
   :ensure nil
   :config
-  ;; Git deposu olmasa dahi CMakeLists.txt bulunan dizini proje kökü say
-  (add-to-list 'project-vc-extra-root-markers "CMakeLists.txt"))
+  ;; Git deposu olmasa dahi kökte duran .dir-locals.el dosyasını proje kökü say.
+  ;; CMakeLists.txt işaret olarak kullanılmaz: alt dizinlerde de bulunduğu için
+  ;; her alt dizini ayrı proje yapar.
+  (add-to-list 'project-vc-extra-root-markers ".dir-locals.el"))
 
 (use-package compile
   :ensure nil
   :custom
-  ;; Her defasında sormadan doğrudan son derleme komutunu çalıştır
-  ;; Komutu değiştirmek istediğinizde C-u M-x compile yapabilirsiniz
-  (compilation-read-command nil)
+  ;; compilation-read-command varsayılan değerinde (t) bırakılır: C-c c komutu
+  ;; çalıştırmadan önce gösterir. Sormadan yinelemek için C-c r (recompile) kullanın.
   (compilation-scroll-output 'first-error)
   (compilation-always-kill t)
   :bind
@@ -121,18 +121,28 @@ Aşağıdaki yapılandırmayı `~/.emacs.d/init.el` veya `~/.config/emacs/init.e
 
 `e` ve büyük `R` bağları, dape’in `c` (continue) ve `r` (restart) tuşlarını ve repeat-map davranışlarını korur.
 
+> **Uyarı:** `compilation-read-command` değişkenini `nil` yapmayın. Emacs belgesinin de belirttiği gibi bu durumda
+> `compile`, bir dosyanın ya da `.dir-locals.el` dosyasının tanımladığı `compile-command` değerini size göstermeden
+> çalıştırır; indirdiğiniz bir depo bu yolla keyfi komut çalıştırabilir. Varsayılan değerde komut önce minibuffer'da görünür.
+
+Proje kökü işareti olarak `CMakeLists.txt` yerine `.dir-locals.el` kullanılır: `project.el` en yakın işareti kök sayar ve
+alt dizinlerinde de `CMakeLists.txt` bulunan bir projede her alt dizin ayrı proje olurdu. Git deposu içinde bu ayara gerek yoktur.
+
 ## 3. Proje düzeyinde CMake ve Clangd ayarları
 
-Clangd dil sunucusunun ve Emacs derleme komutunun projeyi tanıması için proje köküne
-`.dir-locals.el` ekleyebilirsiniz:
+Emacs derleme komutunun projeyi tanıması için proje köküne `.dir-locals.el` ekleyebilirsiniz:
 
 ```elisp
 ((nil . ((compile-command . "cmake --build build -j")
-         (project-compilation-buffer-name-function . project-prefixed-buffer-name)))
- (c++-mode . ((eglot-workspace-configuration
-               . (:clangd (:compilationDatabasePath "build"))))))
+         (project-compilation-buffer-name-function . project-prefixed-buffer-name))))
 ```
 {: data-filename=".dir-locals.el"}
+
+Clangd için ayrıca bir ayar gerekmez: `compile_commands.json` dosyasını düzenlediğiniz dosyanın üst dizinlerinde ve bu
+dizinlerin `build/` alt dizinlerinde kendisi arar. Derleme dizininiz başka bir addaysa `init.el` içindeki clangd
+argümanlarına `"--compile-commands-dir=<dizin>"` ekleyin ya da proje köküne `CompileFlags: {CompilationDatabase: <dizin>}`
+içeren bir `.clangd` dosyası koyun. `eglot-workspace-configuration` ile gönderilen `compilationDatabasePath` işe yaramaz;
+clangd bu alanı yalnızca `initializationOptions` içinde okur.
 
 CMake yapılandırmanızda derleme veritabanını (`compile_commands.json`) üretmeyi unutmayın:
 
@@ -148,7 +158,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ### 1. Adım: Derleme
 
 Kaynak dosya açıkken `C-c c` (`compile`) veya `C-x p c` (`project-compile`) tuşlayın.
-Derleme çıktısı `*compilation*` penceresinde akar. Hata varsa `C-x \`` (`next-error`) ile
+Derleme çıktısı `*compilation*` penceresinde akar. Hata varsa ``C-x ` `` (`next-error`) ile
 hatalı satıra atlayabilirsiniz.
 
 ```bash
@@ -156,8 +166,7 @@ cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build -j
 ```
 
-> [!IMPORTANT]
-> Hata ayıklama sembollerinin tam görünmesi için projenin **Debug** veya **RelWithDebInfo**
+> **Önemli:** Hata ayıklama sembollerinin tam görünmesi için projenin **Debug** veya **RelWithDebInfo**
 > modunda derlenmiş olması gerekir.
 
 ### 2. Adım: Breakpoint (Kesme Noktası) Koyma
@@ -182,7 +191,7 @@ Emacs otomatik olarak pencereleri yeniden düzenler (`gdb` düzeni):
 
 Program breakpoint satırında durduğunda:
 - **Satır İçi Değerler:** Değişkenlerin güncel değerleri doğrudan kodun sağında silik metin olarak görünür.
-- **İzleme (Watch):** `*dape-info*` penceresinde `i` tuşuna basarak özel bir ifadeyi (örneğin `dizi.size()`) sürekli izlemeye alabilirsiniz.
+- **İzleme (Watch):** `C-x C-a w` (`dape-watch-dwim`) ile bir ifadeyi (örneğin `dizi.size()`) izleme listesine ekleyin; ifade `*dape-info*` penceresinin Watch bölümünde her duraklamada yeniden hesaplanır. Aynı komut, listedeki bir ifadeyi kaldırmak için de kullanılır.
 - **Tek Tuşla Adımlama (`repeat-mode`):** İlk adımdan sonra ön ek tuşuna basmadan sadece tek harflere basarak ilerleyin:
   - `n` : Sonraki satıra geç (Step Over / Next)
   - `s` : Fonksiyonun içine gir (Step Into)
@@ -207,5 +216,9 @@ x/16xb pointer_address
 - [Dape Resmi Deposu ve Belgeleri](https://github.com/svaante/dape)
 - [LLVM lldb-dap Dokümantasyonu](https://lldb.llvm.org/)
 - [GNU Emacs Eglot Kullanım Kılavuzu](https://www.gnu.org/software/emacs/manual/html_node/eglot/)
+- [clangd: proje kurulumu ve `compile_commands.json` araması](https://clangd.llvm.org/installation#project-setup)
+- [clangd protokol eklentileri: `compilationDatabasePath`](https://clangd.llvm.org/extensions#compilation-commands)
 
 8–9 Kasım 2026: yapılandırma ve tuş/repeat haritaları Emacs 31.1 batch modunda dape 0.19.0 ve 0.28.0 ile kontrol edildi. Etkileşimli LLDB/DAP oturumu çalıştırılmadı.
+
+14 Kasım 2026: güncellenen `init.el` Emacs 31.1 batch modunda dape 0.27.1 ile yüklendi; `C-x C-a w` bağının `dape-watch-dwim` olduğu, `.dir-locals.el` işaretinin alt dizinden proje kökünü bulduğu ve `compilation-read-command` `nil` iken `compile-command` değerinin güvensiz sayıldığı kontrol edildi.

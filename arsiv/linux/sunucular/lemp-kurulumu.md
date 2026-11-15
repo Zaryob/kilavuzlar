@@ -83,7 +83,7 @@ STRONG Length >= 8, numeric, mixed case, special characters and dictionary file
 Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG:
 ```
 
-Bu aşamada orta uzunlukta bir şifre oluşturalım, bu yüzden 1'e tıklayalım
+Bu aşamada orta düzey (MEDIUM) parola politikasını seçelim, bu yüzden 1'e tıklayalım
 
 ```
 Using existing password for root.
@@ -116,7 +116,7 @@ mysql> SELECT user,authentication_string,plugin,host FROM mysql.user;
 4 rows in set (0.00 sec)
 ```
 
-Burada göründüğü üzere `auth_socket` şifresi verelim. Komuttaki `GUCLU_BIR_PAROLA` yerine kendi belirlediğiniz güçlü ve benzersiz bir parola yazın; `password` gibi tahmin edilebilir bir değer kullanmayın. Not: `mysql_native_password` eklentisi MySQL 8.4'te varsayılan olarak kapalıdır ve 9.0'da kaldırılmıştır; bu komut güncel sürümlerde çalışmaz.
+Burada göründüğü üzere `root` kullanıcısı `auth_socket` ile, yani parola sormadan doğrulanıyor. Özgün not bunu parolalı doğrulamaya çevirir. Yukarıda MEDIUM politikasını seçtiyseniz parola en az 8 karakter olmalı, rakam, büyük ve küçük harf ile özel karakter içermelidir; aksi halde MySQL komutu reddeder. Komuttaki `GUCLU_BIR_PAROLA` yerine kendi belirlediğiniz güçlü ve benzersiz bir parola yazın; `password` gibi tahmin edilebilir bir değer kullanmayın. Not: `mysql_native_password` eklentisi MySQL 8.4'te varsayılan olarak kapalıdır ve 9.0'da kaldırılmıştır; bu komut güncel sürümlerde çalışmaz.
 
 ```sql
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'GUCLU_BIR_PAROLA';
@@ -126,7 +126,7 @@ Bu değişikliğin okunması için tablomuzu güncelleyelim
 ```sql
 mysql> FLUSH PRIVILEGES;
 ```
-Ve yeniden Tablomuzu kontrol edelim
+Ve yeniden tablomuzu kontrol edelim; `root` satırında eklenti artık `mysql_native_password` olmalıdır
 ```sql
 mysql> SELECT user,authentication_string,plugin,host FROM mysql.user;
 ```
@@ -135,7 +135,7 @@ mysql> SELECT user,authentication_string,plugin,host FROM mysql.user;
 +------------------+-------------------------------------------+-----------------------+-----------+
 | user             | authentication_string                     | plugin                | host      |
 +------------------+-------------------------------------------+-----------------------+-----------+
-| root             | *3636DACC8616D997782ADD0839F92C1571D6D78F | auth_socket           | localhost |
+| root             | *3636DACC8616D997782ADD0839F92C1571D6D78F | mysql_native_password | localhost |
 | mysql.session    | *THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE | mysql_native_password | localhost |
 | mysql.sys        | *THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE | mysql_native_password | localhost |
 | debian-sys-maint | *FA769377A401A7D25BE1CA89AFF17BF607F876FF | mysql_native_password | localhost |
@@ -152,7 +152,7 @@ sudo apt install php php-fpm php-mysql
 
 ```
 
-Böylece kurulum işlemi tamamlandı.
+Böylece paket kurulumu tamamlandı. Ancak Nginx bu haliyle PHP dosyalarını çalıştırmaz: site yapılandırmasında `.php` isteklerini PHP-FPM soketine yönlendiren bir `location ~ \.php$` bloğu (`fastcgi_pass`) gerekir. Bu adım bu notta yoktur.
 
 ## Bitiriş
-Artık bir LEMP sunucusuna sahip olduğunuza göre, daha sonra ne yapacağınız konusunda birçok seçeneğiniz var. Temel olarak, sunucunuza çoğu türde web sitesi ve web yazılımı yüklemeniz artık mümkün, güle güle kullanın.
+Bileşenler bir LEMP sunucusunun temelini oluşturur. Nginx ile PHP-FPM bağlantısı ve site yapılandırması bu arşiv notunda eksiktir; PHP ile çalışan bir site yayımlamadan önce tamamlanmalıdır.

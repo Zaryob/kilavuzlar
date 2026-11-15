@@ -6,7 +6,7 @@ permalink: /arsiv/goruntu-isleme/caffe-kurulumu/
 status: arsiv
 reviewed: 2026-11-02
 scope: "BVLC Caffe, Python 2/3.7 ve OpenCV 4 yamaları."
-archive_reason: "Python ABI yolları ve mimariye bağlı kütüphane dizinleri sabit. Bağımlılıklar, yamalar ve test adımları sabitlenmiş bir ortamda doğrulanmalı."
+archive_reason: "Python ABI yolları ve mimariye bağlı kütüphane dizinleri sabit. Bağımlılıklar, yamalar ve test adımları sabitlenmiş bir ortamda doğrulanmalı. Kasım 2026'da Python kurulum adımı Caffe deposuna ve kurulum belgesine göre düzeltildi; derleme yeniden yapılmadı."
 redirect_from:
   - "/opencv/Caffe Kurulum Kılavuzu.html"
 ---
@@ -108,6 +108,8 @@ nano Makefile.config
 INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial
 LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/arm-linux-gnueabihf/hdf5/serial/
 ```
+
+Buradaki `/usr/lib/arm-linux-gnueabihf/hdf5/serial/` yolu yalnızca 32 bit ARM (Raspberry Pi) içindir. Başka mimarilerde kendi çoklu mimari dizininizi yazın; örneğin x86_64 için `/usr/lib/x86_64-linux-gnu/hdf5/serial/`. Dizin adını `dpkg-architecture -qDEB_HOST_MULTIARCH` gösterir.
 
 Eğer opencv'yi kendi derlemenizden kullanacaksanız INCLUDE_DIRS ibaresi şöyle olmalıdır.
 
@@ -211,7 +213,7 @@ LIBRARIES += opencv_core opencv_highgui opencv_imgproc  opencv_imgcodecs
 ```
 yapmanızı öneririm.
 
-## İnşaa adımları
+## İnşa adımları
 
 Tüm kaynağı inşaa edin:
 
@@ -219,7 +221,7 @@ Tüm kaynağı inşaa edin:
 make all
 ```
 
-Eğer gerkli görürseniz testleri işletin:
+Eğer gerekli görürseniz testleri işletin:
 ```
 make test
 
@@ -236,10 +238,10 @@ python3 scripts/download_model_binary.py models/bvlc_googlenet
 ## Kurulum
 
 
-Protobuf python bindingini kurmak için:
+Caffe deposunun `python/` dizininde `setup.py` yoktur; özgün nottaki `sudo python3 setup.py install` komutu bu yüzden çalışmaz. `make pycaffe` ile derlenen Python arayüzünü kullanmak için Caffe dizinindeyken Python bağımlılıklarını kurun ve `python/` dizinini `PYTHONPATH` değişkenine ekleyin:
 ```
-cd python
+python3 -m pip install --user -r python/requirements.txt
 
-sudo python3 setup.py install
+export PYTHONPATH="$PWD/python:$PYTHONPATH"
 ```
-komutlarını işletin.
+komutlarını işletin. `export` satırı yalnızca açık kabuk için geçerlidir; kalıcı olması için tam yolu yazarak `~/.profile` dosyanıza ekleyin.

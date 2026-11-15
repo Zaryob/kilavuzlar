@@ -5,7 +5,8 @@ status: arsiv
 reviewed: 2026-11-02
 scope: BVLC Caffe, Python 2/3.7 and OpenCV 4 patches.
 archive_reason: Python ABI paths and architecture-specific library directories are
-  hard-coded. Verify dependencies, patches and tests in a pinned environment.
+  hard-coded. Verify dependencies, patches and tests in a pinned environment. In November 2026 the Python
+  installation step was corrected from the Caffe repository and installation documentation; the build was not repeated.
 lang: en
 translation_key: guide-arsiv-goruntu-isleme-caffe-kurulumu
 translation_of: /arsiv/goruntu-isleme/caffe-kurulumu/
@@ -111,6 +112,8 @@ nano Makefile.config
 INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial
 LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/arm-linux-gnueabihf/hdf5/serial/
 ```
+
+The `/usr/lib/arm-linux-gnueabihf/hdf5/serial/` path here applies only to 32-bit ARM (Raspberry Pi). On other architectures use your own multiarch directory, for example `/usr/lib/x86_64-linux-gnu/hdf5/serial/` on x86_64; `dpkg-architecture -qDEB_HOST_MULTIARCH` prints the directory name.
 
 For a manually built OpenCV, the example uses these INCLUDE_DIRS:
 
@@ -243,10 +246,12 @@ python3 scripts/download_model_binary.py models/bvlc_googlenet
 
 ## Install
 
-Install the protobuf Python binding:
+The Caffe repository has no `setup.py` in its `python/` directory, so the `sudo python3 setup.py install` command in the original notes cannot work. To use the Python interface built by `make pycaffe`, install the Python dependencies from the Caffe directory and add `python/` to `PYTHONPATH`:
 
 ```
-cd python
+python3 -m pip install --user -r python/requirements.txt
 
-sudo python3 setup.py install
+export PYTHONPATH="$PWD/python:$PYTHONPATH"
 ```
+
+The `export` line only applies to the open shell; to make it permanent, add it to `~/.profile` with the full path.

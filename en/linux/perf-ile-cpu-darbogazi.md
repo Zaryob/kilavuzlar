@@ -2,7 +2,7 @@
 title: Finding CPU bottlenecks with perf on Linux
 permalink: /en/linux/perf-ile-cpu-darbogazi/
 status: duzenlendi
-reviewed: 2026-11-03
+reviewed: 2026-11-14
 scope: CPU sampling, call graphs and Brendan Gregg Flame Graph analysis with perf
   on Linux 6.x.
 lang: en
@@ -25,9 +25,13 @@ For security, Linux restricts access to performance counters for users without `
 
 This setting controls the permitted profiling level:
 
-- `2`: userspace profiling only; kernel profiling is restricted, as on many distributions by default.
-- `1`: permits kernel and userspace CPU profiling.
+- `4`: disables `perf` entirely for unprivileged users. Mainline does not have this level; the Ubuntu kernel adds it and it is the default on Ubuntu 24.04.
+- `2`: users may profile their own processes in userspace only; kernel profiling is disallowed (the mainline default).
+- `1`: users may profile their own processes including the kernel side. System-wide (`-a`) or per-CPU profiling is still disallowed.
+- `0`: also permits system-wide and per-CPU profiling; raw tracepoints remain restricted.
 - `-1`: removes restrictions, including access to raw tracepoints.
+
+The commands in this guide only profile a process you start yourself, so `1` is sufficient. System-wide recording (`perf record -a`) as an unprivileged user needs `0` or lower, or `CAP_PERFMON`.
 
 Temporarily grant access in a development environment:
 
@@ -80,7 +84,7 @@ perf record -F 99 -g -- ./hesaplayici
 | :--- | :--- | :--- | :--- |
 | **Frame pointer** | `-g` or `--call-graph fp` | **1–2%, lowest in this comparison** | Requires `-fno-omit-frame-pointer`; a convenient production-profiling method. |
 | **DWARF** | `--call-graph dwarf,8192` | **15–30%, higher** | Copies stack memory; `perf.data` can grow to gigabytes, but works without frame pointers. |
-| **Last Branch Record** | `--call-graph lbr` | **Hardware-assisted, approximately 0% in this comparison** | Uses supported Intel/AMD hardware; depth is limited and availability in VMs is restricted. |
+| **Last Branch Record** | `--call-graph lbr` | **Hardware-assisted, approximately 0% in this comparison** | According to the `perf` documentation, available only on Intel processors (Haswell and later) and yields the user-space call chain only. Depth is limited and availability in VMs is restricted. |
 
 ## 4. Reports and analysis: perf report and perf annotate
 
@@ -145,7 +149,9 @@ perf script | /tmp/FlameGraph/stackcollapse-perf.pl | /tmp/FlameGraph/flamegraph
 ## Sources and verification environment
 
 - [Brendan Gregg — Linux perf Examples](https://www.brendangregg.com/perf.html)
-- [Linux perf wiki](https://perf.wiki.kernel.org/)
+- [Linux perf wiki](https://perfwiki.github.io/main/)
 - [FlameGraph repository](https://github.com/brendangregg/FlameGraph)
+- [Linux kernel documentation: `perf_event_paranoid`](https://docs.kernel.org/admin-guide/sysctl/kernel.html#perf-event-paranoid)
+- [`perf-record(1)` manual page](https://man7.org/linux/man-pages/man1/perf-record.1.html)
 
 This guide was tested by profiling a real C++ workload on Ubuntu 24.04 LTS (Linux 6.8 x86_64) with `linux-tools-generic` 6.8.0 and FlameGraph.

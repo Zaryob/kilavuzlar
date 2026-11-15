@@ -30,10 +30,10 @@ Add the repository:
 rpm -Uvh https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
 ```
 
-Refresh the package metadata:
+Refresh the package metadata. `yum makecache` is enough for this; `yum update` would upgrade every package on the system rather than only refreshing metadata:
 
 ```
-yum update
+yum makecache
 ```
 
 ## Install a mainline kernel

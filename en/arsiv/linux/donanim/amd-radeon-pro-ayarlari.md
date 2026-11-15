@@ -36,7 +36,9 @@ If the application still does not use the intended GPU, the notes apply:
 
 ```shell
 $ sudo su
-# echo \"DRI_PRIME=1\" >> /etc/environment
+# echo 'DRI_PRIME=1' >> /etc/environment
 ```
 
-This sets DRI_PRIME for the graphical session.
+This line defines `DRI_PRIME=1` for every session.
+
+> **Warning:** `/etc/environment` is system-wide: the setting forces every application, not only Xorg, onto the secondary GPU. It only makes sense on hybrid (dual-GPU) systems, increases power use, and applications may fail to start when the secondary GPU is unavailable. Running a single application as `DRI_PRIME=1 application` is safer. To undo it, delete the line from `/etc/environment`.

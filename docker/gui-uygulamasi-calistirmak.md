@@ -4,7 +4,7 @@ lang: tr
 title: "Docker içinde GUI uygulaması çalıştırmak"
 permalink: /docker/gui-uygulamasi-calistirmak/
 status: duzenlendi
-reviewed: 2026-11-09
+reviewed: 2026-11-14
 scope: Linux ortamında X11 ve Wayland görüntü sunucuları, GPU hızlandırma (/dev/dri) ve güvenli soket yetkilendirmesi.
 ---
 
@@ -37,14 +37,19 @@ kullanır. Bu soketler ana makinede `/tmp/.X11-unix/` dizininde bulunur:
 
 #### Neden `xhost +` kullanılmamalıdır?
 İnternetteki birçok rehber `xhost +local:docker` veya `xhost +` komutunu önerir.
-Bu komut X11 erişim kontrolünü tamamen kapatır. X11 protokolünde istemciler arasında
+`xhost +` X11 erişim kontrolünü tamamen kapatır; `xhost +local:docker` gibi biçimler ise yalnızca gevşetir (yerel bağlantılara veya belirli bir yerel kullanıcıya izin verir). X11 protokolünde istemciler arasında
 tecrit olmadığı için, konteyner içindeki zararlı bir yazılım ana makinedeki diğer
 pencerelerin klavye girdilerini dinleyebilir (keylogger), ekran görüntüsü alabilir veya
 sahte giriş olayları (`XSendEvent`) üretebilir.
 
-#### Güvenli yöntem: XAUTHORITY (MIT-MAGIC-COOKIE-1)
-Güvenli yol, X sunucusunun ürettiği 16 baytlık gizli anahtarı (cookie) izole bir dosyaya
-kopyalayarak konteynere vermektir.
+#### Daha dar yöntem: XAUTHORITY (MIT-MAGIC-COOKIE-1)
+Erişimi daraltmanın yolu, X sunucusunun ürettiği 16 baytlık gizli anahtarı (cookie) izole bir dosyaya
+kopyalayarak konteynere vermektir. Böylece ekrana yalnızca çerezi taşıyan istemciler bağlanır.
+
+> **Uyarı:** Çerez, *kimin* bağlanabileceğini sınırlar; bağlanan istemcinin neler yapabileceğini
+> sınırlamaz. Çerezi alan konteyner tam yetkili bir X istemcisidir ve yukarıda sayılan tuş kaydı,
+> ekran görüntüsü ve sahte girdi riskleri onun için aynen geçerlidir. Güvenmediğiniz bir uygulamayı
+> X11 ile ana ekranınıza bağlamayın; Wayland'i veya ayrı bir iç içe X sunucusunu (Xephyr gibi) tercih edin.
 
 Konteynerin rastgele hostname alması nedeniyle oluşabilecek kimlik doğrulama hatalarını
 (`No protocol specified`) engellemek için adres ailesi `ffff` (FamilyWild - joker aile)
@@ -65,6 +70,11 @@ paylaşımlı bellek (`shmget`/`shmat`) ile aktarır. Konteyner izole bir IPC ad
 çalıştığında `BadShmAttach` veya `BadAccess` hatası vererek çöker.
 
 **Çözüm:** Konteynere `--ipc=host` parametresi eklemektir.
+
+> **Uyarı:** `--ipc=host`, konteyneri ana makinenin IPC ad alanına sokar: konteyner ana makinedeki
+> System V paylaşımlı bellek bölütlerini ve POSIX ileti kuyruklarını görebilir. Bu, tecridi belirgin
+> biçimde zayıflatır. Qt uygulamalarında bunun yerine `-e QT_X11_NO_MITSHM=1` ile MIT-SHM kapatılabilir;
+> çizim yavaşlar ama IPC ad alanı ayrı kalır.
 
 ### X11 Konteyner çalıştırma komutu
 

@@ -107,7 +107,7 @@ Example output:
 4 rows in set (0.00 sec)
 ```
 
-The output shows `auth_socket`. The original example switches authentication to a password. Replace `GUCLU_BIR_PAROLA` (“a strong password”) with a strong, unique password of your own; never use a guessable value such as `password`. Note that `mysql_native_password` is disabled by default in MySQL 8.4 and removed in 9.0, so this command fails on current releases.
+The output shows `auth_socket`. The original example switches authentication to a password. If you chose the MEDIUM policy above, the password must be at least 8 characters and contain digits, mixed case and a special character; otherwise MySQL rejects the command. Replace `GUCLU_BIR_PAROLA` (“a strong password”) with a strong, unique password of your own; never use a guessable value such as `password`. Note that `mysql_native_password` is disabled by default in MySQL 8.4 and removed in 9.0, so this command fails on current releases.
 
 ```sql
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'GUCLU_BIR_PAROLA';
@@ -119,7 +119,7 @@ Apply the privilege-table change:
 mysql> FLUSH PRIVILEGES;
 ```
 
-Check the table again:
+Check the table again; the `root` row should now show `mysql_native_password`:
 
 ```sql
 mysql> SELECT user,authentication_string,plugin,host FROM mysql.user;
@@ -129,7 +129,7 @@ mysql> SELECT user,authentication_string,plugin,host FROM mysql.user;
 +------------------+-------------------------------------------+-----------------------+-----------+
 | user             | authentication_string                     | plugin                | host      |
 +------------------+-------------------------------------------+-----------------------+-----------+
-| root             | *3636DACC8616D997782ADD0839F92C1571D6D78F | auth_socket           | localhost |
+| root             | *3636DACC8616D997782ADD0839F92C1571D6D78F | mysql_native_password | localhost |
 | mysql.session    | *THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE | mysql_native_password | localhost |
 | mysql.sys        | *THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE | mysql_native_password | localhost |
 | debian-sys-maint | *FA769377A401A7D25BE1CA89AFF17BF607F876FF | mysql_native_password | localhost |

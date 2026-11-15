@@ -6,7 +6,7 @@ permalink: /arsiv/goruntu-isleme/opencv-kurulumu/
 status: arsiv
 reviewed: 2026-11-02
 scope: "OpenCV 4.0.0, Python 2 ve eski APT paket adları."
-archive_reason: "İndirme sürümleri tutarsız; x86 ve ARM derleme seçenekleri karışmış. Sistem pip kurulumu ve sanal ortam bağlantısı yeniden yazılmalı."
+archive_reason: "İndirme sürümleri tutarsız; x86 ve ARM derleme seçenekleri karışmış. Sistem pip kurulumu ve sanal ortam bağlantısı yeniden yazılmalı. Kasım 2026'da yalnızca ~/.profile komutu ile OpenCV 4.0.0'da bulunmayan iki CMake seçeneği düzeltildi; derleme yeniden yapılmadı."
 redirect_from:
   - "/opencv/OpenCV kurulum kılavuzu.html"
 ---
@@ -14,7 +14,7 @@ redirect_from:
 # OpenCV kaynak kodundan kurulum
 
 
-İnşaa bağımlılıklarını kurmak
+İnşa bağımlılıklarını kurmak
 -----------------------------
 
 
@@ -36,6 +36,8 @@ sudo apt-get install build-essential cmake unzip pkg-config
 * Video kayıt için: (Kamera kullanımında önerilir) ``` sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev```
 * Video dosyaları için: (Temel video formatları ve h264) ```sudo apt-get install libxvidcore-dev libx264-dev```
 * Ek kodekler için: ```sudo apt-get install libdc1394-22-dev libtheora-dev libvorbis-dev yasm libopencore-amrnb-dev libopencore-amrwb-dev libxine2-dev```
+
+Not: Bu sayfadaki `libdc1394-22-dev`, `qt5-default`, `libvtk6-dev` ve `python-dev` gibi paket adları notun yazıldığı döneme aittir; güncel Debian/Ubuntu sürümlerinde bulunmayabilir veya başka adla gelir.
 
 ## GUI Araçları
 Gui araçlarını kullanacaksanız (Opencv ile pencere içerisinde çıktı almak gibi) GTK kurmanız önerilir
@@ -60,7 +62,7 @@ sudo apt-get install libvtk6-dev
 
 ## Sayısal optimizasyon araçları
 
-OpenCV'nin sayısal optimizayon araçları daha pürüzsüz sonuçlar almanızı sağlar ancak totalde hız düşmesine sebep olur.
+`libatlas-base-dev` ve `gfortran`, OpenCV'nin doğrusal cebir işlemlerinde kullanabildiği BLAS/LAPACK arka uçlarını sağlar. Özgün notta bunların toplamda hız düşmesine yol açtığı yazıyordu; bu ölçülmemiş bir iddiaydı ve bu kitaplıkların amacı söz konusu işlemleri hızlandırmaktır.
 Bunu eklemek için:
 ```
 sudo apt-get install libatlas-base-dev gfortran
@@ -111,12 +113,15 @@ mv opencv-4.0.0 opencv
 mv opencv_contrib-4.0.0 opencv_contrib
 ```
 
-## İnşaa
+## İnşa
 
 ## Ana sisteme inşaa etmek
-Eğer ki virtualenv ile uğraşmak istemiyorsanız benim yönetemimi deneyin.
+Eğer ki virtualenv ile uğraşmak istemiyorsanız benim yöntemimi deneyin.
 
 ### Numpy'i kurun
+
+> **Uyarı:** `sudo pip` ile sistem Python'una paket kurmak, dağıtımın kendi Python paketlerini bozabilir; güncel Debian/Ubuntu sürümleri bunu `externally-managed-environment` hatasıyla reddeder. Aşağıdaki komutlar tarihsel kayıt olarak durmaktadır; bugün `python3 -m venv` ile oluşturulmuş bir sanal ortam kullanın.
+
 Kök sisteme kurmak için
 ```
 sudo pip3 install numpy
@@ -139,13 +144,15 @@ sudo rm -rf ~/get-pip.py ~/.cache/pip
 
 ### Kabuk ortamınıza virtualenv'yi ekleyin
 
-~/.profile dosyanızın içerisine virtualenv'yi ekleyerek her kabuk ortamını başlattığınızda virtualenv'ye kolayca ulaşabilirsiniz
+~/.profile dosyanızın içerisine virtualenv'yi ekleyerek her kabuk ortamını başlattığınızda virtualenv'ye kolayca ulaşabilirsiniz. (Özgün nottaki `echo -e` komutu satır sonlarındaki `\` yüzünden dosyaya `#` ile başlayan tek bir satır yazıyor ve hiçbir değişkeni dışa aktarmıyordu; aşağıdaki biçim dört satırı ayrı ayrı ekler.)
 
 ```
-echo -e "# virtualenv and virtualenvwrapper \
-export WORKON_HOME=$HOME/.virtualenvs  \
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3 \
-source /usr/local/bin/virtualenvwrapper.sh" >> ~/.profile
+cat >> ~/.profile <<'EOF'
+# virtualenv and virtualenvwrapper
+export WORKON_HOME=$HOME/.virtualenvs
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+source /usr/local/bin/virtualenvwrapper.sh
+EOF
 ```
 
 ve kabuk ortamınızı yeniden başlatın:
@@ -185,7 +192,7 @@ mkdir build
 cd build
 ```
 
-Ardından CMake konfigürasyonunu yapın:
+Ardından CMake konfigürasyonunu yapın. (Özgün nottaki `FORCE_VTK` ve `WITH_LIBV4L` seçenekleri OpenCV 4.0.0'da yoktur ve yok sayılır; yerlerine `WITH_VTK` ve `WITH_V4L` yazıldı. `ENABLE_NEON` ve `ENABLE_VFPV3` yalnızca ARM içindir; x86'da kaldırın.)
 
 ```
 cmake -D CMAKE_BUILD_TYPE=RELEASE \
@@ -195,8 +202,8 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D ENABLE_VFPV3=ON \
     -D WITH_OPENGL=ON \
     -D WITH_QT=ON \
-    -D FORCE_VTK=ON \
-    -D WITH_LIBV4L=ON \
+    -D WITH_VTK=ON \
+    -D WITH_V4L=ON \
     -D WITH_TBB=ON \
     -D WITH_GDAL=ON \
     -D WITH_FFMPEG=0 \
@@ -208,7 +215,7 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D BUILD_EXAMPLES=ON ..
 ```
 
-### İnşaa
+### İnşa
 
 Make aracı ile inşaa etmeye başlayalım
 ```

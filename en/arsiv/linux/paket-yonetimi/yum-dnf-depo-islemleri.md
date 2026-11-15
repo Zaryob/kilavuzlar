@@ -4,8 +4,8 @@ permalink: /en/arsiv/linux/paket-yonetimi/yum-dnf-depo-islemleri/
 status: arsiv
 reviewed: 2026-11-02
 scope: YUM, yum-utils and RHEL 8 repository examples.
-archive_reason: Distinguish YUM and DNF versions. Review bulk enable/disable examples
-  and wildcard expansion by the shell.
+archive_reason: Distinguish YUM and DNF versions. The bulk enable/disable commands were corrected in November 2026
+  from the yum-utils and dnf config-manager documentation; they were not run on a RHEL system.
 lang: en
 translation_key: guide-arsiv-linux-paket-yonetimi-yum-dnf-depo-islemleri
 translation_of: /arsiv/linux/paket-yonetimi/yum-dnf-depo-islemleri/
@@ -101,8 +101,12 @@ Repository definitions are stored in `/etc/yum.repos.d`. An example entry:
 
 ## Enable all repositories
 
+`--enablerepo` and `--disablerepo` apply only to the single command being run; they do not change a repository permanently. Use `--enable` and `--disable` for a persistent change. The asterisk must be escaped as `\*` so that the shell does not expand it to file names. On DNF systems the equivalents are `dnf config-manager --set-enabled '*'` and `dnf config-manager --set-disabled '*'`.
+
+> **Warning:** Enabling every repository also turns on testing, source and debug repositories. On a production system, enable only the repository you need.
+
 ```shell
-# yum-config-manager --enablerepo=*
+# yum-config-manager --enable \*
 ```
 
 For RHEL-specific repositories:
@@ -114,7 +118,7 @@ For RHEL-specific repositories:
 ## Disable all repositories
 
 ```shell
-# yum-config-manager --disablerepo=*
+# yum-config-manager --disable \*
 ```
 
 For RHEL-specific repositories:

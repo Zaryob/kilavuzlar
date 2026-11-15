@@ -105,10 +105,10 @@ Make the script executable:
 sudo chmod +x ~/.vnc/xstartup
 ```
 
-Start the server again:
+Start the server again. The `-localhost` option makes the server accept connections from the same machine only, so the VNC port is not exposed to the network and can be reached only through the SSH tunnel below:
 
 ```bash
-vncserver
+vncserver -localhost
 ```
 
 Example output:
