@@ -15,4 +15,4 @@ These 12 historical notes depend on old versions, omit steps or have unverified 
 - [Linux](linux/README.md): servers, package management, kernels, hardware and virtualisation.
 - [Image processing](goruntu-isleme/README.md): OpenCV, Caffe and model training.
 
-The [maintenance notes](../BAKIM.md) explain shared issues and the order of future updates.
+The [maintenance notes](https://github.com/Zaryob/kilavuzlar/blob/main/en/BAKIM.md) explain shared issues and the order of future updates.

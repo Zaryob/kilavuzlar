@@ -37,6 +37,9 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - scripts
+  # Internal review notes stay in the repository; /bakim/ redirects to the archive index, which links to them on GitHub.
+  - BAKIM.md
+  - en/BAKIM.md
 
 # Common Zaryob navigation; override suite_url for a combined local preview.
 suite_url: "https://zaryob.github.io"

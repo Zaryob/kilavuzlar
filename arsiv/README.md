@@ -17,4 +17,4 @@ başında arşiv gerekçesi ve yeniden kullanım koşulları bulunur.
 - [Linux](linux/README.md): sunucular, paket yönetimi, çekirdek, donanım ve sanallaştırma.
 - [Görüntü işleme](goruntu-isleme/README.md): OpenCV, Caffe ve model eğitimi.
 
-Güncelleme sırası ve ortak sorunlar [bakım notlarında](../BAKIM.md) açıklanır.
+Güncelleme sırası ve ortak sorunlar [bakım notlarında](https://github.com/Zaryob/kilavuzlar/blob/main/BAKIM.md) açıklanır.

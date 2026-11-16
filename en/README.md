@@ -49,4 +49,4 @@ Archived installation commands should not be assumed to have been tested on a cu
 
 ## Contributing
 
-See the [contribution guide](CONTRIBUTING.md) for document and maintenance rules, and the [maintenance notes](BAKIM.md) for the most recent recorded review findings.
+See the [contribution guide](CONTRIBUTING.md) for document and maintenance rules.
