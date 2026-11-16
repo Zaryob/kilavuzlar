@@ -93,7 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filename) {
       const name = document.createElement('span');
       name.className = 'guide-code-filename';
-      name.textContent = filename;
+      filename.split(/(?<=\/)/).forEach((part, index) => {
+        if (index) name.append(document.createElement('wbr'));
+        name.append(part);
+      });
       bar.append(name);
     }
     if (copy) bar.append(copy);
