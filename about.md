@@ -8,7 +8,7 @@ nav_order: 5
 
 # Hakkında
 
-Bu depo, Süleyman Poyraz'ın yazılım geliştirme ve sistem yönetimi sırasında
+Bu site, Süleyman Poyraz'ın yazılım geliştirme ve sistem yönetimi sırasında
 tuttuğu Türkçe çalışma notlarını içerir.
 
 C++, Docker, Emacs, Linux, sanallaştırma ve Vim belgeleri düzenlenmiş kılavuzlardır.
