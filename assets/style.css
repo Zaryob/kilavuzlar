@@ -49,7 +49,22 @@ details[open] > summary > .tree-chevron { transform: rotate(0); }
 .guide-content th { background: var(--surface); text-align: left; font-weight: 500; }
 .guide-content .notice { padding: 12px 16px; border-left: 2px solid var(--accent); background: var(--surface); font-size: var(--text-sm); margin: 20px 0; }
 .guide-content .notice p { margin: 8px 0 0; }
-.guide-content .archive { border-color: var(--warning); }
+/* Archive warning: its own warning tone (the shared --warning equals --accent), a thicker border and a ⚠ prefix. */
+:root { --archive-warning: #9a3412; }
+:root[data-theme="dark"] { --archive-warning: #f0905c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) { --archive-warning: #f0905c; } }
+.guide-content .notice.archive { border-left: 4px solid var(--archive-warning); background: var(--warning-surface); }
+.guide-content .notice.archive > strong { color: var(--archive-warning); }
+.guide-content .notice.archive .notice-icon { font-weight: 400; }
+.archive-details > summary { display: none; }
+@media (max-width: 760px) {
+  .archive-details { margin-top: 8px; }
+  .archive-details > summary { display: flex; align-items: center; min-height: 44px; margin-block: -8px; width: max-content; max-width: 100%; color: var(--link); cursor: pointer; }
+  .archive-details[open] > summary + p { margin-top: 0; }
+  .archive-details > summary::-webkit-details-marker { display: none; }
+  .archive-details > summary::before { content: "▸" / ""; margin-inline-end: 8px; }
+  .archive-details[open] > summary::before { content: "▾" / ""; }
+}
 .guide-content .reviewed { padding-top: 16px; margin-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: var(--text-xs); }
 .guide-related { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; font-size: var(--text-xs); }
 .guide-content .console-code pre { max-width: 100%; }
