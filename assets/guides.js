@@ -40,7 +40,7 @@
   nav.append(details);
 
   const wide = matchMedia('(min-width: 1440px)');
-  const title = article.querySelector('.notice') || article.querySelector('.article-meta') || article.querySelector('h1');
+  const title = article.querySelector('.guide-article-head') || article.querySelector('.notice') || article.querySelector('.article-meta') || article.querySelector('h1');
   const placeToc = () => {
     details.open = wide.matches;
     if (wide.matches) article.after(nav);
