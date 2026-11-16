@@ -60,5 +60,4 @@ Düzenlenmiş belgelerde de kaynak kontrolü ile uygulamalı test ayrı belirtil
 
 ## Bu depoya katkı
 
-Yeni belge ekleme ve bakım kuralları için [katkı rehberine](CONTRIBUTING.md),
-son incelemenin bulguları için [bakım notlarına](BAKIM.md) bakın.
+Yeni belge ekleme ve bakım kuralları için [katkı rehberine](CONTRIBUTING.md) bakın.
