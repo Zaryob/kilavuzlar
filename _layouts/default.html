@@ -89,21 +89,26 @@
         </div></details>
       </aside>
       <div class="guide-content">
+        {%- assign page_lang = page.lang | default: 'tr' %}
+        <div class="guide-topline">
         <nav class="guide-breadcrumb" aria-label="{% if page.lang == 'en' %}Breadcrumb{% else %}Konum{% endif %}"><a href="{{ language_prefix | append: '/' | relative_url }}">{% if page.lang == 'en' %}Guides{% else %}Kılavuzlar{% endif %}</a></nav>
-        {%- capture provenance %}
-        <p class="article-meta console-meta" lang="{{ page.lang | default: 'tr' }}">{% if page.status == 'duzenlendi' %}{% if page.lang == 'en' %}Edited{% else %}Düzenlendi{% endif %} · {% elsif page.status == 'arsiv' %}{% if page.lang == 'en' %}Archive{% else %}Arşiv{% endif %} · {% endif %}{% if page.reviewed %}{% if page.lang == 'en' %}Reviewed{% else %}İnceleme{% endif %}: <time datetime="{{ page.reviewed | date: '%Y-%m-%d' }}">{{ page.reviewed | date: '%d.%m.%Y' }}</time> · {% endif %}<a href="https://github.com/Zaryob/kilavuzlar/blob/main/{{ page.path | uri_escape }}">{% if page.lang == 'en' %}Source{% else %}Kaynak{% endif %} ↗</a></p>
-        {%- if page.status == 'arsiv' %}
-          <aside class="notice archive" lang="{{ page.lang | default: 'tr' }}" aria-label="{% if page.lang == 'en' %}Archive note{% else %}Arşiv notu{% endif %}">
-            <strong>{% if page.lang == 'en' %}Archive · Revalidation required{% else %}Arşiv · Yeniden doğrulama gerekiyor{% endif %}</strong>
-            <p lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</p>
-            <p lang="{{ page.lang | default: 'tr' }}">{{ page.archive_reason | escape }}</p>
-            <p lang="{{ page.lang | default: 'tr' }}">{% if page.lang == 'en' %}These commands have not been verified for current systems.{% else %}Bu komutlar güncel sistemler için doğrulanmadı.{% endif %} <a href="{{ language_prefix | append: '/arsiv/' | relative_url }}">{% if page.lang == 'en' %}Archive directory{% else %}Arşiv dizini{% endif %}</a></p>
-          </aside>
-        {%- elsif page.status == 'duzenlendi' %}
-          <p class="notice guide-scope"><span lang="{{ page.lang | default: 'tr' }}">{% if page.lang == 'en' %}Scope:{% else %}Kapsam:{% endif %}</span> <span lang="{{ page.lang | default: 'tr' }}">{{ page.scope | escape }}</span></p>
-        {%- endif %}
-        {%- endcapture %}
         {%- include console-content-language.html %}
+        </div>
+        {%- capture provenance %}
+        <div class="guide-article-head">
+        <p class="article-meta console-meta" lang="{{ page_lang }}">{% if page.status == 'duzenlendi' %}{% if page.lang == 'en' %}Edited{% else %}Düzenlendi{% endif %} · {% elsif page.status == 'arsiv' %}{% if page.lang == 'en' %}Archive{% else %}Arşiv{% endif %} · {% endif %}{% if page.reviewed %}{% if page.lang == 'en' %}Reviewed{% else %}İnceleme{% endif %}: <time datetime="{{ page.reviewed | date: '%Y-%m-%d' }}">{{ page.reviewed | date: '%d.%m.%Y' }}</time> · {% endif %}<a href="https://github.com/Zaryob/kilavuzlar/blob/main/{{ page.path | uri_escape }}">{% if page.lang == 'en' %}Source{% else %}Kaynak{% endif %} ↗</a></p>
+        {%- if page.status == 'arsiv' %}
+          <aside class="notice archive" lang="{{ page_lang }}" aria-label="{% if page.lang == 'en' %}Archive note{% else %}Arşiv notu{% endif %}">
+            <strong>{% if page.lang == 'en' %}Archive · Revalidation required{% else %}Arşiv · Yeniden doğrulama gerekiyor{% endif %}</strong>
+            <p lang="{{ page_lang }}">{{ page.archive_reason | escape }}</p>
+            <p lang="{{ page_lang }}">{% if page.lang == 'en' %}These commands have not been verified for current systems.{% else %}Bu komutlar güncel sistemler için doğrulanmadı.{% endif %} <a href="{{ language_prefix | append: '/arsiv/' | relative_url }}">{% if page.lang == 'en' %}Archive directory{% else %}Arşiv dizini{% endif %}</a></p>
+          </aside>
+        {%- endif %}
+        {%- if page.status == 'arsiv' or page.status == 'duzenlendi' %}
+          <p class="guide-scope"><span class="guide-scope__label" lang="{{ page_lang }}">{% if page.lang == 'en' %}Scope:{% else %}Kapsam:{% endif %}</span> <span lang="{{ page_lang }}">{{ page.scope | escape }}</span></p>
+        {%- endif %}
+        </div>
+        {%- endcapture %}
         <div class="guide-article-layout">
           <article lang="{{ page.lang | default: 'tr' }}"{% if page.title and page.path != '404.html' %} data-pagefind-body{% endif %}>
             {%- if content contains '</h1>' %}

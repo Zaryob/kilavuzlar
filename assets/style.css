@@ -103,3 +103,17 @@ details[open] > summary > .tree-chevron { transform: rotate(0); }
 }
 
 .guide-content .article-meta a { white-space: nowrap; }
+
+/* Article header: location and content language on one line, then title, provenance, archive warning and scope. */
+.guide-topline { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 1px solid var(--line); font-size: var(--text-xs); }
+.guide-content .guide-topline .guide-breadcrumb { margin: 0; padding: 0; border: 0; }
+.guide-topline .console-language-note { margin: 0; padding: 0; border: 0; background: none; }
+.guide-topline .console-language-note a { margin-inline-start: 8px; }
+.guide-content h1 { margin-bottom: 12px; }
+.guide-content .guide-article-head { margin: 0 0 24px; }
+.guide-content .guide-article-head > .article-meta { margin: 0 0 12px; }
+.guide-content .guide-article-head > :last-child { margin-bottom: 0; }
+.guide-content .guide-article-head .notice { margin: 12px 0; }
+.guide-content .guide-scope { margin: 0; max-width: 70ch; padding-top: 12px; border-top: 1px dashed var(--line); color: var(--muted); font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1.6; }
+.guide-content .guide-article-head > .article-meta + .guide-scope { padding-top: 0; border-top: 0; }
+.guide-scope__label { color: var(--accent); }
