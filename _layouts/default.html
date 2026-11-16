@@ -105,7 +105,7 @@
         {%- endcapture %}
         {%- include console-content-language.html %}
         <div class="guide-article-layout">
-          <article lang="{{ page.lang | default: 'tr' }}"{% if page.title and page.path != '404.html' %} data-pagefind-body{% endif %}>
+          <article lang="{{ page.lang | default: 'tr' }}"{% if page.title and page.path != '404.html' %} data-pagefind-body{% endif %}{% if page.translation_key == 'guide-README' %} data-guides-index{% endif %}>
             {%- if content contains '</h1>' %}
               {%- assign after_title = '</h1>' | append: provenance %}
               {{ content | replace_first: '</h1>', after_title }}
@@ -133,6 +133,6 @@
     {%- capture footer_legal %}<span aria-hidden="true"># </span>© {{ site.author | escape }} · <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>{% endcapture %}
     {%- capture footer_links %}<span class="console-hints"><kbd>/</kbd> <span data-i18n="search">ara</span> <kbd>Tab</kbd> <span data-i18n="navigate">gezin</span> <kbd>Enter</kbd> <span data-i18n="open">aç</span></span>{% endcapture %}
     {% include console-footer.html cwd="~/kilavuzlar" columns=footer_columns legal=footer_legal links=footer_links top="#icerik" %}
-    <script src="{{ '/assets/guides.js' | relative_url }}?v=directory-layout-20261115" defer></script>
+    <script src="{{ '/assets/guides.js' | relative_url }}?v=guides-index-toc-20261116" defer></script>
   </body>
 </html>
