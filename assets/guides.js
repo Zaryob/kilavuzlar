@@ -1,6 +1,6 @@
-/* Keep the directory compact on phones without hiding it when JS is disabled. */
+/* Keep the directory and archive reasons compact on phones without hiding them when JS is disabled. */
 (() => {
-  const trees = document.querySelectorAll('.guide-directory');
+  const trees = document.querySelectorAll('.guide-directory, [data-archive-details]');
   const narrow = matchMedia('(max-width: 760px)');
   const update = () => { trees.forEach(tree => { tree.open = !narrow.matches; }); };
   update();
