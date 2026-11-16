@@ -102,6 +102,8 @@
             <strong><span class="notice-icon" aria-hidden="true">⚠</span> {% if page.lang == 'en' %}Archive · Revalidation required{% else %}Arşiv · Yeniden doğrulama gerekiyor{% endif %}</strong>
             <p lang="{{ page_lang }}">{% if page.lang == 'en' %}These commands have not been verified for current systems.{% else %}Bu komutlar güncel sistemler için doğrulanmadı.{% endif %} <a href="{{ language_prefix | append: '/arsiv/' | relative_url }}">{% if page.lang == 'en' %}Archive directory{% else %}Arşiv dizini{% endif %}</a></p>
             <details class="archive-details" open data-archive-details><summary>{% if page.lang == 'en' %}Details{% else %}Ayrıntılar{% endif %}</summary><p lang="{{ page_lang }}">{{ page.archive_reason | escape }}</p></details>
+            {%- comment %} Fold the reason on phones before the first paint; without JavaScript it stays open. {% endcomment %}
+            <script>if (matchMedia('(max-width: 760px)').matches) document.currentScript.previousElementSibling.open = false;</script>
           </aside>
         {%- endif %}
         {%- if page.status == 'arsiv' or page.status == 'duzenlendi' %}
