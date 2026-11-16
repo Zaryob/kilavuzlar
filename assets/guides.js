@@ -77,6 +77,23 @@
   }
 })();
 
+/* Tables with three or more columns become one card per row on phones (CSS); label each cell with its column header and keep table roles, because changing display drops them. */
+(() => {
+  for (const table of document.querySelectorAll('.guide-content article table')) {
+    const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
+    if (headers.length < 3) continue;
+    table.classList.add('guide-table-cards');
+    table.setAttribute('role', 'table');
+    table.querySelectorAll(':scope > :is(thead, tbody, tfoot)').forEach(group => group.setAttribute('role', 'rowgroup'));
+    table.querySelectorAll('tr').forEach(row => row.setAttribute('role', 'row'));
+    table.querySelectorAll('thead th').forEach(th => th.setAttribute('role', 'columnheader'));
+    table.querySelectorAll('tbody tr').forEach(row => [...row.children].forEach((cell, index) => {
+      cell.setAttribute('role', cell.tagName === 'TH' ? 'rowheader' : 'cell');
+      if (headers[index]) cell.dataset.label = headers[index];
+    }));
+  }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   for (const block of document.querySelectorAll('.guide-content article .console-code')) {
     const code = block.querySelector('pre > code');
