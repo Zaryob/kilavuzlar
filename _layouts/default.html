@@ -123,9 +123,9 @@
       <nav class="suite-footer__col" aria-label="{% if footer_en %}Guides{% else %}Kılavuzlar{% endif %}" data-i18n-aria-label="Guides">
         <p class="suite-footer__title">~/kilavuzlar/</p>
         <ul>
-          <li><a href="{{ language_prefix | append: '/' | relative_url }}"><span data-i18n="Guides">{% if footer_en %}Guides{% else %}Kılavuzlar{% endif %}</span></a></li>
-          <li><a href="{{ language_prefix | append: '/arsiv/' | relative_url }}"><span data-i18n="Archive directory">{% if footer_en %}Archive directory{% else %}Arşiv dizini{% endif %}</span></a></li>
-          <li><a href="{{ language_prefix | append: '/about/' | relative_url }}"><span data-i18n="About the guides">{% if footer_en %}About the guides{% else %}Kılavuzlar hakkında{% endif %}</span></a></li>
+          <li><a href="{{ language_prefix | append: '/' | relative_url }}">kilavuzlar/<span class="console-sr-only"> — <span data-i18n="Guides">{% if footer_en %}Guides{% else %}Kılavuzlar{% endif %}</span></span></a></li>
+          <li><a href="{{ language_prefix | append: '/arsiv/' | relative_url }}">arsiv/<span class="console-sr-only"> — <span data-i18n="Archive directory">{% if footer_en %}Archive directory{% else %}Arşiv dizini{% endif %}</span></span></a></li>
+          <li><a href="{{ language_prefix | append: '/about/' | relative_url }}">about.txt<span class="console-sr-only"> — <span data-i18n="About the guides">{% if footer_en %}About the guides{% else %}Kılavuzlar hakkında{% endif %}</span></span></a></li>
           <li><a href="https://github.com/Zaryob/kilavuzlar">GitHub <span aria-hidden="true">↗</span></a></li>
         </ul>
       </nav>
