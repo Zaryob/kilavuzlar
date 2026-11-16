@@ -10,7 +10,8 @@
 (() => {
   const article = document.querySelector('.guide-article-layout > article');
   const headings = article?.querySelectorAll('h2[id], h3[id]');
-  if (!headings || headings.length < 2) return;
+  // The guides index repeats the sidebar directory in its own sections; the sidebar is its navigation.
+  if (!headings || headings.length < 2 || article.hasAttribute('data-guides-index')) return;
 
   const nav = document.createElement('nav');
   nav.className = 'guide-toc';
