@@ -26,6 +26,9 @@ Kılavuzlar, sistem yazılımı ve geliştirme ortamları için test edilmiş, p
 
 ## Linux ve Çekirdek
 
+- [Linux Thread Scheduling Yapısı](https://zaryob.github.io/kilavuzlar/linux/thread-scheduling-yapisi/): 1:1 NPTL iş parçacığı modeli, sched_class hiyerarşisi, CFS ve EEVDF vruntime hesabı, bağlam değişimi ve SMP yük dengeleme.
+- [Ubuntu Çekirdek Yapılandırmaları](https://zaryob.github.io/kilavuzlar/linux/ubuntu-kernel-konfigurasyonlari/): generic, lowlatency ve HWE çekirdeklerinin mimarisi, kurulumu ve GRUB yönetimi.
+- [Headless Sistemlerde Çekirdek Değişimi](https://zaryob.github.io/kilavuzlar/linux/headless-kernel-degisimi/): grub-reboot ile tek seferlik generic, lowlatency ve HWE geçişleri, panic ve recordfail güvenlik yapılandırmaları.
 - [perf ile CPU Darboğazı Analizi](https://zaryob.github.io/kilavuzlar/linux/perf-ile-cpu-darbogazi/): Linux perf aracıyla örnekleme, donanım sayaçları ve analiz.
 - [Jetson Orin Nano OpenCLAW Kurulumu](https://zaryob.github.io/kilavuzlar/linux/jetson-orin-nano-openclaw-kurulumu/): NVIDIA Jetson üzerinde yapay zeka ve sistem altyapısı.
 - [LVM Bölümünü Canlı Büyütmek](https://zaryob.github.io/kilavuzlar/linux/lvm-bolumunu-buyutmek/): Çevrimiçi disk alanı genişletme adımları.

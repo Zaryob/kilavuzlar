@@ -28,6 +28,9 @@ redirect_from:
 - [LVM bölümünü veri kaybetmeden büyütmek](linux/lvm-bolumunu-buyutmek.md): lsblk, pvresize, lvextend ve resize2fs ile çevrimiçi disk genişletme.
 - [perf ile CPU darboğazı bulmak](linux/perf-ile-cpu-darbogazi.md): Profilleme, çağrı grafikleri ve flame graph analizi.
 - [NVIDIA Jetson Orin Nano üzerinde OpenClaw kurulumu](linux/jetson-orin-nano-openclaw-kurulumu.md): 8 GB ARM64 ortamında Ollama, Qwen 3.5 2B ve sistem servisleri ile yerel yapay zeka asistanı.
+- [Ubuntu çekirdek yapılandırmaları](linux/ubuntu-kernel-konfigurasyonlari.md): generic, lowlatency ve HWE çekirdeklerinin mimarisi, kurulumu ve GRUB yönetimi.
+- [Linux thread scheduling yapısı](linux/thread-scheduling-yapisi.md): 1:1 NPTL modeli, sched_class, CFS/EEVDF vruntime hesabı, bağlam değişimi ve SMP yük dengeleme.
+- [Headless sistemlerde çekirdek değişimi](linux/headless-kernel-degisimi.md): grub-reboot ile bir sonraki açılışta tek seferlik generic, lowlatency ve HWE geçişi, panic ve recordfail güvenlik ayarları.
 
 ## C++
 

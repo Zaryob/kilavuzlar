@@ -20,6 +20,9 @@ translated: '2026-11-03'
 - [Expanding an LVM volume without losing data](linux/lvm-bolumunu-buyutmek.md): online disk expansion with lsblk, pvresize, lvextend and resize2fs.
 - [Finding CPU bottlenecks with perf](linux/perf-ile-cpu-darbogazi.md): profiling, call graphs and flame graph analysis.
 - [Installing OpenClaw on NVIDIA Jetson Orin Nano](linux/jetson-orin-nano-openclaw-kurulumu.md): local AI assistant with Ollama, Qwen 3.5 2B, and system services in an 8 GB ARM64 environment.
+- [Ubuntu kernel configurations](linux/ubuntu-kernel-konfigurasyonlari.md): generic, lowlatency, and HWE architectures, installation, and GRUB management.
+- [Linux thread scheduling architecture](linux/thread-scheduling-yapisi.md): 1:1 NPTL model, sched_class hierarchy, CFS/EEVDF vruntime calculation, context switching, and SMP load balancing.
+- [Headless kernel switching](linux/headless-kernel-degisimi.md): one-shot transition between generic, lowlatency, and HWE variants using grub-reboot, panic handling, and recordfail safety configurations.
 
 ## C++
 
