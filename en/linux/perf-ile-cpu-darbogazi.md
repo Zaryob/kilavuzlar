@@ -2,9 +2,8 @@
 title: Finding CPU bottlenecks with perf on Linux
 permalink: /en/linux/perf-ile-cpu-darbogazi/
 status: duzenlendi
-reviewed: 2026-11-14
-scope: CPU sampling, call graphs and Brendan Gregg Flame Graph analysis with perf
-  on Linux 6.x.
+reviewed: 2026-11-20
+scope: CPU sampling, call graphs, hardware counters and Brendan Gregg Flame Graph analysis with perf on Linux 6.x.
 lang: en
 translation_key: guide-linux-perf-ile-cpu-darbogazi
 translation_of: /linux/perf-ile-cpu-darbogazi/
@@ -15,7 +14,7 @@ translated: '2026-11-03'
 
 The Linux `perf` tool uses hardware Performance Monitoring Unit (PMU) counters and kernel tracepoints to investigate which functions consume CPU time.
 
-A properly configured profile can reveal expensive loops, excessive memory accesses, L1/L3 cache misses and call-stack costs in an interactive **flame graph**.
+A properly configured profile can reveal expensive loops, hot call chains and function execution costs in an interactive **flame graph**. When paired with hardware counters, it also clarifies cache (L1/L3) misses and memory stall latencies.
 
 ## 1. Kernel permissions and system settings
 
@@ -114,14 +113,51 @@ Select a CPU-intensive function and press `a`, or run `perf annotate <fonksiyon_
        │    00000000000011a0 <KarmasikHesapla>:
   0.03 │        push   %rbp
   1.20 │        mov    %rsp,%rbp
- 42.50 │ 11b0:  mov    (%rdi,%rax,4),%edx     <-- %42.5 CPU burada bekliyor (Bellek erişimi / Cache miss)
- 51.10 │        add    %edx,%ecx
+ 42.50 │ 11b0:  mov    (%rdi,%rax,4),%edx     <-- 42.5% of samples attributed to this instruction
+ 51.10 │        add    %edx,%ecx              <-- 51.1% of samples attributed here (data dependency / skid)
   4.20 │        inc    %rax
   0.97 │        cmp    %rsi,%rax
        │        jne    11b0
 ```
 
-In this example, 42% of CPU cycles are attributed to reading an array element from RAM.
+> **Important: Sample density alone does not prove cache misses or RAM stalls!**
+>
+> By default, `perf record -F 99 -g` samples CPU cycles (`cycles` event). The percentages in `perf annotate` represent the fraction of CPU cycle samples recorded while the instruction pointer was at or immediately after that instruction; they do not directly prove the CPU is waiting on RAM or that a cache miss occurred.
+>
+> In modern out-of-order, pipelined processors, high sample density on an instruction can occur for multiple reasons:
+> 1. **Loop frequency:** The instruction executes frequently in a tight loop.
+> 2. **Data dependency stalls:** The subsequent `add` instruction (51.10%) may be stalled waiting for operand `%edx` loaded by `mov`.
+> 3. **Instruction skid:** The delay between PMU counter overflow and interrupt delivery can attribute samples to neighbouring instructions unless precise sampling mechanisms (such as Intel PEBS or AMD IBS) are used.
+>
+> Therefore, high sample density in `perf annotate` alone cannot be taken as proof of a cache miss or memory wait; it must be substantiated with hardware counters.
+
+### Proving memory bottlenecks with hardware counters (PMU)
+
+To confirm whether a hotspot is truly memory-bound or cache-bound, corroborate the profile with PMU hardware counters:
+
+```bash
+# 1. Measure cycles, instructions, and cache misses:
+perf stat -e cycles,instructions,cache-misses,cache-references,L1-dcache-load-misses,LLC-load-misses -- ./hesaplayici
+```
+
+Key indicators:
+- **IPC (Instructions Per Cycle):** A low IPC (< 1.0) coupled with high `cache-misses` or `LLC-load-misses` (Last Level Cache misses) confirms that CPU cycles are lost to memory stalls.
+- **Topdown analysis:** On Intel/modern x86 architectures, running `perf stat --topdown -- ./hesaplayici` distinguishes whether the bottleneck is *Backend Bound -> Memory Bound* or *Core Bound*.
+
+To sample cache misses directly:
+
+```bash
+# Sample cache misses directly:
+perf record -e cache-misses -c 1000 -g -- ./hesaplayici
+perf report
+```
+
+Or profile memory access latencies and hit levels (L1, L2, LLC, RAM) using `perf mem`:
+
+```bash
+perf mem record -- ./hesaplayici
+perf mem report --stdio
+```
 
 ## 5. Generating a flame graph
 

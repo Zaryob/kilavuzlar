@@ -4,8 +4,8 @@ lang: tr
 title: "Linux'ta perf ile CPU darboğazı bulmak"
 permalink: /linux/perf-ile-cpu-darbogazi/
 status: duzenlendi
-reviewed: 2026-11-14
-scope: Linux 6.x çekirdeğinde perf aracı ile CPU örnekleme, çağrı grafikleri ve Brendan Gregg Flame Graph analizi.
+reviewed: 2026-11-20
+scope: Linux 6.x çekirdeğinde perf aracı ile CPU örnekleme, çağrı grafikleri, donanım sayaçları ve Brendan Gregg Flame Graph analizi.
 ---
 
 # Linux'ta perf ile CPU darboğazı bulmak
@@ -14,9 +14,10 @@ Linux çekirdeğiyle bütünleşik gelen `perf` aracı, donanımsal Performans �
 (PMU) sayaçlarını ve çekirdek izleme noktalarını (tracepoints) kullanarak uygulamalarda
 en çok CPU harcayan fonksiyonları nano-saniye hassasiyetinde tespit eder.
 
-Doğru yapılandırılmış bir `perf` profillemesi; döngü darboğazlarını, aşırı bellek erişimlerini,
-önbellek (L1/L3 cache) ıskalamalarını ve çağrı yığınındaki gecikmeleri görsel bir
-**Alev Grafiği (Flame Graph)** üzerinde net biçimde görmemizi sağlar.
+Doğru yapılandırılmış bir `perf` profillemesi; döngü darboğazlarını, CPU'yu tüketen sıcak çağrı
+yollarını ve fonksiyon maliyetlerini görsel bir **Alev Grafiği (Flame Graph)** üzerinde
+görmemizi sağlar. Donanım sayaçlarıyla desteklendiğinde ise önbellek (L1/L3 cache) ıskalamaları
+ve bellek bekleme süreleri net biçimde tespit edilebilir.
 
 ## 1. Çekirdek izinleri ve sistem ayarları
 
@@ -121,14 +122,51 @@ En çok CPU tüketen fonksiyonun üzerine gelip `a` tuşuna basarak (veya termin
        │    00000000000011a0 <KarmasikHesapla>:
   0.03 │        push   %rbp
   1.20 │        mov    %rsp,%rbp
- 42.50 │ 11b0:  mov    (%rdi,%rax,4),%edx     <-- %42.5 CPU burada bekliyor (Bellek erişimi / Cache miss)
- 51.10 │        add    %edx,%ecx
+ 42.50 │ 11b0:  mov    (%rdi,%rax,4),%edx     <-- Örneklerin %42.5'i bu komutta toplandı
+ 51.10 │        add    %edx,%ecx              <-- Örneklerin %51.1'i bu komutta (bağımlılık / kayma)
   4.20 │        inc    %rax
   0.97 │        cmp    %rsi,%rax
        │        jne    11b0
 ```
 
-Burada CPU döngülerinin %42'sinin dizi elemanını RAM'den okurken harcandığı net şekilde görülür.
+> **Önemli: Örnek yoğunluğu tek başına önbellek ıskalamasını veya RAM beklemesini kanıtlamaz!**
+>
+> `perf record -F 99 -g` varsayılan olarak `cycles` (CPU döngüleri) olayını örnekler. `perf annotate` çıktısındaki yüzde, işlemcinin komut işaretçisinin (instruction pointer) o komut üzerindeyken yakalandığı örneklerin oranını gösterir; doğrudan "RAM'den veri bekleniyor" veya "kesinlikle cache miss var" anlamına gelmez.
+>
+> Modern işlemcilerde (sırasız yürütme / out-of-order execution, derin işlem hatları) bir komut satırında örnek yığılması birkaç farklı nedenden kaynaklanabilir:
+> 1. **Döngü vuruşu:** Komutun çok sık çalıştırılması.
+> 2. **Veri bağımlılığı gecikmesi (data dependency stall):** Örneğin yukarıdaki `add` komutu (%51.10), bir önceki `mov` komutunun `%edx` yazmacına getireceği veriyi beklerken işlem hattı durakladığı için yüksek örnek alabilir.
+> 3. **Kesme kayması (Instruction skid):** PMU sayacı taştığında çekirdek kesmesi (interrupt) üretilene kadar işlemci birkaç komut ilerleyebilir (Intel PEBS veya AMD IBS gibi hassas donanım mekanizmaları kullanılmadıkça).
+>
+> Bu nedenle `perf annotate` çıktısındaki örnekleme yoğunluğu tek başına önbellek ıskalaması veya RAM beklemesi olarak yorumlanamaz; mutlaka donanım sayaçlarıyla desteklenmelidir.
+
+### Donanım sayaçlarıyla (PMU) bellek darboğazını doğrulama
+
+Bir fonksiyon veya komut satırındaki sıcak noktanın bellek erişimi kaynaklı olduğunu kanıtlamak için Performans İzleme Birimi (PMU) sayaçlarından yararlanılır:
+
+```bash
+# 1. Genel CPU döngüsü, komut sayısı ve önbellek ıskalamalarını ölçün:
+perf stat -e cycles,instructions,cache-misses,cache-references,L1-dcache-load-misses,LLC-load-misses -- ./hesaplayici
+```
+
+Burada incelenecek temel göstergeler:
+- **IPC (Instructions Per Cycle):** Eğer IPC değeri düşükse (örneğin < 1.0) ve `cache-misses` ya da `LLC-load-misses` (Son Seviye Önbellek ıskalamaları) yüksekse, CPU'nun komut yürütmek yerine bellek hiyerarşisinden veri beklerken durakladığı (memory stall) kesinleşir.
+- **Topdown analizi:** Modern x86 işlemcilerde `perf stat --topdown -- ./hesaplayici` komutu, darboğazın *Backend Bound -> Memory Bound* (Bellek sınırlı) mu yoksa *Core Bound* (Hesaplama sınırlı) mu olduğunu doğrudan sınıflandırır.
+
+Doğrudan önbellek ıskalamalarını profilleyip hangi fonksiyonların buna yol açtığını görmek için:
+
+```bash
+# Önbellek ıskalamalarını örnekleyerek kayıt alın:
+perf record -e cache-misses -c 1000 -g -- ./hesaplayici
+perf report
+```
+
+Bellek erişimlerinin gecikmesini ve verinin hangi önbellek kademesinden (L1, L2, LLC veya RAM) geldiğini satır satır analiz etmek için `perf mem`:
+
+```bash
+perf mem record -- ./hesaplayici
+perf mem report --stdio
+```
 
 ## 5. Flame Graph (Alev Grafiği) üretimi
 
