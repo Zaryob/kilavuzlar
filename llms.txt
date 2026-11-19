@@ -1,0 +1,38 @@
+# Kılavuzlar — Sistem Programlama ve Yazılım Kılavuzları
+
+> Linux sistem yönetimi, modern C++, Docker, derleyiciler ve sanallaştırma üzerine derinlemesine Türkçe teknik rehberler.
+
+Kılavuzlar, sistem yazılımı ve geliştirme ortamları için test edilmiş, pratik ve doğrudan uygulanabilir rehberler içerir.
+
+## Kılavuz Dizini
+
+- [Kılavuzlar Ana Sayfa](https://zaryob.github.io/kilavuzlar/): Tüm teknik kılavuzların kategorize edilmiş dizini.
+- [Hakkında](https://zaryob.github.io/kilavuzlar/about/): Projenin kapsamı ve yaklaşımı.
+
+## C++ ve Derleme Sistemleri
+
+- [CMake ile Taşınabilir C++ Projesi](https://zaryob.github.io/kilavuzlar/cpp/tasinabilir-cmake-projesi/): Modern CMake (3.21+), target-tabanlı mimari, CMakePresets ve çapraz platform derleme.
+- [Tracy ile Profilleme](https://zaryob.github.io/kilavuzlar/cpp/tracy-ile-profilleme/): Gerçek zamanlı kare ve fonksiyon profilleme, bellek tahsis izleme.
+- [vcpkg ile Bağımlılık Yönetimi](https://zaryob.github.io/kilavuzlar/cpp/vcpkg-bagimlilik-yonetimi/): Manifest modu, ikili önbellekleme (binary caching) ve CMake entegrasyonu.
+- [GCC ve Clang Geçiş Problemleri](https://zaryob.github.io/kilavuzlar/cpp/gcc-clang-gecis-problemleri/): Uyarı farklılıkları, şablon ayrıştırma ve ABI uyumluluğu.
+
+## Docker ve Konteynerler
+
+- [Çok Mimarili Docker İmajları](https://zaryob.github.io/kilavuzlar/docker/coklu-mimari-imajlar/): Docker Buildx ve QEMU ile amd64 ve arm64 mimarileri için çoklu imaj derleme.
+- [C++ Derleme ve Test Konteynerleri](https://zaryob.github.io/kilavuzlar/docker/cpp-derleme-ve-test/): İzole ve tekrarlanabilir derleme ortamları kurgulama.
+- [Docker'da GUI Uygulaması Çalıştırmak](https://zaryob.github.io/kilavuzlar/docker/gui-uygulamasi-calistirmak/): X11 ve Wayland soket aktarımı ile masaüstü uygulamaları çalıştırma.
+- [Konteyner İçinden USB Aygıt Erişimi](https://zaryob.github.io/kilavuzlar/docker/usb-aygit-erisimi/): Gömülü cihaz programlayıcıları ve seri port cihazlarına erişim.
+- [Scratch İmajı ile Minimal Statik Uygulama](https://zaryob.github.io/kilavuzlar/docker/scratch-ile-statik-uygulama/): Sıfır bağımlılıklı minimal konteyner üretimi.
+
+## Linux ve Çekirdek
+
+- [perf ile CPU Darboğazı Analizi](https://zaryob.github.io/kilavuzlar/linux/perf-ile-cpu-darbogazi/): Linux perf aracıyla örnekleme, donanım sayaçları ve analiz.
+- [Jetson Orin Nano OpenCLAW Kurulumu](https://zaryob.github.io/kilavuzlar/linux/jetson-orin-nano-openclaw-kurulumu/): NVIDIA Jetson üzerinde yapay zeka ve sistem altyapısı.
+- [LVM Bölümünü Canlı Büyütmek](https://zaryob.github.io/kilavuzlar/linux/lvm-bolumunu-buyutmek/): Çevrimiçi disk alanı genişletme adımları.
+
+## Sanallaştırma ve Geliştirme Ortamı
+
+- [Apple Silicon Üzerinde ARM64 Linux](https://zaryob.github.io/kilavuzlar/sanallastirma/apple-silicon-arm64-linux/): Hypervisor.framework ve sanal makine yapılandırması.
+- [macOS ile Linux Arasında USB/IP](https://zaryob.github.io/kilavuzlar/sanallastirma/macos-linux-usbip/): Ağ üzerinden USB aygıt paylaşımı.
+- [Vim Tuş Kombinasyonları](https://zaryob.github.io/kilavuzlar/vim/vim-tus-kombinasyonlari/): Hızlı gezinme, metin nesneleri ve düzenleme pratikleri.
+- [Emacs ile CMake ve LLDB](https://zaryob.github.io/kilavuzlar/emacs/cmake-ve-lldb/): C++ geliştirme ve hata ayıklama ortamı.
