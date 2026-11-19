@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="{{ page.lang | default: site.lang | default: 'tr' }}">
+{% assign document_lang = page.lang | default: site.lang | default: 'tr' %}
+<html lang="{{ document_lang }}"{% if page.translation_key %} data-route-language="{{ document_lang | split: '-' | first }}"{% endif %}>
   <head>
     {% include console-alternates.html %}
     <meta charset="utf-8">

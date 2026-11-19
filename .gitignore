@@ -6,3 +6,6 @@ vendor
 .bundle
 
 *.swp
+
+.omc/
+.codegraph/
