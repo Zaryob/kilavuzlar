@@ -161,6 +161,8 @@ clang++ -fopenmp main.cpp -o uygulama
 | **Warnings** | Clang warnings under `-Werror` | Separate compiler-specific flags; `-Wno-unknown-warning-option` may help. |
 | **OpenMP** | Mixed `libgomp` / `libomp` | Link a single OpenMP runtime. |
 
+Use [Execmap’s ABI experiments](https://zaryob.github.io/execmap/rehberler/abi.html) to inspect a small binary compatibility problem through calling conventions, C++ object layout, and ELF symbol versions.
+
 ## Sources and verification environment
 
 - [LLVM Clang Compiler User’s Manual](https://clang.llvm.org/docs/UsersManual.html)

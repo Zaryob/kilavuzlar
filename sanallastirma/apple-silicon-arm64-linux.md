@@ -196,6 +196,8 @@ Linux ubuntu-vm 6.8.0-31-generic #31-Ubuntu SMP PREEMPT_DYNAMIC arm64 aarch64 GN
 Çıkmak için seri konsol terminalinde `Ctrl + A` tuşuna basıp ardından `x` harfine basmanız
 QEMU'yu anında kapatacaktır.
 
+Linux konuğu hazır olduğunda [Wire’ın sanal CAN laboratuvarını](https://zaryob.github.io/wire/tr/buses/can/labs/#virtual-can) deneyebilirsiniz. Konuk çekirdeğinde `vcan` desteği varsa bir CAN denetleyicisi ya da USB aygıtı bağlamadan SocketCAN trafiği üretebilir ve yakalayabilirsiniz.
+
 ## Kaynaklar ve doğrulama ortamı
 
 - [QEMU Documentation - System Emulation for Arm](https://www.qemu.org/docs/master/system/target-arm.html)

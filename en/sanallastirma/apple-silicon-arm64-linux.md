@@ -182,6 +182,8 @@ Linux ubuntu-vm 6.8.0-31-generic #31-Ubuntu SMP PREEMPT_DYNAMIC arm64 aarch64 GN
 
 To exit QEMU immediately, press `Ctrl + A` and then `x` in the serial-console terminal.
 
+Once the guest is running, try the [Wire virtual CAN lab](https://zaryob.github.io/wire/buses/can/labs/#virtual-can). A guest kernel with `vcan` support can generate and capture SocketCAN traffic without a physical CAN controller or USB passthrough.
+
 ## Sources and verification environment
 
 - [QEMU documentation — Arm system emulation](https://www.qemu.org/docs/master/system/target-arm.html)

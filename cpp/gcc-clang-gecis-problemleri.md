@@ -182,6 +182,8 @@ clang++ -fopenmp main.cpp -o uygulama
 | **Uyarılar** | `-Werror` altındaki Clang uyarıları | `-Wno-unknown-warning-option` ile derleyiciye özgü bayrakları ayırın |
 | **OpenMP** | `libgomp` / `libomp` karışımı | Yalnızca tek bir OpenMP çalışma zamanı bağlayın |
 
+Bir ikili uyumluluk sorununu küçük bir örnekle incelemek için [Execmap’in ABI deneylerinde](https://zaryob.github.io/execmap/rehberler/abi.html) çağrı kurallarını, C++ nesne yerleşimini ve ELF sembol sürümlerini karşılaştırın.
+
 ## Kaynaklar ve doğrulama ortamı
 
 - [LLVM Clang Compiler User's Manual](https://clang.llvm.org/docs/UsersManual.html)
